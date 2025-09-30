@@ -1,0 +1,1 @@
+{'role': 'user', 'content': '<tool_result> <create-file> ToolResult(success=True, output="File \'prisma/schema-ai-extensions.prisma\' created successfully.") </create-file> </tool_result>'}

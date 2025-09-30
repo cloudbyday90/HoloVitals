@@ -44,6 +44,9 @@
     "tesseract.js": "^6.0.1",
     "zustand": "^5.0.8"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",

@@ -1,0 +1,17 @@
+
+🙌  Seed your database
+
+Usage
+
+  $ prisma db seed [options]
+
+Options
+
+  -h, --help   Display this help message
+    --config   Custom path to your Prisma config file
+
+Examples
+
+  Passing extra arguments to the seed command
+    $ prisma db seed -- --arg1 value1 --arg2 value2
+

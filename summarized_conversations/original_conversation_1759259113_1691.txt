@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': '<function_calls>\n<execute-command>\ncd medical-analysis-platform && mv prisma/schema-updated.prisma prisma/schema.prisma\n</execute-command>\n</function_calls>'}

@@ -1,0 +1,1 @@
+{'role': 'user', 'content': "/fast-deep-research Okay, let's look at everything we have developed thus far. Look for optimizations, changes, and other code defects. Ensure our roadmap looks correct."}

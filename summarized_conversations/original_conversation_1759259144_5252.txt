@@ -1,0 +1,1 @@
+{'role': 'user', 'content': '/fast-deep-research Can we resolve this warning please? The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`)'}

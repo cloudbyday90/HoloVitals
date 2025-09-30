@@ -1,0 +1,18 @@
+total 116
+drwxr-xr-x 9 root root  4096 Sep 30 18:54 .
+drwxr-xr-x 1 root root   122 Sep 30 17:49 ..
+drwxr-xr-x 8 root root  4096 Sep 30 19:01 .git
+-rw-r--r-- 1 root root   368 Sep 30 18:43 .gitignore
+-rw-r--r-- 1 root root 11740 Sep 30 15:01 FINAL_SUMMARY.md
+-rw-r--r-- 1 root root  7745 Sep 30 15:02 GET_STARTED.md
+-rw-r--r-- 1 root root   741 Sep 30 18:43 HoloVitals.iml
+-rw-r--r-- 1 root root  1076 Sep 30 18:43 LICENSE
+-rw-r--r-- 1 root root  8421 Sep 30 18:35 README.md
+-rw-r--r-- 1 root root 13774 Sep 30 17:06 README_DEV_QA_SYSTEM.md
+drwxr-xr-x 2 root root  4096 Sep 30 19:00 docs
+drwxr-xr-x 9 root root  4096 Sep 30 18:54 medical-analysis-platform
+drwxr-xr-x 2 root root  4096 Sep 30 19:01 outputs
+drwxr-xr-x 2 root root   160 Sep 30 18:19 prisma
+drwxr-xr-x 3 root root    22 Sep 30 16:51 src
+drwxr-xr-x 2 root root 28672 Sep 30 19:06 summarized_conversations
+-rw-r--r-- 1 root root  2476 Sep 30 18:59 todo.md

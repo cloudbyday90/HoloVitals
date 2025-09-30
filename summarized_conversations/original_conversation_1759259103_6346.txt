@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "There's a merge conflict in .gitignore. Let me resolve it:\n\n<function_calls>\n<execute-command>\ngit checkout --theirs .gitignore\n</execute-command>\n</function_calls>"}

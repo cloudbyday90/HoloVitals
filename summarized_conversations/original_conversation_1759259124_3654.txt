@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "Now let's install ts-node as a dev dependency:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && npm install --save-dev ts-node @types/bcrypt\n</execute-command>\n</function_calls>"}
