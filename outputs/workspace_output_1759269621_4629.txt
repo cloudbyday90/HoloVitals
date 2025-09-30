@@ -1,0 +1,150 @@
+
+> medical-analysis-platform@0.1.0 test
+> jest AnalysisQueueService
+
+FAIL __tests__/services/AnalysisQueueService.test.ts
+  AnalysisQueueService
+    Singleton Pattern
+      ✓ should return the same instance (2 ms)
+    Task Submission
+      ✕ should submit a task with default priority (1 ms)
+      ✕ should submit a task with custom priority (1 ms)
+      ✕ should submit a task with metadata (1 ms)
+      ✕ should emit taskSubmitted event (1 ms)
+    Task Retrieval
+      ✕ should get task by ID
+      ✕ should return null for non-existent task
+      ✕ should get user tasks (1 ms)
+      ✕ should filter user tasks by status (1 ms)
+      ✕ should filter user tasks by type
+      ✕ should limit user tasks
+    Task Cancellation
+      ✕ should cancel a pending task
+      ✕ should not cancel task for wrong user
+      ✕ should not cancel completed task
+      ✕ should emit taskCancelled event (1 ms)
+    Task Processing
+      ✓ should register a task processor
+      ✕ should update task progress (1 ms)
+      ✕ should emit taskProgress event
+      ✕ should clamp progress to 0-100 range (1 ms)
+    Priority Handling
+      ✕ should set correct max retries for URGENT priority
+      ✕ should set correct max retries for HIGH priority (1 ms)
+      ✕ should set correct max retries for NORMAL priority
+      ✕ should set correct max retries for LOW priority
+    Queue Statistics
+      ✕ should get queue statistics
+      ✕ should have non-negative statistics
+    Concurrent Processing
+      ✓ should set max concurrent tasks
+      ✕ should handle multiple task submissions
+    Task Types
+      ✕ should handle DOCUMENT_ANALYSIS type
+      ✕ should handle CHAT_RESPONSE type
+      ✕ should handle BATCH_PROCESSING type
+      ✕ should handle REPORT_GENERATION type
+    Edge Cases
+      ✕ should handle empty data object
+      ✕ should handle complex data object
+    Cleanup
+      ✕ should clean up old tasks
+
+  ● AnalysisQueueService › Task Submission › should submit a task with default priority
+
+    TypeError: Cannot read properties of undefined (reading 'create')
+
+      134 |
+      135 |     // Create task in database
+    > 136 |     const task = await prisma.analysisTask.create({
+          |                                            ^
+      137 |       data: {
+      138 |         userId: request.userId,
+      139 |         type: request.type,
+
+      at AnalysisQueueService.create [as submitTask] (lib/services/AnalysisQueueService.ts:136:44)
+      at Object.submitTask (__tests__/services/AnalysisQueueService.test.ts:36:34)
+
+  ● AnalysisQueueService › Task Submission › should submit a task with custom priority
+
+    TypeError: Cannot read properties of undefined (reading 'create')
+
+      134 |
+      135 |     // Create task in database
+    > 136 |     const task = await prisma.analysisTask.create({
+          |                                            ^
+      137 |       data: {
+      138 |         userId: request.userId,
+      139 |         type: request.type,
+
+      at AnalysisQueueService.create [as submitTask] (lib/services/AnalysisQueueService.ts:136:44)
+      at Object.submitTask (__tests__/services/AnalysisQueueService.test.ts:52:34)
+
+  ● AnalysisQueueService › Task Submission › should submit a task with metadata
+
+    TypeError: Cannot read properties of undefined (reading 'create')
+
+      134 |
+      135 |     // Create task in database
+    > 136 |     const task = await prisma.analysisTask.create({
+          |                                            ^
+      137 |       data: {
+      138 |         userId: request.userId,
+      139 |         type: request.type,
+
+      at AnalysisQueueService.create [as submitTask] (lib/services/AnalysisQueueService.ts:136:44)
+      at Object.submitTask (__tests__/services/AnalysisQueueService.test.ts:65:34)
+
+  ● AnalysisQueueService › Task Submission › should emit taskSubmitted event
+
+    TypeError: Cannot read properties of undefined (reading 'create')
+
+      134 |
+      135 |     // Create task in database
+    > 136 |     const task = await prisma.analysisTask.create({
+          |                                            ^
+      137 |       data: {
+      138 |         userId: request.userId,
+      139 |         type: request.type,
+
+      at AnalysisQueueService.create [as submitTask] (lib/services/AnalysisQueueService.ts:136:44)
+      at Object.submitTask (__tests__/services/AnalysisQueueService.test.ts:79:21)
+
+  ● AnalysisQueueService › Task Retrieval › should get task by ID
+
+    TypeError: Cannot read properties of undefined (reading 'create')
+
+      134 |
+      135 |     // Create task in database
+    > 136 |     const task = await prisma.analysisTask.create({
+          |                                            ^
+      137 |       data: {
+      138 |         userId: request.userId,
+      139 |         type: request.type,
+
+      at AnalysisQueueService.create [as submitTask] (lib/services/AnalysisQueueService.ts:136:44)
+      at Object.submitTask (__tests__/services/AnalysisQueueService.test.ts:91:39)
+
+  ● AnalysisQueueService › Task Retrieval › should return null for non-existent task
+
+    TypeError: Cannot read properties of undefined (reading 'findUnique')
+
+      163 |    */
+      164 |   async getTask(taskId: string): Promise<AnalysisTask | null> {
+    > 165 |     const task = await prisma.analysisTask.findUnique({
+          |                                            ^
+      166 |       where: { id: taskId }
+      167 |     });
+      168 |
+
+      at AnalysisQueueService.findUnique [as getTask] (lib/services/AnalysisQueueService.ts:165:44)
+      at Object.getTask (__tests__/services/AnalysisQueueService.test.ts:104:34)
+
+  ● AnalysisQueueService › Task Retrieval › should get user tasks
+
+    TypeError: Cannot read properties of undefined (reading 'create')
+
+      134 |
+      135 |     // Create task in database
+    > 136 |     const task = await prisma.analysisTask.create({
+          |                                            ^

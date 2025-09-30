@@ -40,6 +40,7 @@ model User {
   chatbotCosts          ChatbotCost[]
   analysisCosts         AnalysisCost[]
   contextOptimizations  ContextOptimization[]
+  analysisTasks         AnalysisTask[]
   
   @@map("users")
 }
@@ -824,4 +825,33 @@ model ContextOptimization {
   @@index([userId])
   @@index([createdAt])
   @@index([strategy])
+}
+
+
+model AnalysisTask {
+  id                      String    @id @default(cuid())
+  userId                  String
+  type                    String
+  priority                String
+  status                  String
+  progress                Int       @default(0)
+  data                    String    @db.Text
+  result                  String?   @db.Text
+  error                   String?   @db.Text
+  retryCount              Int       @default(0)
+  maxRetries              Int       @default(2)
+  estimatedCompletionTime DateTime?
+  startedAt               DateTime?
+  completedAt             DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  metadata                String?   @db.Text
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([priority])
+  @@index([type])
+  @@index([createdAt])
 }
