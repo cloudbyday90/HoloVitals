@@ -1,0 +1,372 @@
+// AI Architecture Database Schema Extensions
+// Add these models to your existing schema.prisma file
+
+// ============================================================================
+// CHATBOT CONVERSATIONS
+// ============================================================================
+
+model ChatConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title     String?  // Optional conversation title
+  startedAt DateTime @default(now())
+  lastMessageAt DateTime @default(now())
+  
+  messages  ChatMessage[]
+  
+  @@index([userId])
+  @@index([lastMessageAt])
+}
+
+model ChatMessage {
+  id             String   @id @default(cuid())
+  conversationId String
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  role           String   // 'user' | 'assistant' | 'system'
+  content        String   @db.Text
+  timestamp      DateTime @default(now())
+  
+  // Metadata
+  type           String   @default("quick") // 'quick' | 'analysis' | 'notification'
+  confidence     Float?   // AI confidence score (0-1)
+  
+  // Escalation tracking
+  needsEscalation Boolean @default(false)
+  escalationReason String? @db.Text
+  escalatedToTaskId String? // Reference to AnalysisQueue task
+  
+  // Related entities
+  documentId     String?
+  analysisId     String?
+  
+  metadata       Json?    // Additional metadata
+  
+  @@index([conversationId])
+  @@index([timestamp])
+}
+
+// ============================================================================
+// ANALYSIS QUEUE SYSTEM
+// ============================================================================
+
+model AnalysisQueue {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Task details
+  type      String   // 'document_analysis' | 'complex_query' | 'comparison' | 'trend_analysis'
+  priority  Int      @default(3) // 1=URGENT, 2=HIGH, 3=NORMAL, 4=LOW
+  
+  // Content
+  prompt    String   @db.Text
+  documents Json     // Array of document IDs or content
+  
+  // Context analysis
+  totalTokens      Int
+  contextWindow    Int
+  needsSplitting   Boolean @default(false)
+  splitStrategy    String? // 'sequential' | 'parallel' | 'hierarchical'
+  estimatedCost    Float
+  recommendedModel String
+  
+  // Status tracking
+  status    String   @default("queued") // 'queued' | 'processing' | 'completed' | 'failed'
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+  
+  // Results
+  result    Json?
+  error     String?  @db.Text
+  
+  // Instance tracking
+  instanceId String?
+  instance   CloudInstance? @relation(fields: [instanceId], references: [id])
+  
+  // Cost tracking
+  actualCost Float?
+  
+  @@index([userId])
+  @@index([status])
+  @@index([priority, createdAt])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// CLOUD INSTANCE TRACKING
+// ============================================================================
+
+model CloudInstance {
+  id           String   @id @default(cuid())
+  
+  // Provider details
+  provider     String   // 'azure' | 'aws'
+  region       String
+  instanceType String
+  instanceId   String   @unique // Provider-specific instance ID
+  
+  // Model details
+  model        String   // 'gpt-4-turbo' | 'claude-3-opus' | etc.
+  
+  // Status
+  status       String   @default("provisioning") // 'provisioning' | 'ready' | 'executing' | 'deprovisioning' | 'terminated'
+  
+  // Timestamps
+  createdAt    DateTime @default(now())
+  readyAt      DateTime?
+  terminatedAt DateTime?
+  
+  // Cost tracking
+  costPerMinute Float
+  totalCost     Float   @default(0)
+  
+  // Relationships
+  tasks        AnalysisQueue[]
+  
+  // Metadata
+  metadata     Json?
+  
+  @@index([status])
+  @@index([createdAt])
+  @@index([provider, region])
+}
+
+// ============================================================================
+// COST TRACKING
+// ============================================================================
+
+model InstanceCost {
+  id           String   @id @default(cuid())
+  
+  // Instance details
+  instanceId   String
+  provider     String
+  instanceType String
+  model        String
+  
+  // Time tracking
+  createdAt    DateTime
+  terminatedAt DateTime
+  duration     Float    // minutes
+  
+  // Cost
+  costPerMinute Float
+  totalCost     Float
+  
+  // Usage details
+  tasksCompleted Int    @default(0)
+  tokensProcessed Int   @default(0)
+  
+  // Metadata
+  metadata     Json?
+  
+  @@index([createdAt])
+  @@index([provider])
+  @@index([model])
+}
+
+model ChatbotCost {
+  id        String   @id @default(cuid())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Interaction details
+  messageId String
+  timestamp DateTime @default(now())
+  
+  // Token usage
+  inputTokens  Int
+  outputTokens Int
+  totalTokens  Int
+  
+  // Cost
+  cost      Float
+  
+  // Model used
+  model     String   @default("gpt-3.5-turbo")
+  
+  @@index([userId])
+  @@index([timestamp])
+}
+
+model AnalysisCost {
+  id        String   @id @default(cuid())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Analysis details
+  taskId    String
+  timestamp DateTime @default(now())
+  
+  // Token usage
+  inputTokens  Int
+  outputTokens Int
+  totalTokens  Int
+  
+  // Cost breakdown
+  modelCost      Float  // Cost of LLM inference
+  infrastructureCost Float  // Cost of cloud instance
+  totalCost      Float
+  
+  // Model and instance used
+  model        String
+  instanceType String?
+  
+  // Duration
+  duration     Float  // minutes
+  
+  @@index([userId])
+  @@index([timestamp])
+}
+
+// ============================================================================
+// CONTEXT OPTIMIZATION
+// ============================================================================
+
+model PromptOptimization {
+  id        String   @id @default(cuid())
+  
+  // Original prompt
+  originalPrompt String @db.Text
+  originalTokens Int
+  
+  // Optimized prompt
+  optimizedPrompt String @db.Text
+  optimizedTokens Int
+  
+  // Optimization details
+  strategy       String  // 'compression' | 'splitting' | 'summarization'
+  tokenReduction Int     // Number of tokens saved
+  reductionPercent Float // Percentage reduction
+  
+  // Performance
+  executionTime  Float?  // seconds
+  successRate    Float?  // 0-1
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  
+  // Metadata
+  metadata  Json?
+  
+  @@index([createdAt])
+}
+
+model PromptSplit {
+  id        String   @id @default(cuid())
+  
+  taskId    String   // Reference to AnalysisQueue task
+  
+  // Split details
+  splitId   String   // Unique ID for this split
+  content   String   @db.Text
+  tokens    Int
+  order     Int
+  
+  // Dependencies
+  dependencies Json   // Array of split IDs this depends on
+  
+  // Status
+  status    String   @default("pending") // 'pending' | 'processing' | 'completed' | 'failed'
+  
+  // Result
+  result    Json?
+  error     String?  @db.Text
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+  
+  @@index([taskId])
+  @@index([order])
+}
+
+// ============================================================================
+// MODEL PERFORMANCE TRACKING
+// ============================================================================
+
+model ModelPerformance {
+  id        String   @id @default(cuid())
+  
+  // Model details
+  model     String
+  provider  String
+  
+  // Performance metrics
+  avgResponseTime Float  // seconds
+  avgTokensPerSecond Float
+  successRate Float      // 0-1
+  errorRate   Float      // 0-1
+  
+  // Cost metrics
+  avgCostPerRequest Float
+  avgCostPerToken   Float
+  
+  // Usage stats
+  totalRequests Int
+  totalTokens   Int
+  totalCost     Float
+  
+  // Time period
+  periodStart DateTime
+  periodEnd   DateTime
+  
+  // Metadata
+  metadata    Json?
+  
+  @@index([model])
+  @@index([periodStart])
+}
+
+// ============================================================================
+// SYSTEM HEALTH MONITORING
+// ============================================================================
+
+model SystemHealth {
+  id        String   @id @default(cuid())
+  
+  // Component
+  component String   // 'chatbot' | 'queue' | 'provisioner' | 'database' | etc.
+  
+  // Status
+  status    String   // 'healthy' | 'degraded' | 'down'
+  
+  // Metrics
+  responseTime Float? // milliseconds
+  errorRate    Float? // 0-1
+  throughput   Float? // requests per second
+  
+  // Resource usage
+  cpuUsage    Float?  // 0-100
+  memoryUsage Float?  // 0-100
+  diskUsage   Float?  // 0-100
+  
+  // Timestamp
+  timestamp DateTime @default(now())
+  
+  // Details
+  message   String?  @db.Text
+  metadata  Json?
+  
+  @@index([component])
+  @@index([timestamp])
+  @@index([status])
+}
+
+// ============================================================================
+// UPDATES TO EXISTING MODELS
+// ============================================================================
+
+// Add these relations to your existing User model:
+// chatConversations ChatConversation[]
+// analysisQueue     AnalysisQueue[]
+// chatbotCosts      ChatbotCost[]
+// analysisCosts     AnalysisCost[]

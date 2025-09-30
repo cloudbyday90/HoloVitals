@@ -1,0 +1,6 @@
+The directory medical-analysis-platform contains files that could conflict:
+
+  package.json
+
+Either try using a new directory name, or remove the files listed above.
+

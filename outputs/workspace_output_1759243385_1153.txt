@@ -1,0 +1,33 @@
+[?25l[2K[1G[36m?[39m [1mWould you like to use Turbopack? (recommended)[22m [90m›[39m No [90m/[39m [36m[4mYes[39m[24m[2K[1G[2K[1G[32m✔[39m [1mWould you like to use Turbopack? (recommended)[22m [90m…[39m No [90m/[39m [36m[4mYes[39m[24m
+[?25hCreating a new Next.js app in /workspace/medical-analysis-platform.
+
+Using npm.
+
+Initializing project with template: app-tw 
+
+
+Installing dependencies:
+- react
+- react-dom
+- next
+
+Installing devDependencies:
+- typescript
+- @types/node
+- @types/react
+- @types/react-dom
+- @tailwindcss/postcss
+- tailwindcss
+- eslint
+- eslint-config-next
+- @eslint/eslintrc
+
+
+added 398 packages, and audited 399 packages in 18s
+
+165 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+Success! Created medical-analysis-platform at /workspace/medical-analysis-platform
+
