@@ -1,0 +1,461 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String    @id @default(uuid())
+  email                 String    @unique
+  passwordHash          String    @map("password_hash")
+  mfaEnabled            Boolean   @default(false) @map("mfa_enabled")
+  mfaSecret             String?   @map("mfa_secret")
+  mfaBackupCodes        String?   @map("mfa_backup_codes")
+  failedLoginAttempts   Int       @default(0) @map("failed_login_attempts")
+  lastFailedLogin       DateTime? @map("last_failed_login")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  
+  patients              Patient[]
+  documents             Document[]
+  analysisSessions      AnalysisSession[]
+  sessions              UserSession[]
+  consentRequestsAsPatient ConsentGrant[] @relation("PatientConsents")
+  consentRequestsAsSpecialist ConsentGrant[] @relation("SpecialistConsents")
+  auditLogs             AuditLog[]
+  
+  @@map("users")
+}
+
+model Patient {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  firstName     String?   @map("first_name")
+  lastName      String?   @map("last_name")
+  dateOfBirth   DateTime? @map("date_of_birth")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents     Document[]
+  analysisSessions AnalysisSession[]
+  
+  @@map("patients")
+}
+
+model Document {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  patientId     String?   @map("patient_id")
+  filePath      String    @map("file_path")
+  fileName      String    @map("file_name")
+  fileSize      Int?      @map("file_size")
+  mimeType      String?   @map("mime_type")
+  documentType  String?   @map("document_type") // 'bloodwork', 'imaging', 'aftercare', etc.
+  uploadDate    DateTime  @default(now()) @map("upload_date")
+  documentDate  DateTime? @map("document_date") // Date of the actual medical document
+  status        String    @default("pending") // 'pending', 'processing', 'completed', 'failed'
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patient       Patient?  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  ocrResults    OcrResult[]
+  extractedData ExtractedData[]
+  sourceLinks   DocumentLink[] @relation("SourceDocument")
+  targetLinks   DocumentLink[] @relation("TargetDocument")
+  embeddings    DocumentEmbedding[]
+  
+  @@map("documents")
+}
+
+model OcrResult {
+  id              String    @id @default(uuid())
+  documentId      String    @map("document_id")
+  rawText         String    @map("raw_text") @db.Text
+  confidenceScore Float?    @map("confidence_score")
+  processedAt     DateTime  @default(now()) @map("processed_at")
+  
+  document        Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@map("ocr_results")
+}
+
+model ExtractedData {
+  id            String    @id @default(uuid())
+  documentId    String    @map("document_id")
+  dataType      String    @map("data_type") // 'test_result', 'diagnosis', 'medication', etc.
+  fieldName     String    @map("field_name")
+  fieldValue    String    @map("field_value") @db.Text
+  unit          String?
+  referenceRange String?  @map("reference_range")
+  isAbnormal    Boolean?  @map("is_abnormal")
+  extractedAt   DateTime  @default(now()) @map("extracted_at")
+  
+  document      Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@map("extracted_data")
+}
+
+model DocumentLink {
+  id                  String    @id @default(uuid())
+  sourceDocumentId    String    @map("source_document_id")
+  targetDocumentId    String    @map("target_document_id")
+  relationshipType    String    @map("relationship_type") // 'follow_up', 'related', 'supersedes', etc.
+  createdAt           DateTime  @default(now()) @map("created_at")
+  
+  sourceDocument      Document  @relation("SourceDocument", fields: [sourceDocumentId], references: [id], onDelete: Cascade)
+  targetDocument      Document  @relation("TargetDocument", fields: [targetDocumentId], references: [id], onDelete: Cascade)
+  
+  @@unique([sourceDocumentId, targetDocumentId])
+  @@map("document_links")
+}
+
+model AnalysisSession {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  patientId     String?   @map("patient_id")
+  sessionType   String    @map("session_type") // 'query', 'trend_analysis', 'insight_generation'
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patient       Patient?  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  interactions  AiInteraction[]
+  
+  @@map("analysis_sessions")
+}
+
+model AiInteraction {
+  id                String    @id @default(uuid())
+  sessionId         String    @map("session_id")
+  query             String    @db.Text
+  response          String?   @db.Text
+  contextDocuments  String[]  @map("context_documents") // Array of document IDs
+  createdAt         DateTime  @default(now()) @map("created_at")
+  
+  session           AnalysisSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@map("ai_interactions")
+}
+
+model DocumentEmbedding {
+  id            String    @id @default(uuid())
+  documentId    String    @map("document_id")
+  chunkIndex    Int       @map("chunk_index")
+  chunkText     String    @map("chunk_text") @db.Text
+  embedding     Float[]   // Store as array of floats
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  document      Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@map("document_embeddings")
+}
+
+// User Sessions for authentication
+model UserSession {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  expiresAt     DateTime  @map("expires_at")
+  ipAddress     String?   @map("ip_address")
+  userAgent     String?   @map("user_agent")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_sessions")
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// Consent Management
+model ConsentGrant {
+  id                      String    @id @default(uuid())
+  patientId               String    @map("patient_id")
+  specialistId            String    @map("specialist_id")
+  permissions             String    @db.Text // JSON array of permissions
+  reason                  String    @db.Text
+  requestedDuration       Int       @map("requested_duration") // in hours
+  urgency                 String    // 'routine', 'urgent', 'emergency'
+  status                  String    // 'pending', 'approved', 'active', 'expired', 'revoked', 'denied'
+  restrictions            String?   @db.Text // JSON array of restrictions
+  grantedAt               DateTime? @map("granted_at")
+  expiresAt               DateTime  @map("expires_at")
+  revokedAt               DateTime? @map("revoked_at")
+  revocationReason        String?   @map("revocation_reason") @db.Text
+  denialReason            String?   @map("denial_reason") @db.Text
+  lastAccessed            DateTime? @map("last_accessed")
+  accessCount             Int       @default(0) @map("access_count")
+  expirationWarningSent   Boolean   @default(false) @map("expiration_warning_sent")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  patient                 User      @relation("PatientConsents", fields: [patientId], references: [id], onDelete: Cascade)
+  specialist              User      @relation("SpecialistConsents", fields: [specialistId], references: [id], onDelete: Cascade)
+  accessLogs              AccessLog[]
+  
+  @@map("consent_grants")
+  @@index([patientId])
+  @@index([specialistId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+// Access Logs for consent-based access
+model AccessLog {
+  id            String    @id @default(uuid())
+  consentId     String    @map("consent_id")
+  specialistId  String    @map("specialist_id")
+  action        String
+  resource      String
+  ipAddress     String?   @map("ip_address")
+  userAgent     String?   @map("user_agent")
+  details       String?   @db.Text // JSON
+  timestamp     DateTime  @default(now())
+  success       Boolean   @default(true)
+  
+  consent       ConsentGrant @relation(fields: [consentId], references: [id], onDelete: Cascade)
+  
+  @@map("access_logs")
+  @@index([consentId])
+  @@index([specialistId])
+  @@index([timestamp])
+}
+
+// Audit Logs for HIPAA compliance
+model AuditLog {
+  id              String    @id @default(uuid())
+  userId          String    @map("user_id")
+  action          String
+  resource        String
+  resourceId      String    @map("resource_id")
+  details         String?   @db.Text // JSON
+  ipAddress       String?   @map("ip_address")
+  userAgent       String?   @map("user_agent")
+  sessionId       String?   @map("session_id")
+  severity        String    // 'low', 'medium', 'high', 'critical'
+  requiresReview  Boolean   @default(false) @map("requires_review")
+  reviewed        Boolean   @default(false)
+  reviewedBy      String?   @map("reviewed_by")
+  reviewedAt      DateTime? @map("reviewed_at")
+  reviewNotes     String?   @map("review_notes") @db.Text
+  consentId       String?   @map("consent_id")
+  timestamp       DateTime  @default(now())
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("audit_logs")
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([timestamp])
+  @@index([severity])
+  @@index([requiresReview])
+}
+
+// Notifications for patients
+model Notification {
+  id              String    @id @default(uuid())
+  patientId       String    @map("patient_id")
+  type            String    // 'request', 'expiring', 'expired', 'accessed'
+  message         String    @db.Text
+  requiresAction  Boolean   @default(false) @map("requires_action")
+  read            Boolean   @default(false)
+  readAt          DateTime? @map("read_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  @@map("notifications")
+  @@index([patientId])
+  @@index([read])
+  @@index([createdAt])
+}
+
+// Security Alerts
+model SecurityAlert {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  action        String
+  details       String    @db.Text // JSON
+  severity      String    @default("high")
+  acknowledged  Boolean   @default(false)
+  acknowledgedBy String?  @map("acknowledged_by")
+  acknowledgedAt DateTime? @map("acknowledged_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  @@map("security_alerts")
+  @@index([userId])
+  @@index([acknowledged])
+  @@index([createdAt])
+}
+
+// Patient Repository - Sandboxed per patient
+model PatientRepository {
+  id                      String    @id @default(uuid())
+  userId                  String    @unique @map("user_id")
+  primaryIdentityHash     String    @unique @map("primary_identity_hash")
+  secondaryIdentityHash   String    @map("secondary_identity_hash")
+  compositeIdentityHash   String    @unique @map("composite_identity_hash")
+  encryptedPersonalInfo   String    @map("encrypted_personal_info") @db.Text
+  hasMothersMaidenName    Boolean   @default(false) @map("has_mothers_maiden_name")
+  hasPreviousAddress      Boolean   @default(false) @map("has_previous_address")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  lastAccessedAt          DateTime? @map("last_accessed_at")
+  version                 Int       @default(1)
+  
+  diagnoses               PatientDiagnosis[]
+  medications             PatientMedication[]
+  allergies               PatientAllergy[]
+  vitalSigns              PatientVitalSign[]
+  procedures              PatientProcedure[]
+  immunizations           PatientImmunization[]
+  familyHistory           PatientFamilyHistory[]
+  
+  @@map("patient_repositories")
+  @@index([userId])
+  @@index([compositeIdentityHash])
+}
+
+// Patient Medical Data Tables
+
+model PatientDiagnosis {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  condition       String
+  icd10Code       String?   @map("icd10_code")
+  diagnosedDate   DateTime  @map("diagnosed_date")
+  status          String    // 'active', 'resolved', 'chronic'
+  severity        String?   // 'mild', 'moderate', 'severe'
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_diagnoses")
+  @@index([repositoryId])
+  @@index([diagnosedDate])
+}
+
+model PatientMedication {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  name            String
+  dosage          String
+  frequency       String
+  startDate       DateTime  @map("start_date")
+  endDate         DateTime? @map("end_date")
+  prescribedBy    String?   @map("prescribed_by")
+  purpose         String?   @db.Text
+  status          String    // 'active', 'discontinued', 'completed'
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_medications")
+  @@index([repositoryId])
+  @@index([status])
+}
+
+model PatientAllergy {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  allergen        String
+  type            String    // 'drug', 'food', 'environmental', 'other'
+  reaction        String
+  severity        String    // 'mild', 'moderate', 'severe', 'life-threatening'
+  diagnosedDate   DateTime? @map("diagnosed_date")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_allergies")
+  @@index([repositoryId])
+}
+
+model PatientVitalSign {
+  id                      String    @id @default(uuid())
+  repositoryId            String    @map("repository_id")
+  date                    DateTime
+  bloodPressureSystolic   Int?      @map("blood_pressure_systolic")
+  bloodPressureDiastolic  Int?      @map("blood_pressure_diastolic")
+  heartRate               Int?      @map("heart_rate")
+  temperature             Float?
+  weight                  Float?
+  height                  Float?
+  bmi                     Float?
+  oxygenSaturation        Int?      @map("oxygen_saturation")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  
+  repository              PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_vital_signs")
+  @@index([repositoryId])
+  @@index([date])
+}
+
+model PatientProcedure {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  name            String
+  date            DateTime
+  performedBy     String?   @map("performed_by")
+  location        String?
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_procedures")
+  @@index([repositoryId])
+  @@index([date])
+}
+
+model PatientImmunization {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  vaccine         String
+  date            DateTime
+  doseNumber      Int?      @map("dose_number")
+  administeredBy  String?   @map("administered_by")
+  lotNumber       String?   @map("lot_number")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_immunizations")
+  @@index([repositoryId])
+  @@index([date])
+}
+
+model PatientFamilyHistory {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  relationship    String
+  condition       String
+  ageAtDiagnosis  Int?      @map("age_at_diagnosis")
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_family_history")
+  @@index([repositoryId])
+}
+
+// Identity Verification Challenges
+model IdentityChallenge {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  questions       String    @db.Text // JSON array
+  expiresAt       DateTime  @map("expires_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  @@map("identity_challenges")
+  @@index([repositoryId])
+  @@index([expiresAt])
+}

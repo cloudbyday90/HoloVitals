@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': '<function_calls>\n<execute-command>\ncd medical-analysis-platform && npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias "@/*" --use-npm\n</execute-command>\n</function_calls>'}

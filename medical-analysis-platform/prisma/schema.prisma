@@ -1,5 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// HoloVitals Complete Database Schema
+// Includes: Base platform + AI Architecture + All Repository Systems
 
 generator client {
   provider = "prisma-client-js"
@@ -9,6 +9,10 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// ============================================================================
+// USER MANAGEMENT & AUTHENTICATION
+// ============================================================================
 
 model User {
   id                    String    @id @default(uuid())
@@ -30,6 +34,12 @@ model User {
   consentRequestsAsSpecialist ConsentGrant[] @relation("SpecialistConsents")
   auditLogs             AuditLog[]
   
+  // AI Architecture Relations
+  chatConversations     ChatConversation[]
+  analysisQueue         AnalysisQueue[]
+  chatbotCosts          ChatbotCost[]
+  analysisCosts         AnalysisCost[]
+  
   @@map("users")
 }
 
@@ -48,6 +58,10 @@ model Patient {
   @@map("patients")
 }
 
+// ============================================================================
+// DOCUMENT MANAGEMENT
+// ============================================================================
+
 model Document {
   id            String    @id @default(uuid())
   userId        String    @map("user_id")
@@ -56,10 +70,10 @@ model Document {
   fileName      String    @map("file_name")
   fileSize      Int?      @map("file_size")
   mimeType      String?   @map("mime_type")
-  documentType  String?   @map("document_type") // 'bloodwork', 'imaging', 'aftercare', etc.
+  documentType  String?   @map("document_type")
   uploadDate    DateTime  @default(now()) @map("upload_date")
-  documentDate  DateTime? @map("document_date") // Date of the actual medical document
-  status        String    @default("pending") // 'pending', 'processing', 'completed', 'failed'
+  documentDate  DateTime? @map("document_date")
+  status        String    @default("pending")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
   
@@ -89,7 +103,7 @@ model OcrResult {
 model ExtractedData {
   id            String    @id @default(uuid())
   documentId    String    @map("document_id")
-  dataType      String    @map("data_type") // 'test_result', 'diagnosis', 'medication', etc.
+  dataType      String    @map("data_type")
   fieldName     String    @map("field_name")
   fieldValue    String    @map("field_value") @db.Text
   unit          String?
@@ -106,7 +120,7 @@ model DocumentLink {
   id                  String    @id @default(uuid())
   sourceDocumentId    String    @map("source_document_id")
   targetDocumentId    String    @map("target_document_id")
-  relationshipType    String    @map("relationship_type") // 'follow_up', 'related', 'supersedes', etc.
+  relationshipType    String    @map("relationship_type")
   createdAt           DateTime  @default(now()) @map("created_at")
   
   sourceDocument      Document  @relation("SourceDocument", fields: [sourceDocumentId], references: [id], onDelete: Cascade)
@@ -116,11 +130,28 @@ model DocumentLink {
   @@map("document_links")
 }
 
+model DocumentEmbedding {
+  id            String    @id @default(uuid())
+  documentId    String    @map("document_id")
+  chunkIndex    Int       @map("chunk_index")
+  chunkText     String    @map("chunk_text") @db.Text
+  embedding     Float[]
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  document      Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@map("document_embeddings")
+}
+
+// ============================================================================
+// ANALYSIS SESSIONS (Legacy)
+// ============================================================================
+
 model AnalysisSession {
   id            String    @id @default(uuid())
   userId        String    @map("user_id")
   patientId     String?   @map("patient_id")
-  sessionType   String    @map("session_type") // 'query', 'trend_analysis', 'insight_generation'
+  sessionType   String    @map("session_type")
   createdAt     DateTime  @default(now()) @map("created_at")
   
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -135,7 +166,7 @@ model AiInteraction {
   sessionId         String    @map("session_id")
   query             String    @db.Text
   response          String?   @db.Text
-  contextDocuments  String[]  @map("context_documents") // Array of document IDs
+  contextDocuments  String[]  @map("context_documents")
   createdAt         DateTime  @default(now()) @map("created_at")
   
   session           AnalysisSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
@@ -143,20 +174,326 @@ model AiInteraction {
   @@map("ai_interactions")
 }
 
-model DocumentEmbedding {
-  id            String    @id @default(uuid())
-  documentId    String    @map("document_id")
-  chunkIndex    Int       @map("chunk_index")
-  chunkText     String    @map("chunk_text") @db.Text
-  embedding     Float[]   // Store as array of floats
-  createdAt     DateTime  @default(now()) @map("created_at")
+// ============================================================================
+// CHATBOT CONVERSATIONS (New AI Architecture)
+// ============================================================================
+
+model ChatConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  document      Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  title     String?
+  startedAt DateTime @default(now())
+  lastMessageAt DateTime @default(now())
   
-  @@map("document_embeddings")
+  messages  ChatMessage[]
+  
+  @@index([userId])
+  @@index([lastMessageAt])
+  @@map("chat_conversations")
 }
 
-// User Sessions for authentication
+model ChatMessage {
+  id             String   @id @default(cuid())
+  conversationId String
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  role           String
+  content        String   @db.Text
+  timestamp      DateTime @default(now())
+  
+  type           String   @default("quick")
+  confidence     Float?
+  
+  needsEscalation Boolean @default(false)
+  escalationReason String? @db.Text
+  escalatedToTaskId String?
+  
+  documentId     String?
+  analysisId     String?
+  
+  metadata       Json?
+  
+  @@index([conversationId])
+  @@index([timestamp])
+  @@map("chat_messages")
+}
+
+// ============================================================================
+// ANALYSIS QUEUE SYSTEM (New AI Architecture)
+// ============================================================================
+
+model AnalysisQueue {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type      String
+  priority  Int      @default(3)
+  
+  prompt    String   @db.Text
+  documents Json
+  
+  totalTokens      Int
+  contextWindow    Int
+  needsSplitting   Boolean @default(false)
+  splitStrategy    String?
+  estimatedCost    Float
+  recommendedModel String
+  
+  status    String   @default("queued")
+  
+  createdAt   DateTime @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+  
+  result    Json?
+  error     String?  @db.Text
+  
+  instanceId String?
+  instance   CloudInstance? @relation(fields: [instanceId], references: [id])
+  
+  actualCost Float?
+  
+  @@index([userId])
+  @@index([status])
+  @@index([priority, createdAt])
+  @@index([createdAt])
+  @@map("analysis_queue")
+}
+
+// ============================================================================
+// CLOUD INSTANCE TRACKING (New AI Architecture)
+// ============================================================================
+
+model CloudInstance {
+  id           String   @id @default(cuid())
+  
+  provider     String
+  region       String
+  instanceType String
+  instanceId   String   @unique
+  
+  model        String
+  
+  status       String   @default("provisioning")
+  
+  createdAt    DateTime @default(now())
+  readyAt      DateTime?
+  terminatedAt DateTime?
+  
+  costPerMinute Float
+  totalCost     Float   @default(0)
+  
+  tasks        AnalysisQueue[]
+  
+  metadata     Json?
+  
+  @@index([status])
+  @@index([createdAt])
+  @@index([provider, region])
+  @@map("cloud_instances")
+}
+
+// ============================================================================
+// COST TRACKING (New AI Architecture)
+// ============================================================================
+
+model InstanceCost {
+  id           String   @id @default(cuid())
+  
+  instanceId   String
+  provider     String
+  instanceType String
+  model        String
+  
+  createdAt    DateTime
+  terminatedAt DateTime
+  duration     Float
+  
+  costPerMinute Float
+  totalCost     Float
+  
+  tasksCompleted Int    @default(0)
+  tokensProcessed Int   @default(0)
+  
+  metadata     Json?
+  
+  @@index([createdAt])
+  @@index([provider])
+  @@index([model])
+  @@map("instance_costs")
+}
+
+model ChatbotCost {
+  id        String   @id @default(cuid())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  messageId String
+  timestamp DateTime @default(now())
+  
+  inputTokens  Int
+  outputTokens Int
+  totalTokens  Int
+  
+  cost      Float
+  
+  model     String   @default("gpt-3.5-turbo")
+  
+  @@index([userId])
+  @@index([timestamp])
+  @@map("chatbot_costs")
+}
+
+model AnalysisCost {
+  id        String   @id @default(cuid())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  taskId    String
+  timestamp DateTime @default(now())
+  
+  inputTokens  Int
+  outputTokens Int
+  totalTokens  Int
+  
+  modelCost      Float
+  infrastructureCost Float
+  totalCost      Float
+  
+  model        String
+  instanceType String?
+  
+  duration     Float
+  
+  @@index([userId])
+  @@index([timestamp])
+  @@map("analysis_costs")
+}
+
+// ============================================================================
+// CONTEXT OPTIMIZATION (New AI Architecture)
+// ============================================================================
+
+model PromptOptimization {
+  id        String   @id @default(cuid())
+  
+  originalPrompt String @db.Text
+  originalTokens Int
+  
+  optimizedPrompt String @db.Text
+  optimizedTokens Int
+  
+  strategy       String
+  tokenReduction Int
+  reductionPercent Float
+  
+  executionTime  Float?
+  successRate    Float?
+  
+  createdAt DateTime @default(now())
+  
+  metadata  Json?
+  
+  @@index([createdAt])
+  @@map("prompt_optimizations")
+}
+
+model PromptSplit {
+  id        String   @id @default(cuid())
+  
+  taskId    String
+  
+  splitId   String
+  content   String   @db.Text
+  tokens    Int
+  order     Int
+  
+  dependencies Json
+  
+  status    String   @default("pending")
+  
+  result    Json?
+  error     String?  @db.Text
+  
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+  
+  @@index([taskId])
+  @@index([order])
+  @@map("prompt_splits")
+}
+
+// ============================================================================
+// MODEL PERFORMANCE TRACKING (New AI Architecture)
+// ============================================================================
+
+model ModelPerformance {
+  id        String   @id @default(cuid())
+  
+  model     String
+  provider  String
+  
+  avgResponseTime Float
+  avgTokensPerSecond Float
+  successRate Float
+  errorRate   Float
+  
+  avgCostPerRequest Float
+  avgCostPerToken   Float
+  
+  totalRequests Int
+  totalTokens   Int
+  totalCost     Float
+  
+  periodStart DateTime
+  periodEnd   DateTime
+  
+  metadata    Json?
+  
+  @@index([model])
+  @@index([periodStart])
+  @@map("model_performance")
+}
+
+// ============================================================================
+// SYSTEM HEALTH MONITORING (New AI Architecture)
+// ============================================================================
+
+model SystemHealth {
+  id        String   @id @default(cuid())
+  
+  component String
+  
+  status    String
+  
+  responseTime Float?
+  errorRate    Float?
+  throughput   Float?
+  
+  cpuUsage    Float?
+  memoryUsage Float?
+  diskUsage   Float?
+  
+  timestamp DateTime @default(now())
+  
+  message   String?  @db.Text
+  metadata  Json?
+  
+  @@index([component])
+  @@index([timestamp])
+  @@index([status])
+  @@map("system_health")
+}
+
+// ============================================================================
+// AUTHENTICATION & SESSIONS
+// ============================================================================
+
 model UserSession {
   id            String    @id @default(uuid())
   userId        String    @map("user_id")
@@ -172,17 +509,20 @@ model UserSession {
   @@index([expiresAt])
 }
 
-// Consent Management
+// ============================================================================
+// CONSENT MANAGEMENT
+// ============================================================================
+
 model ConsentGrant {
   id                      String    @id @default(uuid())
   patientId               String    @map("patient_id")
   specialistId            String    @map("specialist_id")
-  permissions             String    @db.Text // JSON array of permissions
+  permissions             String    @db.Text
   reason                  String    @db.Text
-  requestedDuration       Int       @map("requested_duration") // in hours
-  urgency                 String    // 'routine', 'urgent', 'emergency'
-  status                  String    // 'pending', 'approved', 'active', 'expired', 'revoked', 'denied'
-  restrictions            String?   @db.Text // JSON array of restrictions
+  requestedDuration       Int       @map("requested_duration")
+  urgency                 String
+  status                  String
+  restrictions            String?   @db.Text
   grantedAt               DateTime? @map("granted_at")
   expiresAt               DateTime  @map("expires_at")
   revokedAt               DateTime? @map("revoked_at")
@@ -205,7 +545,6 @@ model ConsentGrant {
   @@index([expiresAt])
 }
 
-// Access Logs for consent-based access
 model AccessLog {
   id            String    @id @default(uuid())
   consentId     String    @map("consent_id")
@@ -214,7 +553,7 @@ model AccessLog {
   resource      String
   ipAddress     String?   @map("ip_address")
   userAgent     String?   @map("user_agent")
-  details       String?   @db.Text // JSON
+  details       String?   @db.Text
   timestamp     DateTime  @default(now())
   success       Boolean   @default(true)
   
@@ -226,18 +565,21 @@ model AccessLog {
   @@index([timestamp])
 }
 
-// Audit Logs for HIPAA compliance
+// ============================================================================
+// AUDIT & COMPLIANCE
+// ============================================================================
+
 model AuditLog {
   id              String    @id @default(uuid())
   userId          String    @map("user_id")
   action          String
   resource        String
   resourceId      String    @map("resource_id")
-  details         String?   @db.Text // JSON
+  details         String?   @db.Text
   ipAddress       String?   @map("ip_address")
   userAgent       String?   @map("user_agent")
   sessionId       String?   @map("session_id")
-  severity        String    // 'low', 'medium', 'high', 'critical'
+  severity        String
   requiresReview  Boolean   @default(false) @map("requires_review")
   reviewed        Boolean   @default(false)
   reviewedBy      String?   @map("reviewed_by")
@@ -258,11 +600,14 @@ model AuditLog {
   @@index([requiresReview])
 }
 
-// Notifications for patients
+// ============================================================================
+// NOTIFICATIONS & ALERTS
+// ============================================================================
+
 model Notification {
   id              String    @id @default(uuid())
   patientId       String    @map("patient_id")
-  type            String    // 'request', 'expiring', 'expired', 'accessed'
+  type            String
   message         String    @db.Text
   requiresAction  Boolean   @default(false) @map("requires_action")
   read            Boolean   @default(false)
@@ -275,12 +620,11 @@ model Notification {
   @@index([createdAt])
 }
 
-// Security Alerts
 model SecurityAlert {
   id            String    @id @default(uuid())
   userId        String    @map("user_id")
   action        String
-  details       String    @db.Text // JSON
+  details       String    @db.Text
   severity      String    @default("high")
   acknowledged  Boolean   @default(false)
   acknowledgedBy String?  @map("acknowledged_by")
@@ -293,7 +637,10 @@ model SecurityAlert {
   @@index([createdAt])
 }
 
-// Patient Repository - Sandboxed per patient
+// ============================================================================
+// PATIENT REPOSITORY (Sandboxed per patient)
+// ============================================================================
+
 model PatientRepository {
   id                      String    @id @default(uuid())
   userId                  String    @unique @map("user_id")
@@ -321,16 +668,14 @@ model PatientRepository {
   @@index([compositeIdentityHash])
 }
 
-// Patient Medical Data Tables
-
 model PatientDiagnosis {
   id              String    @id @default(uuid())
   repositoryId    String    @map("repository_id")
   condition       String
   icd10Code       String?   @map("icd10_code")
   diagnosedDate   DateTime  @map("diagnosed_date")
-  status          String    // 'active', 'resolved', 'chronic'
-  severity        String?   // 'mild', 'moderate', 'severe'
+  status          String
+  severity        String?
   notes           String?   @db.Text
   createdAt       DateTime  @default(now()) @map("created_at")
   
@@ -351,7 +696,7 @@ model PatientMedication {
   endDate         DateTime? @map("end_date")
   prescribedBy    String?   @map("prescribed_by")
   purpose         String?   @db.Text
-  status          String    // 'active', 'discontinued', 'completed'
+  status          String
   createdAt       DateTime  @default(now()) @map("created_at")
   
   repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
@@ -365,9 +710,9 @@ model PatientAllergy {
   id              String    @id @default(uuid())
   repositoryId    String    @map("repository_id")
   allergen        String
-  type            String    // 'drug', 'food', 'environmental', 'other'
+  type            String
   reaction        String
-  severity        String    // 'mild', 'moderate', 'severe', 'life-threatening'
+  severity        String
   diagnosedDate   DateTime? @map("diagnosed_date")
   createdAt       DateTime  @default(now()) @map("created_at")
   
@@ -447,11 +792,10 @@ model PatientFamilyHistory {
   @@index([repositoryId])
 }
 
-// Identity Verification Challenges
 model IdentityChallenge {
   id              String    @id @default(uuid())
   repositoryId    String    @map("repository_id")
-  questions       String    @db.Text // JSON array
+  questions       String    @db.Text
   expiresAt       DateTime  @map("expires_at")
   createdAt       DateTime  @default(now()) @map("created_at")
   

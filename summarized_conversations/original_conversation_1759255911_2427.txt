@@ -1,0 +1,1 @@
+{'role': 'user', 'content': 'We need a way to do a quick restore from a complete outage or critical error. We need a change management process that includes emergency changes to quickly restore services. Since we are using AI, we need to make sure we have the ability to examine current error states and a way to restore services, whether that is a rollback or code changes.'}

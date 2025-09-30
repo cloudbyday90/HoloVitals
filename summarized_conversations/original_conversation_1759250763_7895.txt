@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': '<function_calls>\n<execute-command blocking="true">\nnpx -y create-next-app@latest medical-analysis-platform --typescript --tailwind --app --no-src-dir --import-alias "@/*" --use-npm --eslint\n</execute-command>\n</function_calls>'}

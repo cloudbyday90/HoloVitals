@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': '<function_calls>\n<execute-command blocking="true">\ncd medical-analysis-platform && npm install -D @types/pdf-parse\n</execute-command>\n</function_calls>'}
