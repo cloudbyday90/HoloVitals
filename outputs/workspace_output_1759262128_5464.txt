@@ -1,0 +1,10 @@
+
+> medical-analysis-platform@0.1.0 db:seed
+> ts-node prisma/seed.ts
+
+🌱 Seeding database...
+✅ Created test user: test@holovitals.com
+✅ Created test patient: John Doe
+✅ Seeded model performance data
+✅ Seeded system health data
+🎉 Seeding complete!
