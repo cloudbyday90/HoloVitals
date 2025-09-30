@@ -1,0 +1,24 @@
+[main d36fbe4] feat: Implement Service 1 - LightweightChatbotService
+ 25 files changed, 11571 insertions(+), 3729 deletions(-)
+ create mode 100644 PHASE_2_SUMMARY.md
+ create mode 100644 SERVICE_1_COMPLETE.md
+ create mode 100644 medical-analysis-platform/PHASE_3_PLAN.md
+ create mode 100644 medical-analysis-platform/__tests__/services/LightweightChatbotService.test.ts
+ create mode 100644 medical-analysis-platform/app/api/chat/route.ts
+ create mode 100644 medical-analysis-platform/docs/LIGHTWEIGHT_CHATBOT_SERVICE.md
+ create mode 100644 medical-analysis-platform/jest.config.js
+ create mode 100644 medical-analysis-platform/jest.setup.js
+ create mode 100644 medical-analysis-platform/lib/services/LightweightChatbotService.ts
+ create mode 100644 medical-analysis-platform/lib/types/chatbot.ts
+ create mode 100644 medical-analysis-platform/lib/utils/openai.ts
+ create mode 100644 medical-analysis-platform/lib/utils/queryClassifier.ts
+ create mode 100644 medical-analysis-platform/lib/utils/tokenCounter.ts
+ create mode 100644 outputs/workspace_output_1759262628_6463.txt
+ create mode 100644 outputs/workspace_output_1759262653_4839.txt
+ create mode 100644 outputs/workspace_output_1759262671_6700.txt
+ create mode 100644 outputs/workspace_output_1759262687_8071.txt
+ create mode 100644 outputs/workspace_output_1759262706_7841.txt
+ create mode 100644 outputs/workspace_output_1759262957_6287.txt
+ create mode 100644 outputs/workspace_output_1759263270_9716.txt
+ create mode 100644 outputs/workspace_output_1759263645_7456.txt
+ create mode 100644 outputs/workspace_output_1759263727_3933.txt

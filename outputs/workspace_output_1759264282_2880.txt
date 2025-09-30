@@ -1,0 +1,72 @@
+
+> medical-analysis-platform@0.1.0 test
+> jest
+
+  console.error
+    Chat error: Error: API Error
+        at Object.<anonymous> (/workspace/medical-analysis-platform/__tests__/services/LightweightChatbotService.test.ts:349:50)
+        at Promise.finally.completed (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:1557:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:1497:10)
+        at _callCircusTest (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:1007:40)
+        at processTicksAndRejections (node:internal/process/task_queues:95:5)
+        at _runTest (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:947:3)
+        at /workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:849:7
+        at _runTestsForDescribeBlock (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:862:11)
+        at _runTestsForDescribeBlock (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+        at _runTestsForDescribeBlock (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+        at run (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:761:3)
+        at runAndTransformResultsToJestFormat (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:1918:21)
+        at jestAdapter (/workspace/medical-analysis-platform/node_modules/jest-circus/build/runner.js:101:19)
+        at runTestInternal (/workspace/medical-analysis-platform/node_modules/jest-runner/build/index.js:275:16)
+        at runTest (/workspace/medical-analysis-platform/node_modules/jest-runner/build/index.js:343:7)
+
+      184 |       };
+      185 |     } catch (error: any) {
+    > 186 |       console.error('Chat error:', error);
+          |               ^
+      187 |       throw new Error(`Chat processing failed: ${error.message}`);
+      188 |     }
+      189 |   }
+
+      at LightweightChatbotService.error [as chat] (lib/services/LightweightChatbotService.ts:186:15)
+      at Object.<anonymous> (__tests__/services/LightweightChatbotService.test.ts:362:7)
+
+FAIL __tests__/services/LightweightChatbotService.test.ts
+  LightweightChatbotService
+    chat
+      ✕ should process a simple chat request (4 ms)
+      ✓ should handle escalation for complex queries (1 ms)
+      ✓ should use existing conversation if conversationId provided (2 ms)
+      ✓ should include conversation history in context (1 ms)
+    getConversationHistory
+      ✓ should retrieve conversation with messages (1 ms)
+    getUserConversations
+      ✓ should retrieve all conversations for a user (1 ms)
+    deleteConversation
+      ✓ should delete conversation and all messages (1 ms)
+    error handling
+      ✓ should handle API errors gracefully (33 ms)
+
+  ● LightweightChatbotService › chat › should process a simple chat request
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 0
+    Received:   0
+
+      121 |       expect(response.role).toBe(MessageRole.ASSISTANT);
+      122 |       expect(response.escalated).toBe(false);
+    > 123 |       expect(response.processingTime).toBeGreaterThan(0);
+          |                                       ^
+      124 |       expect(mockPrisma.chatConversation.create).toHaveBeenCalled();
+      125 |       expect(mockPrisma.chatMessage.create).toHaveBeenCalledTimes(2);
+      126 |     });
+
+      at Object.toBeGreaterThan (__tests__/services/LightweightChatbotService.test.ts:123:39)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 7 passed, 8 total
+Snapshots:   0 total
+Time:        0.624 s
+Ran all test suites.

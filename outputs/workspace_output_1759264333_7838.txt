@@ -1,0 +1,34 @@
+
+> medical-analysis-platform@0.1.0 test
+> jest
+
+  console.error
+    Chat error: Error: API Error
+        at Object.<anonymous> (/workspace/medical-analysis-platform/__tests__/services/LightweightChatbotService.test.ts:349:50)
+        at Promise.finally.completed (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:1557:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:1497:10)
+        at _callCircusTest (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:1007:40)
+        at processTicksAndRejections (node:internal/process/task_queues:95:5)
+        at _runTest (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:947:3)
+        at /workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:849:7
+        at _runTestsForDescribeBlock (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:862:11)
+        at _runTestsForDescribeBlock (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+        at _runTestsForDescribeBlock (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+        at run (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:761:3)
+        at runAndTransformResultsToJestFormat (/workspace/medical-analysis-platform/node_modules/jest-circus/build/jestAdapterInit.js:1918:21)
+        at jestAdapter (/workspace/medical-analysis-platform/node_modules/jest-circus/build/runner.js:101:19)
+        at runTestInternal (/workspace/medical-analysis-platform/node_modules/jest-runner/build/index.js:275:16)
+        at runTest (/workspace/medical-analysis-platform/node_modules/jest-runner/build/index.js:343:7)
+
+      184 |       };
+      185 |     } catch (error: any) {
+    > 186 |       console.error('Chat error:', error);
+          |               ^
+      187 |       throw new Error(`Chat processing failed: ${error.message}`);
+      188 |     }
+      189 |   }
+
+      at LightweightChatbotService.error [as chat] (lib/services/LightweightChatbotService.ts:186:15)
+      at Object.<anonymous> (__tests__/services/LightweightChatbotService.test.ts:362:7)
+

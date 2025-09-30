@@ -1,0 +1,50 @@
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateEmptyCoverage (/workspace/medical-analysis-platform/node_modules/@jest/reporters/build/CoverageWorker.js:92:9)
+------------------------------------|---------|----------|---------|---------|-------------------
+File                                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+------------------------------------|---------|----------|---------|---------|-------------------
+All files                           |     4.4 |     1.42 |    4.05 |     4.5 |                   
+ app                                |       0 |      100 |       0 |       0 |                   
+  layout.tsx                        |       0 |      100 |       0 |       0 | 2-20              
+  page.tsx                          |       0 |      100 |       0 |       0 | 1-6               
+ app/api/analyze                    |       0 |        0 |       0 |       0 |                   
+  route.ts                          |       0 |        0 |       0 |       0 | 1-32              
+ app/api/chat                       |       0 |        0 |       0 |       0 |                   
+  route.ts                          |       0 |        0 |       0 |       0 | 8-148             
+ app/api/documents/upload           |       0 |        0 |       0 |       0 |                   
+  route.ts                          |       0 |        0 |       0 |       0 | 1-76              
+ app/dashboard                      |       0 |        0 |       0 |       0 |                   
+  page.tsx                          |       0 |        0 |       0 |       0 | 3-146             
+ lib/audit                          |       0 |        0 |       0 |       0 |                   
+  AuditLogger.ts                    |       0 |        0 |       0 |       0 | 14-525            
+ lib/auth                           |       0 |        0 |       0 |       0 |                   
+  AuthService.ts                    |       0 |        0 |       0 |       0 | 12-598            
+ lib/consent                        |       0 |        0 |       0 |       0 |                   
+  ConsentManagementService.ts       |       0 |        0 |       0 |       0 | 14-636            
+ lib/identity                       |       0 |        0 |       0 |       0 |                   
+  IdentityVerificationService.ts    |       0 |        0 |       0 |       0 | 11-554            
+ lib/repositories                   |       0 |        0 |       0 |       0 |                   
+  AIAnalysisRepository.ts           |       0 |        0 |       0 |       0 | 14-490            
+  AIContextCacheRepository.ts       |       0 |        0 |       0 |       0 | 14-572            
+  AIPromptOptimizationRepository.ts |       0 |        0 |       0 |       0 | 13-655            
+  RepositoryCoordinator.ts          |       0 |        0 |       0 |       0 | 12-453            
+ lib/repositories/patient           |       0 |        0 |       0 |       0 |                   
+  PatientRepository.ts              |       0 |        0 |       0 |       0 | 19-881            
+ lib/services                       |   27.05 |     8.63 |   28.84 |   27.82 |                   
+  LightweightChatbotService.ts      |    78.4 |    63.15 |   93.75 |   79.31 | 195-257,303       
+  ai.service.ts                     |       0 |        0 |       0 |       0 | 1-291             
+  context.service.ts                |       0 |        0 |       0 |       0 | 2-202             
+  ocr.service.ts                    |       0 |        0 |       0 |       0 | 1-256             
+ lib/types                          |      80 |      100 |     100 |     100 |                   
+  chatbot.ts                        |      80 |      100 |     100 |     100 |                   
+ lib/utils                          |       0 |        0 |       0 |       0 |                   
+  cn.ts                             |       0 |      100 |       0 |       0 | 1-5               
+  openai.ts                         |       0 |        0 |       0 |       0 | 8-197             
+  queryClassifier.ts                |       0 |        0 |       0 |       0 | 14-320            
+  tokenCounter.ts                   |       0 |        0 |       0 |       0 | 8-224             
+------------------------------------|---------|----------|---------|---------|-------------------
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        15.447 s
+Ran all test suites.

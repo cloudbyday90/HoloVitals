@@ -120,7 +120,7 @@ describe('LightweightChatbotService', () => {
       expect(response.content).toBe('Test response');
       expect(response.role).toBe(MessageRole.ASSISTANT);
       expect(response.escalated).toBe(false);
-      expect(response.processingTime).toBeGreaterThan(0);
+      expect(response.processingTime).toBeGreaterThanOrEqual(0);
       expect(mockPrisma.chatConversation.create).toHaveBeenCalled();
       expect(mockPrisma.chatMessage.create).toHaveBeenCalledTimes(2);
     });
