@@ -1,170 +1,244 @@
 'use client';
 
-import { useState } from 'react';
-import { UploadZone } from '@/components/document/upload-zone';
-import { DocumentCard } from '@/components/document/document-card';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, TrendingUp, AlertCircle, Clock } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { 
+  FileText, 
+  MessageSquare, 
+  TrendingUp, 
+  DollarSign,
+  Server,
+  Activity,
+  ArrowUpRight,
+  Clock,
+  CheckCircle2,
+  AlertCircle
+} from 'lucide-react';
+import Link from 'next/link';
 
 export default function DashboardPage() {
-  const [documents, setDocuments] = useState([
-    {
-      id: '1',
-      fileName: 'Bloodwork_Results_2024.pdf',
-      documentType: 'bloodwork',
-      documentDate: new Date('2024-01-15'),
-      uploadDate: new Date('2024-01-16'),
-      status: 'completed',
-      hasAbnormalValues: true
-    },
-    {
-      id: '2',
-      fileName: 'MRI_Scan_Report.pdf',
-      documentType: 'imaging',
-      documentDate: new Date('2024-02-20'),
-      uploadDate: new Date('2024-02-21'),
-      status: 'completed',
-      hasAbnormalValues: false
-    },
-    {
-      id: '3',
-      fileName: 'Post_Surgery_Care.pdf',
-      documentType: 'aftercare',
-      documentDate: new Date('2024-03-10'),
-      uploadDate: new Date('2024-03-10'),
-      status: 'processing',
-      hasAbnormalValues: false
-    }
-  ]);
-
-  const handleUpload = async (files: File[]) => {
-    console.log('Uploading files:', files);
-    // TODO: Implement actual upload logic
-    alert(`Uploading ${files.length} file(s). This will be implemented with the API.`);
-  };
-
-  const handleView = (id: string) => {
-    console.log('Viewing document:', id);
-    // TODO: Navigate to document view
-    alert(`Viewing document ${id}. This will be implemented.`);
-  };
-
-  const handleAnalyze = (id: string) => {
-    console.log('Analyzing document:', id);
-    // TODO: Navigate to analysis view
-    window.location.href = `/dashboard/analyze/${id}`;
-  };
-
+  // Mock data - will be replaced with real API calls
   const stats = {
-    totalDocuments: documents.length,
-    recentUploads: documents.filter(d => {
-      const daysSinceUpload = (Date.now() - d.uploadDate.getTime()) / (1000 * 60 * 60 * 24);
-      return daysSinceUpload <= 7;
-    }).length,
-    abnormalResults: documents.filter(d => d.hasAbnormalValues).length,
-    processing: documents.filter(d => d.status === 'processing').length
+    documents: 12,
+    conversations: 8,
+    activeTasks: 3,
+    activeInstances: 1,
+    todayCost: 2.45,
+    monthlyCost: 67.89,
+    tokensSaved: 45000,
+    costSaved: 18.50,
   };
+
+  const recentActivity = [
+    { id: 1, type: 'document', title: 'Blood Test Results.pdf', time: '2 hours ago', status: 'completed' },
+    { id: 2, type: 'chat', title: 'Analysis of cholesterol levels', time: '3 hours ago', status: 'completed' },
+    { id: 3, type: 'task', title: 'Document processing', time: '5 hours ago', status: 'processing' },
+    { id: 4, type: 'instance', title: 'Azure NC6 provisioned', time: '6 hours ago', status: 'completed' },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold">Medical Document Dashboard</h1>
-          <p className="text-gray-600 mt-2">
-            Upload, analyze, and track your medical documents
-          </p>
-        </div>
+    <div className="space-y-6">
+      {/* Welcome Section */}
+      <div>
+        <h1 className="text-3xl font-bold mb-2">Welcome back!</h1>
+        <p className="text-gray-600">Here's what's happening with your medical analysis platform today.</p>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Total Documents
-              </CardTitle>
-              <FileText className="w-4 h-4 text-gray-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalDocuments}</div>
-            </CardContent>
-          </Card>
+      {/* Stats Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* Documents */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Documents
+            </CardTitle>
+            <FileText className="w-4 h-4 text-gray-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.documents}</div>
+            <p className="text-xs text-gray-500 mt-1">
+              <span className="text-green-600">+2</span> from last week
+            </p>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Recent Uploads
-              </CardTitle>
-              <Clock className="w-4 h-4 text-gray-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.recentUploads}</div>
-              <p className="text-xs text-gray-500">Last 7 days</p>
-            </CardContent>
-          </Card>
+        {/* Conversations */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              AI Conversations
+            </CardTitle>
+            <MessageSquare className="w-4 h-4 text-gray-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.conversations}</div>
+            <p className="text-xs text-gray-500 mt-1">
+              <span className="text-green-600">+3</span> from last week
+            </p>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Abnormal Results
-              </CardTitle>
-              <AlertCircle className="w-4 h-4 text-red-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">{stats.abnormalResults}</div>
-              <p className="text-xs text-gray-500">Requires attention</p>
-            </CardContent>
-          </Card>
+        {/* Active Tasks */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Active Tasks
+            </CardTitle>
+            <Activity className="w-4 h-4 text-gray-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.activeTasks}</div>
+            <p className="text-xs text-gray-500 mt-1">
+              {stats.activeInstances} instance running
+            </p>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Processing
-              </CardTitle>
-              <TrendingUp className="w-4 h-4 text-yellow-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{stats.processing}</div>
-              <p className="text-xs text-gray-500">In progress</p>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Today's Cost */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Today's Cost
+            </CardTitle>
+            <DollarSign className="w-4 h-4 text-gray-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${stats.todayCost}</div>
+            <p className="text-xs text-gray-500 mt-1">
+              ${stats.monthlyCost} this month
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
-        {/* Upload Section */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Upload New Documents</h2>
-          <UploadZone onUpload={handleUpload} />
-        </div>
-
-        {/* Documents List */}
-        <div>
-          <h2 className="text-2xl font-bold mb-4">Your Documents</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {documents.map((doc) => (
-              <DocumentCard
-                key={doc.id}
-                {...doc}
-                onView={handleView}
-                onAnalyze={handleAnalyze}
-              />
-            ))}
+      {/* Cost Savings Card */}
+      <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-green-600" />
+            Cost Savings
+          </CardTitle>
+          <CardDescription>Your optimization is working!</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Tokens Saved</p>
+              <p className="text-3xl font-bold text-green-600">
+                {stats.tokensSaved.toLocaleString()}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">40% reduction</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Cost Saved</p>
+              <p className="text-3xl font-bold text-green-600">
+                ${stats.costSaved}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">This month</p>
+            </div>
           </div>
+        </CardContent>
+      </Card>
 
-          {documents.length === 0 && (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No documents yet</h3>
-                <p className="text-gray-600">
-                  Upload your first medical document to get started
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+      {/* Quick Actions & Recent Activity */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Common tasks and shortcuts</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Link href="/dashboard/documents">
+              <Button variant="outline" className="w-full justify-start">
+                <FileText className="w-4 h-4 mr-2" />
+                Upload Document
+                <ArrowUpRight className="w-4 h-4 ml-auto" />
+              </Button>
+            </Link>
+            <Link href="/dashboard/chat">
+              <Button variant="outline" className="w-full justify-start">
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Start AI Chat
+                <ArrowUpRight className="w-4 h-4 ml-auto" />
+              </Button>
+            </Link>
+            <Link href="/dashboard/instances">
+              <Button variant="outline" className="w-full justify-start">
+                <Server className="w-4 h-4 mr-2" />
+                Provision Instance
+                <ArrowUpRight className="w-4 h-4 ml-auto" />
+              </Button>
+            </Link>
+            <Link href="/dashboard/costs">
+              <Button variant="outline" className="w-full justify-start">
+                <DollarSign className="w-4 h-4 mr-2" />
+                View Cost Report
+                <ArrowUpRight className="w-4 h-4 ml-auto" />
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        {/* Recent Activity */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>Your latest actions and updates</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentActivity.map((activity) => (
+                <div key={activity.id} className="flex items-start gap-3">
+                  <div className="mt-1">
+                    {activity.status === 'completed' ? (
+                      <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    ) : activity.status === 'processing' ? (
+                      <Clock className="w-4 h-4 text-blue-600 animate-pulse" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-yellow-600" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">
+                      {activity.title}
+                    </p>
+                    <p className="text-xs text-gray-500">{activity.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* System Status */}
+      <Card>
+        <CardHeader>
+          <CardTitle>System Status</CardTitle>
+          <CardDescription>All systems operational</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-4 gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full" />
+              <span className="text-sm">Chatbot Service</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full" />
+              <span className="text-sm">Context Optimizer</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full" />
+              <span className="text-sm">Analysis Queue</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full" />
+              <span className="text-sm">Instance Provisioner</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
