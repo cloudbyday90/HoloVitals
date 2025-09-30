@@ -1,0 +1,10 @@
+[main 30ae9bf] feat: Service 4 - InstanceProvisionerService implementation
+ 10 files changed, 2371 insertions(+), 29 deletions(-)
+ create mode 100644 medical-analysis-platform/__tests__/services/InstanceProvisionerService.simple.test.ts
+ create mode 100644 medical-analysis-platform/__tests__/services/InstanceProvisionerService.test.ts
+ create mode 100644 medical-analysis-platform/app/api/instances/[id]/route.ts
+ create mode 100644 medical-analysis-platform/app/api/instances/route.ts
+ create mode 100644 medical-analysis-platform/app/api/instances/stats/route.ts
+ create mode 100644 medical-analysis-platform/docs/PHASE_7_COMPLETE.md
+ create mode 100644 medical-analysis-platform/docs/SERVICE_4_INSTANCE_PROVISIONER.md
+ create mode 100644 medical-analysis-platform/lib/services/InstanceProvisionerService.ts

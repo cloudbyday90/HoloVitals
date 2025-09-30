@@ -1,0 +1,29 @@
+model CloudInstance {
+  id           String   @id @default(cuid())
+  
+  provider     String
+  region       String
+  instanceType String
+  instanceId   String   @unique
+  
+  model        String
+  
+  status       String   @default("provisioning")
+  
+  createdAt    DateTime @default(now())
+  readyAt      DateTime?
+  terminatedAt DateTime?
+  
+  costPerMinute Float
+  totalCost     Float   @default(0)
+  
+  tasks        AnalysisQueue[]
+  
+  metadata     Json?
+  
+  @@index([status])
+  @@index([createdAt])
+  @@index([provider, region])
+  @@map("cloud_instances")
+}
+

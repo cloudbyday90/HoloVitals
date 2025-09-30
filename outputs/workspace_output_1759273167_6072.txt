@@ -1,0 +1,16 @@
+FAIL __tests__/services/InstanceProvisionerService.simple.test.ts
+  ● Test suite failed to run
+
+    ReferenceError: Node is not defined
+
+
+
+      at Object.<anonymous> (node_modules/@testing-library/jest-dom/dist/matchers-0a2a9889.js:1986:4)
+      at Object.<anonymous> (node_modules/@testing-library/jest-dom/dist/index.js:3:16)
+      at Object.<anonymous> (jest.setup.js:6:1)
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        0.215 s
+Ran all test suites matching __tests__/services/InstanceProvisionerService.simple.test.ts.

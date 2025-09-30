@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Let me check the current content of prisma.config.ts:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && cat prisma.config.ts\n</execute-command>\n</function_calls>'}

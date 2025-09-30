@@ -1,0 +1,61 @@
+FAIL __tests__/services/InstanceProvisionerService.test.ts (228.592 s)
+  ● InstanceProvisionerService › provisionInstance › should provision an Azure instance successfully
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "READY"
+    Received: "CONFIGURING"
+
+      89 |       expect(instance.provider).toBe(CloudProvider.AZURE);
+      90 |       expect(instance.instanceType).toBe(InstanceType.AZURE_NC6);
+    > 91 |       expect(instance.status).toBe(InstanceStatus.READY);
+         |                               ^
+      92 |       expect(instance.publicIp).toBeDefined();
+      93 |       expect(instance.privateIp).toBeDefined();
+      94 |       expect(instance.costPerHour).toBe(0.90);
+
+      at Object.toBe (__tests__/services/InstanceProvisionerService.test.ts:91:31)
+
+  ● InstanceProvisionerService › provisionInstance › should provision an AWS instance successfully
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "READY"
+    Received: "CONFIGURING"
+
+      115 |       expect(instance.provider).toBe(CloudProvider.AWS);
+      116 |       expect(instance.instanceType).toBe(InstanceType.AWS_G4DN_XLARGE);
+    > 117 |       expect(instance.status).toBe(InstanceStatus.READY);
+          |                               ^
+      118 |       expect(instance.costPerHour).toBe(0.526);
+      119 |     }, 30000);
+      120 |
+
+      at Object.toBe (__tests__/services/InstanceProvisionerService.test.ts:117:31)
+
+
+  ● Test suite failed to run
+
+    ReferenceError: setImmediate is not defined
+
+      64 |     
+      65 |     service.stopMonitoring();
+    > 66 |     await prisma.$disconnect();
+         |     ^
+      67 |   });
+      68 |
+      69 |   describe('provisionInstance', () => {
+
+      at node_modules/@prisma/client/src/runtime/core/engines/library/LibraryEngine.ts:469:32
+      at r (node_modules/@prisma/client/src/runtime/core/engines/library/LibraryEngine.ts:469:13)
+      at Object.callback [as runInChildSpan] (node_modules/@prisma/client/src/runtime/core/tracing/TracingHelper.ts:24:12)
+      at Ao.runInChildSpan (node_modules/@prisma/client/src/runtime/core/tracing/TracingHelper.ts:49:42)
+      at Qr.stop (node_modules/@prisma/client/src/runtime/core/engines/library/LibraryEngine.ts:495:54)
+      at Proxy.$disconnect (node_modules/@prisma/client/src/runtime/getPrismaClient.ts:473:9)
+      at Object.<anonymous> (__tests__/services/InstanceProvisionerService.test.ts:66:5)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 14 passed, 16 total
+Snapshots:   0 total
+Time:        228.935 s
+Ran all test suites matching __tests__/services/InstanceProvisionerService.test.ts.

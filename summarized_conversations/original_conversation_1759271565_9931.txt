@@ -1,0 +1,1 @@
+{'role': 'user', 'content': '<tool_result> <execute-command> ToolResult(success=True, output=\'{\\n  "output": "   lib/providers/LlamaProvider.ts(30,8): error TS2307: Cannot find module \\\'@/lib/types/ai-provider\\\' or its corresponding type declarations.\\\\n",\\n  "exit_code": 2,\\n  "cwd": "/workspace"\\n}\') </execute-command> </tool_result>'}

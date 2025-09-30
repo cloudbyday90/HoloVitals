@@ -1,0 +1,3 @@
+Unstaged changes after reset:
+M	medical-analysis-platform/jest.setup.js
+M	medical-analysis-platform/prisma/schema.prisma

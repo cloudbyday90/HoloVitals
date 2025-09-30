@@ -1,0 +1,9 @@
+total 52
+drwxr-xr-x  4 root root   106 Sep 30 14:52 .
+drwxr-xr-x 14 root root  4096 Sep 30 23:15 ..
+drwxr-xr-x  9 root root   130 Sep 30 22:47 api
+drwxr-xr-x  3 root root    37 Sep 30 14:53 dashboard
+-rw-r--r--  1 root root 25931 Sep 30 14:43 favicon.ico
+-rw-r--r--  1 root root   488 Sep 30 14:43 globals.css
+-rw-r--r--  1 root root   689 Sep 30 14:43 layout.tsx
+-rw-r--r--  1 root root  8498 Sep 30 14:52 page.tsx

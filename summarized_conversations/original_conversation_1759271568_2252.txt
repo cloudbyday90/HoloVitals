@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'I need to fix the LlamaProvider to match the interface. Let me check the IAIProvider interface first:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && grep -A 30 "export interface IAIProvider" lib/types/ai-provider.ts\n</execute-command>\n</function_calls>'}

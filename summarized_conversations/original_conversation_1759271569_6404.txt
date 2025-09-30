@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Now let me check the AIStreamChunk interface:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && grep -B 5 -A 10 "export interface AIStreamChunk" lib/types/ai-provider.ts\n</execute-command>\n</function_calls>'}

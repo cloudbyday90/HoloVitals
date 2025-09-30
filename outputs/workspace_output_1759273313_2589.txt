@@ -1,0 +1,11 @@
+PASS __tests__/services/InstanceProvisionerService.simple.test.ts (15.336 s)
+  InstanceProvisionerService - Simple Tests
+    ✓ should create service instance (1 ms)
+    ✓ should provision Azure instance (15076 ms)
+    ✓ should get instance statistics (2 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        15.625 s, estimated 16 s
+Ran all test suites matching __tests__/services/InstanceProvisionerService.simple.test.ts.

@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "Perfect! Now let's try the migration again:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && npx prisma migrate dev --name initial_migration 2>&1 | head -200\n</execute-command>\n</function_calls>"}

@@ -1,0 +1,5 @@
+components/ui/button.tsx
+components/ui/card.tsx
+components/document/upload-zone.tsx
+components/document/document-card.tsx
+components/analysis/chat-interface.tsx

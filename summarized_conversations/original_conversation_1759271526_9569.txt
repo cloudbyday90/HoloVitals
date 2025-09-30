@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Great! Now let me check the OpenAI provider to add GPT-5 support:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && head -100 lib/providers/OpenAIProvider.ts\n</execute-command>\n</function_calls>'}

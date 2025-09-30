@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Now let me check the initialization section to add support for Llama:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && grep -A 50 "Initialize from environment" lib/providers/ProviderManager.ts\n</execute-command>\n</function_calls>'}

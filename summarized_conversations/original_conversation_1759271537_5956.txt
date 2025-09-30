@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Now let me find where providers are instantiated in the ProviderManager:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && grep -A 20 "createProvider" lib/providers/ProviderManager.ts\n</execute-command>\n</function_calls>'}

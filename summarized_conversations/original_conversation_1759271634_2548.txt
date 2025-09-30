@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "# Database Migration for Services 2 & 3\n\nLet's run the database migrations to add the ContextOptimization and AnalysisTask tables.\n\n## Step 1: Check Current Database Status\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && npx prisma migrate status\n</execute-command>\n</function_calls>"}

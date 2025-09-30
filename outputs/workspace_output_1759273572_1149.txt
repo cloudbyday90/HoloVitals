@@ -1,0 +1,5 @@
+/workspace/medical-analysis-platform/__tests__/services/InstanceProvisionerService.test.ts
+/workspace/medical-analysis-platform/__tests__/services/InstanceProvisionerService.simple.test.ts
+/workspace/medical-analysis-platform/__tests__/services/LightweightChatbotService.test.ts
+/workspace/medical-analysis-platform/__tests__/services/AnalysisQueueService.test.ts
+/workspace/medical-analysis-platform/__tests__/services/ContextOptimizerService.test.ts

@@ -1,0 +1,11 @@
+  // AI Architecture Relations
+  chatConversations     ChatConversation[]
+  analysisQueue         AnalysisQueue[]
+  chatbotCosts          ChatbotCost[]
+  analysisCosts         AnalysisCost[]
+  contextOptimizations  ContextOptimization[]
+  analysisTasks         AnalysisTask[]
+  
+  @@map("users")
+}
+

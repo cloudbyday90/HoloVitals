@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Now I need to update the User model to include the ContextOptimization relation. Let me check the User model first:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && grep -A 30 "model User {" prisma/schema.prisma\n</execute-command>\n</function_calls>'}

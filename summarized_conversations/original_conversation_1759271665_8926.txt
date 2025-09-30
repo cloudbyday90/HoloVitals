@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Now let\'s also update \'user-456\' to a different test user:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && sed -i "s/\'user-456\'/\'wrong-user-id\'/g" __tests__/services/AnalysisQueueService.test.ts\n</execute-command>\n</function_calls>'}

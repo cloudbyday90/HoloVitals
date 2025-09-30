@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "Let me check the exact formatting:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && sed -n '200,250p' lib/providers/ProviderManager.ts\n</execute-command>\n</function_calls>"}

@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Let me check the current content of the file:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && head -50 lib/types/ai-provider.ts\n</execute-command>\n</function_calls>'}

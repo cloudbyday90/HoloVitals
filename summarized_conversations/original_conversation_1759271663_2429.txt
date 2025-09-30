@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Now let me update all the test cases to use the testUserId instead of hardcoded \'user-123\':\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && sed -i "s/\'user-123\'/testUserId/g" __tests__/services/AnalysisQueueService.test.ts\n</execute-command>\n</function_calls>'}

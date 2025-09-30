@@ -1,0 +1,12 @@
+[main c74a1c6] feat: UI Phase 1 - Dashboard layout and navigation
+ 11 files changed, 1733 insertions(+), 150 deletions(-)
+ create mode 100644 medical-analysis-platform/UI_PHASE_1_COMPLETE.md
+ create mode 100644 medical-analysis-platform/app/dashboard/layout.tsx
+ create mode 100644 medical-analysis-platform/components/layout/DashboardLayout.tsx
+ create mode 100644 medical-analysis-platform/components/layout/Header.tsx
+ create mode 100644 medical-analysis-platform/components/layout/MobileNav.tsx
+ create mode 100644 medical-analysis-platform/components/layout/Sidebar.tsx
+ create mode 100644 medical-analysis-platform/components/layout/StatusBar.tsx
+ create mode 100644 medical-analysis-platform/components/ui/dropdown-menu.tsx
+ create mode 100644 medical-analysis-platform/docs/UI_DEVELOPMENT_PLAN.md
+ create mode 100644 medical-analysis-platform/lib/utils.ts

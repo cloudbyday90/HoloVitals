@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Let me try using the `--skip-generate` flag and create the migration without the shadow database:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && npx prisma migrate dev --name initial_migration --skip-generate --create-only\n</execute-command>\n</function_calls>'}

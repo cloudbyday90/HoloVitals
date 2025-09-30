@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Now let me update the ProviderManager to support the new models and Llama provider:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && grep -n "import.*Provider" lib/providers/ProviderManager.ts | head -10\n</execute-command>\n</function_calls>'}

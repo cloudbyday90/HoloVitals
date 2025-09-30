@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Now let me check the MODEL_CAPABILITIES and MODEL_COSTS sections:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && grep -A 200 "export const MODEL_CAPABILITIES" lib/types/ai-provider.ts | head -100\n</execute-command>\n</function_calls>'}

@@ -1,0 +1,44 @@
+FAIL __tests__/services/InstanceProvisionerService.simple.test.ts (15.415 s)
+  ● InstanceProvisionerService - Simple Tests › should provision Azure instance
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "READY"
+    Received: "CONFIGURING"
+
+      79 |     expect(instance.id).toBeDefined();
+      80 |     expect(instance.provider).toBe(CloudProvider.AZURE);
+    > 81 |     expect(instance.status).toBe(InstanceStatus.READY);
+         |                             ^
+      82 |   }, 30000);
+      83 |
+      84 |   it('should get instance statistics', async () => {
+
+      at Object.toBe (__tests__/services/InstanceProvisionerService.simple.test.ts:81:29)
+
+
+  ● Test suite failed to run
+
+    ReferenceError: setImmediate is not defined
+
+      52 |     await prisma.user.deleteMany({ where: { id: TEST_USER_ID } });
+      53 |     service.stopMonitoring();
+    > 54 |     await prisma.$disconnect();
+         |     ^
+      55 |   });
+      56 |
+      57 |   it('should create service instance', () => {
+
+      at node_modules/@prisma/client/src/runtime/core/engines/library/LibraryEngine.ts:469:32
+      at r (node_modules/@prisma/client/src/runtime/core/engines/library/LibraryEngine.ts:469:13)
+      at Object.callback [as runInChildSpan] (node_modules/@prisma/client/src/runtime/core/tracing/TracingHelper.ts:24:12)
+      at Ao.runInChildSpan (node_modules/@prisma/client/src/runtime/core/tracing/TracingHelper.ts:49:42)
+      at Qr.stop (node_modules/@prisma/client/src/runtime/core/engines/library/LibraryEngine.ts:495:54)
+      at Proxy.$disconnect (node_modules/@prisma/client/src/runtime/getPrismaClient.ts:473:9)
+      at Object.<anonymous> (__tests__/services/InstanceProvisionerService.simple.test.ts:54:5)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 2 passed, 3 total
+Snapshots:   0 total
+Time:        15.712 s
+Ran all test suites matching __tests__/services/InstanceProvisionerService.simple.test.ts.

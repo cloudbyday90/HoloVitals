@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "The database exists but hasn't been managed by Prisma Migrate yet. Let's create the initial migration:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && npx prisma migrate dev --name initial_migration\n</execute-command>\n</function_calls>"}

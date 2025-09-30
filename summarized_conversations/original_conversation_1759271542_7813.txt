@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Let me see the rest of this function:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && grep -A 80 "Initialize Claude if API key is present" lib/providers/ProviderManager.ts | tail -50\n</execute-command>\n</function_calls>'}

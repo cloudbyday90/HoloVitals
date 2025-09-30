@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Let me check the schema file:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && tail -100 prisma/schema.prisma | head -50\n</execute-command>\n</function_calls>'}

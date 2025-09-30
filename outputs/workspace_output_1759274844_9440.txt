@@ -1,0 +1,2 @@
+root       18197  0.0  0.0   2584  1304 pts/0    S+   23:25   0:00 sh -c next dev --turbopack
+root       18198  0.0  0.1 23459052 147060 pts/0 Sl+  23:25   0:00 node /workspace/medical-analysis-platform/node_modules/.bin/next dev --turbopack

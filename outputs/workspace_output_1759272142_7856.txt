@@ -1,0 +1,3 @@
+  analysisTasks         AnalysisTask[]
+  
+  @@map("users")

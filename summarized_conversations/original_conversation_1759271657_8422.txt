@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "We need to create the migration first. Let me use a different approach - let's create a migration for just the new tables (ContextOptimization and AnalysisTask):\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && npx prisma db push --skip-generate 2>&1\n</execute-command>\n</function_calls>"}

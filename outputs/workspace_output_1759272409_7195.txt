@@ -1,0 +1,10 @@
+total 100
+drwxr-xr-x  2 root root  4096 Sep 30 21:55 .
+drwxr-xr-x 11 root root   141 Sep 30 20:43 ..
+-rw-r--r--  1 root root 13895 Sep 30 20:45 AIDevChatService.ts
+-rw-r--r--  1 root root 13298 Sep 30 21:55 AnalysisQueueService.ts
+-rw-r--r--  1 root root 18407 Sep 30 21:48 ContextOptimizerService.ts
+-rw-r--r--  1 root root 15161 Sep 30 20:13 LightweightChatbotService.ts
+-rw-r--r--  1 root root  8701 Sep 30 14:48 ai.service.ts
+-rw-r--r--  1 root root  4865 Sep 30 14:47 context.service.ts
+-rw-r--r--  1 root root  6621 Sep 30 14:47 ocr.service.ts

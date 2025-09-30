@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'We need to disable the shadow database for development. Let me update the database URL to include the shadow database disable flag:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && cat .env | grep DATABASE_URL\n</execute-command>\n</function_calls>'}

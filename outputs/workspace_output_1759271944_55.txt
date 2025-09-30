@@ -1,0 +1,100 @@
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_procedures")
+  @@index([repositoryId])
+  @@index([date])
+}
+
+model PatientImmunization {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  vaccine         String
+  date            DateTime
+  doseNumber      Int?      @map("dose_number")
+  administeredBy  String?   @map("administered_by")
+  lotNumber       String?   @map("lot_number")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_immunizations")
+  @@index([repositoryId])
+  @@index([date])
+}
+
+model PatientFamilyHistory {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  relationship    String
+  condition       String
+  ageAtDiagnosis  Int?      @map("age_at_diagnosis")
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_family_history")
+  @@index([repositoryId])
+}
+
+model IdentityChallenge {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  questions       String    @db.Text
+  expiresAt       DateTime  @map("expires_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  @@map("identity_challenges")
+  @@index([repositoryId])
+  @@index([expiresAt])
+}
+
+model ContextOptimization {
+  id                  String   @id @default(cuid())
+  userId              String
+  originalTokens      Int
+  optimizedTokens     Int
+  reductionPercentage Float
+  strategy            String
+  compressionRatio    Float
+  relevanceScore      Float
+  informationDensity  Float
+  processingTimeMs    Int
+  qualityScore        Float
+  createdAt           DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([strategy])
+}
+
+
+model AnalysisTask {
+  id                      String    @id @default(cuid())
+  userId                  String
+  type                    String
+  priority                String
+  status                  String
+  progress                Int       @default(0)
+  data                    String    @db.Text
+  result                  String?   @db.Text
+  error                   String?   @db.Text
+  retryCount              Int       @default(0)
+  maxRetries              Int       @default(2)
+  estimatedCompletionTime DateTime?
+  startedAt               DateTime?
+  completedAt             DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  metadata                String?   @db.Text
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([priority])
+  @@index([type])
+  @@index([createdAt])
+}

@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'I see. The datasource configuration is in the schema.prisma file, not the config. Let me update the schema.prisma to add the shadow database URL:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && head -20 prisma/schema.prisma\n</execute-command>\n</function_calls>'}

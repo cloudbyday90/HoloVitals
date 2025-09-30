@@ -1,0 +1,53 @@
+model User {
+  id                    String    @id @default(uuid())
+  email                 String    @unique
+  passwordHash          String    @map("password_hash")
+  mfaEnabled            Boolean   @default(false) @map("mfa_enabled")
+  mfaSecret             String?   @map("mfa_secret")
+  mfaBackupCodes        String?   @map("mfa_backup_codes")
+  failedLoginAttempts   Int       @default(0) @map("failed_login_attempts")
+  lastFailedLogin       DateTime? @map("last_failed_login")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  
+  patients              Patient[]
+  documents             Document[]
+  analysisSessions      AnalysisSession[]
+  sessions              UserSession[]
+  consentRequestsAsPatient ConsentGrant[] @relation("PatientConsents")
+  consentRequestsAsSpecialist ConsentGrant[] @relation("SpecialistConsents")
+  auditLogs             AuditLog[]
+  
+  // AI Architecture Relations
+  chatConversations     ChatConversation[]
+  analysisQueue         AnalysisQueue[]
+  chatbotCosts          ChatbotCost[]
+  analysisCosts         AnalysisCost[]
+  contextOptimizations  ContextOptimization[]
+  analysisTasks         AnalysisTask[]
+  
+  @@map("users")
+}
+
+model Patient {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  firstName     String?   @map("first_name")
+  lastName      String?   @map("last_name")
+  dateOfBirth   DateTime? @map("date_of_birth")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents     Document[]
+  analysisSessions AnalysisSession[]
+  
+  @@map("patients")
+}
+
+// ============================================================================
+// DOCUMENT MANAGEMENT
+// ============================================================================
+
+model Document {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
