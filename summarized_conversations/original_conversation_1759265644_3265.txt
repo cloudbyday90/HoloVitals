@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "The seed script is looking for 'bcrypt' but we have 'bcryptjs'. Let me check and fix the seed file:\n\n<function_calls>\n<execute-command>\nhead -20 medical-analysis-platform/prisma/seed.ts\n</execute-command>\n</function_calls>"}

@@ -1,0 +1,16 @@
+[main 1a10145] feat: Implement AI Development Interface with Multi-Provider Support
+ 18 files changed, 3088 insertions(+), 1 deletion(-)
+ create mode 100644 AI_DEV_INTERFACE_COMPLETE.md
+ create mode 100644 medical-analysis-platform/app/api/dev-chat/providers/route.ts
+ create mode 100644 medical-analysis-platform/app/api/dev-chat/route.ts
+ create mode 100644 medical-analysis-platform/docs/AI_DEV_INTERFACE.md
+ create mode 100644 medical-analysis-platform/lib/providers/ClaudeProvider.ts
+ create mode 100644 medical-analysis-platform/lib/providers/OpenAIProvider.ts
+ create mode 100644 medical-analysis-platform/lib/providers/ProviderManager.ts
+ create mode 100644 medical-analysis-platform/lib/services/AIDevChatService.ts
+ create mode 100644 medical-analysis-platform/lib/types/ai-provider.ts
+ create mode 100644 outputs/workspace_output_1759264576_5969.txt
+ create mode 100644 outputs/workspace_output_1759264952_9489.txt
+ create mode 100644 outputs/workspace_output_1759265239_1400.txt
+ create mode 100644 outputs/workspace_output_1759265420_5050.txt
+ create mode 100644 outputs/workspace_output_1759265427_2567.txt

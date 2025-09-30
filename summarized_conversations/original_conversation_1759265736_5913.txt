@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "Perfect! Now let's create a final summary:\n\n<function_calls>\n<complete>\n</complete>\n</function_calls>"}

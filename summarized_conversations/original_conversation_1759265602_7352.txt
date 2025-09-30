@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': '<function_calls>\n<create-file file_path="medical-analysis-platform/prisma.config.ts">\nimport { defineConfig } from "prisma/config";\n\nexport default defineConfig({\n  migrations: {\n    seed: "ts-node prisma/seed.ts"\n  }\n});\n</create-file>\n</function_calls>'}

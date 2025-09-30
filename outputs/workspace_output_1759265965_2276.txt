@@ -1,0 +1,100 @@
+/**
+ * OpenAI AI Provider
+ * 
+ * Implementation of IAIProvider for OpenAI's GPT models.
+ * Supports GPT-3.5 Turbo, GPT-4, GPT-4 Turbo, and GPT-4o.
+ */
+
+import OpenAI from 'openai';
+import { encoding_for_model, TiktokenModel } from 'tiktoken';
+import {
+  IAIProvider,
+  AIProvider,
+  AIModel,
+  AICompletionRequest,
+  AICompletionResponse,
+  AIStreamChunk,
+  AIProviderConfig,
+  AIProviderCapabilities,
+  AIProviderCosts,
+  MODEL_CAPABILITIES,
+  MODEL_COSTS,
+  AIProviderError,
+  RateLimitError,
+  AuthenticationError,
+  InvalidRequestError
+} from '@/lib/types/ai-provider';
+
+export class OpenAIProvider implements IAIProvider {
+  private client: OpenAI;
+  private config: AIProviderConfig;
+  private encoding: any;
+
+  readonly provider = AIProvider.OPENAI;
+  readonly model: AIModel;
+  readonly capabilities: AIProviderCapabilities;
+  readonly costs: AIProviderCosts;
+
+  constructor(config: AIProviderConfig) {
+    if (config.provider !== AIProvider.OPENAI) {
+      throw new Error('Invalid provider for OpenAIProvider');
+    }
+
+    this.config = config;
+    this.model = config.model;
+    this.capabilities = MODEL_CAPABILITIES[config.model];
+    this.costs = MODEL_COSTS[config.model];
+
+    // Initialize OpenAI client
+    this.client = new OpenAI({
+      apiKey: config.apiKey,
+      baseURL: config.baseURL,
+      timeout: config.timeout || 60000,
+    });
+
+    // Initialize tokenizer
+    try {
+      this.encoding = encoding_for_model(this.model as TiktokenModel);
+    } catch (error) {
+      // Fallback to gpt-3.5-turbo encoding
+      this.encoding = encoding_for_model('gpt-3.5-turbo');
+    }
+  }
+
+  /**
+   * Complete a chat request
+   */
+  async complete(request: AICompletionRequest): Promise<AICompletionResponse> {
+    try {
+      const response = await this.client.chat.completions.create({
+        model: request.model,
+        messages: request.messages as any,
+        max_tokens: request.maxTokens || this.config.maxTokens || 4096,
+        temperature: request.temperature ?? this.config.temperature ?? 0.7,
+        top_p: request.topP ?? this.config.topP ?? 1,
+        stop: request.stopSequences,
+        stream: false
+      });
+
+      const choice = response.choices[0];
+      const content = choice.message.content || '';
+      const usage = response.usage!;
+
+      // Calculate cost
+      const cost = this.calculateCost(
+        usage.prompt_tokens,
+        usage.completion_tokens
+      );
+
+      return {
+        id: response.id,
+        content,
+        model: request.model,
+        provider: this.provider,
+        usage: {
+          promptTokens: usage.prompt_tokens,
+          completionTokens: usage.completion_tokens,
+          totalTokens: usage.total_tokens
+        },
+        cost,
+        finishReason: this.mapFinishReason(choice.finish_reason),

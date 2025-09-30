@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Let me try a simpler query:\n\n<function_calls>\n<execute-command>\nsudo -u postgres psql -d holovitals -c "SELECT COUNT(*) as user_count FROM users;"\n</execute-command>\n</function_calls>'}

@@ -18,14 +18,22 @@ export enum AIModel {
   GPT_4 = 'gpt-4',
   GPT_4_TURBO = 'gpt-4-turbo',
   GPT_4O = 'gpt-4o',
+  GPT_5 = 'gpt-5', // Latest model (August 2025) - 128K context
   
   // Claude Models
   CLAUDE_3_OPUS = 'claude-3-opus-20240229',
   CLAUDE_3_SONNET = 'claude-3-sonnet-20240229',
   CLAUDE_3_HAIKU = 'claude-3-haiku-20240307',
   CLAUDE_35_SONNET = 'claude-3-5-sonnet-20241022',
+  CLAUDE_35_SONNET_V2 = 'claude-3-5-sonnet-20250828', // Latest version (August 2025) - 200K context
   
-  // Future: Gemini, Llama, etc.
+  // Llama Models (via Open WebUI/Ollama)
+  LLAMA_32_1B = 'llama-3.2-1b',
+  LLAMA_32_3B = 'llama-3.2-3b',
+  LLAMA_32_11B = 'llama-3.2-11b',
+  LLAMA_32_90B = 'llama-3.2-90b',
+  
+  // Future: Gemini, etc.
 }
 
 export interface AIMessage {
@@ -153,6 +161,14 @@ export const MODEL_CAPABILITIES: Record<AIModel, AIProviderCapabilities> = {
     maxContextWindow: 128000,
     maxOutputTokens: 4096
   },
+  [AIModel.GPT_5]: {
+    supportsStreaming: true,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    supportsSystemMessages: true,
+    maxContextWindow: 128000,
+    maxOutputTokens: 8192
+  },
   
   // Claude Models
   [AIModel.CLAUDE_3_OPUS]: {
@@ -186,6 +202,48 @@ export const MODEL_CAPABILITIES: Record<AIModel, AIProviderCapabilities> = {
     supportsSystemMessages: true,
     maxContextWindow: 200000,
     maxOutputTokens: 8192
+  },
+  [AIModel.CLAUDE_35_SONNET_V2]: {
+    supportsStreaming: true,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    supportsSystemMessages: true,
+    maxContextWindow: 200000,
+    maxOutputTokens: 8192
+  },
+  
+  // Llama Models (via Open WebUI/Ollama)
+  [AIModel.LLAMA_32_1B]: {
+    supportsStreaming: true,
+    supportsVision: false,
+    supportsFunctionCalling: false,
+    supportsSystemMessages: true,
+    maxContextWindow: 128000,
+    maxOutputTokens: 4096
+  },
+  [AIModel.LLAMA_32_3B]: {
+    supportsStreaming: true,
+    supportsVision: false,
+    supportsFunctionCalling: false,
+    supportsSystemMessages: true,
+    maxContextWindow: 128000,
+    maxOutputTokens: 4096
+  },
+  [AIModel.LLAMA_32_11B]: {
+    supportsStreaming: true,
+    supportsVision: true,
+    supportsFunctionCalling: false,
+    supportsSystemMessages: true,
+    maxContextWindow: 128000,
+    maxOutputTokens: 4096
+  },
+  [AIModel.LLAMA_32_90B]: {
+    supportsStreaming: true,
+    supportsVision: true,
+    supportsFunctionCalling: false,
+    supportsSystemMessages: true,
+    maxContextWindow: 128000,
+    maxOutputTokens: 4096
   }
 };
 
@@ -214,6 +272,11 @@ export const MODEL_COSTS: Record<AIModel, AIProviderCosts> = {
     completionCostPer1M: 15.00,
     currency: 'USD'
   },
+  [AIModel.GPT_5]: {
+    promptCostPer1M: 10.00,
+    completionCostPer1M: 30.00,
+    currency: 'USD'
+  },
   
   // Claude Models
   [AIModel.CLAUDE_3_OPUS]: {
@@ -234,6 +297,33 @@ export const MODEL_COSTS: Record<AIModel, AIProviderCosts> = {
   [AIModel.CLAUDE_35_SONNET]: {
     promptCostPer1M: 3.00,
     completionCostPer1M: 15.00,
+    currency: 'USD'
+  },
+  [AIModel.CLAUDE_35_SONNET_V2]: {
+    promptCostPer1M: 3.00,
+    completionCostPer1M: 15.00,
+    currency: 'USD'
+  },
+  
+  // Llama Models (via Open WebUI/Ollama) - FREE (self-hosted)
+  [AIModel.LLAMA_32_1B]: {
+    promptCostPer1M: 0.00,
+    completionCostPer1M: 0.00,
+    currency: 'USD'
+  },
+  [AIModel.LLAMA_32_3B]: {
+    promptCostPer1M: 0.00,
+    completionCostPer1M: 0.00,
+    currency: 'USD'
+  },
+  [AIModel.LLAMA_32_11B]: {
+    promptCostPer1M: 0.00,
+    completionCostPer1M: 0.00,
+    currency: 'USD'
+  },
+  [AIModel.LLAMA_32_90B]: {
+    promptCostPer1M: 0.00,
+    completionCostPer1M: 0.00,
     currency: 'USD'
   }
 };

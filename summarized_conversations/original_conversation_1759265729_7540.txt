@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': '<function_calls>\n<str-replace file_path="medical-analysis-platform/.env.example">\n    <old_str># OpenAI API\nOPENAI_API_KEY="your-openai-api-key-here"</old_str>\n    <new_str># AI Providers\nOPENAI_API_KEY="your-openai-api-key-here"\nANTHROPIC_API_KEY="your-anthropic-api-key-here"</new_str>\n</str-replace>\n</function_calls>'}

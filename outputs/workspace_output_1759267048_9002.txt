@@ -1,0 +1,16 @@
+  cost: number;
+  finishReason: 'stop' | 'length' | 'content_filter' | 'tool_use';
+  metadata?: Record<string, any>;
+}
+
+export interface AIStreamChunk {
+  content: string;
+  finishReason?: 'stop' | 'length' | 'content_filter';
+}
+
+export interface AIProviderConfig {
+  provider: AIProvider;
+  apiKey: string;
+  model: AIModel;
+  maxTokens?: number;
+  temperature?: number;

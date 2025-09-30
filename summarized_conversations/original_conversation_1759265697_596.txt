@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'We need to install jest-environment-jsdom. Let me fix that:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && npm install --save-dev jest-environment-jsdom\n</execute-command>\n</function_calls>'}

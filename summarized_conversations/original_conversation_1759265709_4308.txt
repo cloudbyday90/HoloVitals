@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Let me try a different approach to see the coverage summary:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && npx jest --coverage --coverageReporters=text 2>&1 | tail -50\n</execute-command>\n</function_calls>'}

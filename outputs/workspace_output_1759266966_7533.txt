@@ -1,0 +1,1 @@
+lib/providers/LlamaProvider.ts(30,8): error TS2307: Cannot find module '@/lib/types/ai-provider' or its corresponding type declarations.

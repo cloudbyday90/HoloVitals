@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Let me research the correct format for Prisma 6.x config files:\n\n<function_calls>\n<web-search query="Prisma 6 config file format prisma.config.ts example" num_results="10">\n</web-search>\n</function_calls>'}

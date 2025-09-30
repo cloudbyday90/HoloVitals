@@ -1,0 +1,81 @@
+export const MODEL_COSTS: Record<AIModel, AIProviderCosts> = {
+  // OpenAI Models
+  [AIModel.GPT_35_TURBO]: {
+    promptCostPer1M: 0.50,
+    completionCostPer1M: 1.50,
+    currency: 'USD'
+  },
+  [AIModel.GPT_4]: {
+    promptCostPer1M: 30.00,
+    completionCostPer1M: 60.00,
+    currency: 'USD'
+  },
+  [AIModel.GPT_4_TURBO]: {
+    promptCostPer1M: 10.00,
+    completionCostPer1M: 30.00,
+    currency: 'USD'
+  },
+  [AIModel.GPT_4O]: {
+    promptCostPer1M: 5.00,
+    completionCostPer1M: 15.00,
+    currency: 'USD'
+  },
+  
+  // Claude Models
+  [AIModel.CLAUDE_3_OPUS]: {
+    promptCostPer1M: 15.00,
+    completionCostPer1M: 75.00,
+    currency: 'USD'
+  },
+  [AIModel.CLAUDE_3_SONNET]: {
+    promptCostPer1M: 3.00,
+    completionCostPer1M: 15.00,
+    currency: 'USD'
+  },
+  [AIModel.CLAUDE_3_HAIKU]: {
+    promptCostPer1M: 0.25,
+    completionCostPer1M: 1.25,
+    currency: 'USD'
+  },
+  [AIModel.CLAUDE_35_SONNET]: {
+    promptCostPer1M: 3.00,
+    completionCostPer1M: 15.00,
+    currency: 'USD'
+  }
+};
+
+/**
+ * Provider-specific error types
+ */
+export class AIProviderError extends Error {
+  constructor(
+    message: string,
+    public provider: AIProvider,
+    public statusCode?: number,
+    public originalError?: any
+  ) {
+    super(message);
+    this.name = 'AIProviderError';
+  }
+}
+
+export class RateLimitError extends AIProviderError {
+  constructor(provider: AIProvider, retryAfter?: number) {
+    super(`Rate limit exceeded for ${provider}`, provider, 429);
+    this.name = 'RateLimitError';
+  }
+}
+
+export class AuthenticationError extends AIProviderError {
+  constructor(provider: AIProvider) {
+    super(`Authentication failed for ${provider}`, provider, 401);
+    this.name = 'AuthenticationError';
+  }
+}
+
+export class InvalidRequestError extends AIProviderError {
+  constructor(provider: AIProvider, message: string) {
+    super(`Invalid request for ${provider}: ${message}`, provider, 400);
+    this.name = 'InvalidRequestError';
+  }
+}

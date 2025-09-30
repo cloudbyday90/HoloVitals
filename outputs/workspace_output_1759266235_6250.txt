@@ -1,0 +1,34 @@
+      case AIProvider.OPENAI:
+        provider = new OpenAIProvider(config);
+        break;
+      case AIProvider.CLAUDE:
+        provider = new ClaudeProvider(config);
+        break;
+      default:
+        throw new Error(`Unsupported provider: ${config.provider}`);
+    }
+
+    this.providers.set(name, provider);
+    
+    // Set as active if it's the first provider
+    if (!this.activeProvider) {
+      this.activeProvider = name;
+    }
+  }
+
+  /**
+   * Switch to a different provider
+   */
+  switchProvider(name: string): void {
+    if (!this.providers.has(name)) {
+      throw new Error(`Provider not found: ${name}`);
+    }
+    this.activeProvider = name;
+  }
+
+  /**
+   * Get the active provider
+   */
+  getActiveProvider(): IAIProvider {
+    if (!this.activeProvider) {
+      throw new Error('No active provider set');

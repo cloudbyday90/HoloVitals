@@ -1,0 +1,1 @@
+{'role': 'user', 'content': 'Okay, what else do we need to work on regarding this phase? \n\nAlso, we need to implement a separate AI chat for development for AI. Thinking of using Claude. I would like a backend interface that I can use to hook into Claude using an API string for future developement and improvements.'}

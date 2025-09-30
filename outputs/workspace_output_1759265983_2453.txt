@@ -1,0 +1,100 @@
+export const MODEL_CAPABILITIES: Record<AIModel, AIProviderCapabilities> = {
+  // OpenAI Models
+  [AIModel.GPT_35_TURBO]: {
+    supportsStreaming: true,
+    supportsVision: false,
+    supportsFunctionCalling: true,
+    supportsSystemMessages: true,
+    maxContextWindow: 16385,
+    maxOutputTokens: 4096
+  },
+  [AIModel.GPT_4]: {
+    supportsStreaming: true,
+    supportsVision: false,
+    supportsFunctionCalling: true,
+    supportsSystemMessages: true,
+    maxContextWindow: 8192,
+    maxOutputTokens: 4096
+  },
+  [AIModel.GPT_4_TURBO]: {
+    supportsStreaming: true,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    supportsSystemMessages: true,
+    maxContextWindow: 128000,
+    maxOutputTokens: 4096
+  },
+  [AIModel.GPT_4O]: {
+    supportsStreaming: true,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    supportsSystemMessages: true,
+    maxContextWindow: 128000,
+    maxOutputTokens: 4096
+  },
+  
+  // Claude Models
+  [AIModel.CLAUDE_3_OPUS]: {
+    supportsStreaming: true,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    supportsSystemMessages: true,
+    maxContextWindow: 200000,
+    maxOutputTokens: 4096
+  },
+  [AIModel.CLAUDE_3_SONNET]: {
+    supportsStreaming: true,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    supportsSystemMessages: true,
+    maxContextWindow: 200000,
+    maxOutputTokens: 4096
+  },
+  [AIModel.CLAUDE_3_HAIKU]: {
+    supportsStreaming: true,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    supportsSystemMessages: true,
+    maxContextWindow: 200000,
+    maxOutputTokens: 4096
+  },
+  [AIModel.CLAUDE_35_SONNET]: {
+    supportsStreaming: true,
+    supportsVision: true,
+    supportsFunctionCalling: true,
+    supportsSystemMessages: true,
+    maxContextWindow: 200000,
+    maxOutputTokens: 8192
+  }
+};
+
+/**
+ * Model costs (per 1M tokens)
+ */
+export const MODEL_COSTS: Record<AIModel, AIProviderCosts> = {
+  // OpenAI Models
+  [AIModel.GPT_35_TURBO]: {
+    promptCostPer1M: 0.50,
+    completionCostPer1M: 1.50,
+    currency: 'USD'
+  },
+  [AIModel.GPT_4]: {
+    promptCostPer1M: 30.00,
+    completionCostPer1M: 60.00,
+    currency: 'USD'
+  },
+  [AIModel.GPT_4_TURBO]: {
+    promptCostPer1M: 10.00,
+    completionCostPer1M: 30.00,
+    currency: 'USD'
+  },
+  [AIModel.GPT_4O]: {
+    promptCostPer1M: 5.00,
+    completionCostPer1M: 15.00,
+    currency: 'USD'
+  },
+  
+  // Claude Models
+  [AIModel.CLAUDE_3_OPUS]: {
+    promptCostPer1M: 15.00,
+    completionCostPer1M: 75.00,

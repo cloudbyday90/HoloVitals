@@ -1,0 +1,31 @@
+export interface IAIProvider {
+  // Provider info
+  readonly provider: AIProvider;
+  readonly model: AIModel;
+  readonly capabilities: AIProviderCapabilities;
+  readonly costs: AIProviderCosts;
+
+  // Core methods
+  complete(request: AICompletionRequest): Promise<AICompletionResponse>;
+  stream(request: AICompletionRequest): AsyncGenerator<AIStreamChunk>;
+  
+  // Utility methods
+  countTokens(text: string): number;
+  calculateCost(promptTokens: number, completionTokens: number): number;
+  validateApiKey(): Promise<boolean>;
+  
+  // Configuration
+  updateConfig(config: Partial<AIProviderConfig>): void;
+  getConfig(): AIProviderConfig;
+}
+
+/**
+ * Model capabilities by provider
+ */
+export const MODEL_CAPABILITIES: Record<AIModel, AIProviderCapabilities> = {
+  // OpenAI Models
+  [AIModel.GPT_35_TURBO]: {
+    supportsStreaming: true,
+    supportsVision: false,
+    supportsFunctionCalling: true,
+    supportsSystemMessages: true,

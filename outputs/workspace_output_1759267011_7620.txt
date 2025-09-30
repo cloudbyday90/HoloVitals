@@ -1,0 +1,29 @@
+lib/providers/ClaudeProvider.ts(25,8): error TS2307: Cannot find module '@/lib/types/ai-provider' or its corresponding type declarations.
+lib/providers/LlamaProvider.ts(52,14): error TS2420: Class 'LlamaProvider' incorrectly implements interface 'IAIProvider'.
+  Type 'LlamaProvider' is missing the following properties from type 'IAIProvider': validateApiKey, updateConfig, getConfig
+lib/providers/LlamaProvider.ts(123,9): error TS2322: Type '"length" | "error" | "stop" | "content_filter"' is not assignable to type '"length" | "stop" | "content_filter" | "tool_use"'.
+  Type '"error"' is not assignable to type '"length" | "stop" | "content_filter" | "tool_use"'.
+lib/providers/LlamaProvider.ts(189,19): error TS2353: Object literal may only specify known properties, and 'model' does not exist in type 'AIStreamChunk'.
+lib/providers/LlamaProvider.ts(197,19): error TS2322: Type '"length" | "error" | "stop" | "content_filter"' is not assignable to type '"length" | "stop" | "content_filter"'.
+  Type '"error"' is not assignable to type '"length" | "stop" | "content_filter"'.
+lib/providers/OpenAIProvider.ts(26,8): error TS2307: Cannot find module '@/lib/types/ai-provider' or its corresponding type declarations.
+lib/providers/ProviderManager.ts(16,8): error TS2307: Cannot find module '@/lib/types/ai-provider' or its corresponding type declarations.
+lib/providers/ProviderManager.ts(222,36): error TS2802: Type 'Map<string, IAIProvider>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.
+node_modules/@anthropic-ai/sdk/client.d.ts(100,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/@anthropic-ai/sdk/core/api-promise.d.ts(9,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/@anthropic-ai/sdk/core/pagination.d.ts(7,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/@anthropic-ai/sdk/core/streaming.d.ts(9,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/@anthropic-ai/sdk/internal/decoders/line.d.ts(9,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/@anthropic-ai/sdk/lib/BetaMessageStream.d.ts(21,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/@anthropic-ai/sdk/lib/MessageStream.d.ts(21,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/@anthropic-ai/sdk/lib/tools/BetaToolRunner.d.ts(13,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/openai/client.d.ts(132,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/openai/core/api-promise.d.ts(9,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/openai/core/pagination.d.ts(7,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/openai/core/streaming.d.ts(9,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/openai/lib/AbstractChatCompletionRunner.d.ts(14,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/openai/lib/AssistantStream.d.ts(36,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/openai/lib/ChatCompletionStream.d.ts(68,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/openai/lib/EventStream.d.ts(3,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/openai/lib/responses/ResponseStream.d.ts(47,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/openai/resources/webhooks.d.ts(4,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.

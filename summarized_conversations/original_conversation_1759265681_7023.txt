@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "Now let's create a test file for the LightweightChatbotService. First, let me install the testing dependencies:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && npm install --save-dev jest @types/jest ts-jest @testing-library/react @testing-library/jest-dom\n</execute-command>\n</function_calls>"}

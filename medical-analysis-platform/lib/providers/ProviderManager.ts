@@ -16,6 +16,7 @@ import {
 } from '@/lib/types/ai-provider';
 import { OpenAIProvider } from './OpenAIProvider';
 import { ClaudeProvider } from './ClaudeProvider';
+import { LlamaProvider } from './LlamaProvider';
 
 export class ProviderManager {
   private providers: Map<string, IAIProvider> = new Map();
@@ -33,6 +34,9 @@ export class ProviderManager {
         break;
       case AIProvider.CLAUDE:
         provider = new ClaudeProvider(config);
+        break;
+      case AIProvider.LLAMA:
+        provider = new LlamaProvider(config);
         break;
       default:
         throw new Error(`Unsupported provider: ${config.provider}`);
@@ -276,6 +280,22 @@ export function initializeProvidersFromEnv(): ProviderManager {
 
   // Initialize OpenAI if API key is present
   if (process.env.OPENAI_API_KEY) {
+    manager.registerProvider('openai-gpt5', {
+      provider: AIProvider.OPENAI,
+      apiKey: process.env.OPENAI_API_KEY,
+      model: AIModel.GPT_5,
+      maxTokens: 8192,
+      temperature: 0.7
+    });
+
+    manager.registerProvider('openai-gpt4o', {
+      provider: AIProvider.OPENAI,
+      apiKey: process.env.OPENAI_API_KEY,
+      model: AIModel.GPT_4O,
+      maxTokens: 4096,
+      temperature: 0.7
+    });
+
     manager.registerProvider('openai-gpt4', {
       provider: AIProvider.OPENAI,
       apiKey: process.env.OPENAI_API_KEY,
@@ -295,6 +315,22 @@ export function initializeProvidersFromEnv(): ProviderManager {
 
   // Initialize Claude if API key is present
   if (process.env.ANTHROPIC_API_KEY) {
+    manager.registerProvider('claude-sonnet-v2', {
+      provider: AIProvider.CLAUDE,
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      model: AIModel.CLAUDE_35_SONNET_V2,
+      maxTokens: 8192,
+      temperature: 0.7
+    });
+
+    manager.registerProvider('claude-sonnet', {
+      provider: AIProvider.CLAUDE,
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      model: AIModel.CLAUDE_35_SONNET,
+      maxTokens: 8192,
+      temperature: 0.7
+    });
+
     manager.registerProvider('claude-opus', {
       provider: AIProvider.CLAUDE,
       apiKey: process.env.ANTHROPIC_API_KEY,
@@ -303,18 +339,51 @@ export function initializeProvidersFromEnv(): ProviderManager {
       temperature: 0.7
     });
 
-    manager.registerProvider('claude-sonnet', {
-      provider: AIProvider.CLAUDE,
-      apiKey: process.env.ANTHROPIC_API_KEY,
-      model: AIModel.CLAUDE_35_SONNET,
-      maxTokens: 4096,
-      temperature: 0.7
-    });
-
     manager.registerProvider('claude-haiku', {
       provider: AIProvider.CLAUDE,
       apiKey: process.env.ANTHROPIC_API_KEY,
       model: AIModel.CLAUDE_3_HAIKU,
+      maxTokens: 4096,
+      temperature: 0.7
+    });
+  }
+
+  // Initialize Llama (local) if base URL is configured
+  if (process.env.LLAMA_BASE_URL || process.env.OPEN_WEBUI_URL) {
+    const baseURL = process.env.LLAMA_BASE_URL || process.env.OPEN_WEBUI_URL || 'http://localhost:3000/api';
+    
+    manager.registerProvider('llama-90b', {
+      provider: AIProvider.LLAMA,
+      apiKey: 'local', // Not required for local models
+      model: AIModel.LLAMA_32_90B,
+      baseURL,
+      maxTokens: 4096,
+      temperature: 0.7
+    });
+
+    manager.registerProvider('llama-11b', {
+      provider: AIProvider.LLAMA,
+      apiKey: 'local',
+      model: AIModel.LLAMA_32_11B,
+      baseURL,
+      maxTokens: 4096,
+      temperature: 0.7
+    });
+
+    manager.registerProvider('llama-3b', {
+      provider: AIProvider.LLAMA,
+      apiKey: 'local',
+      model: AIModel.LLAMA_32_3B,
+      baseURL,
+      maxTokens: 4096,
+      temperature: 0.7
+    });
+
+    manager.registerProvider('llama-1b', {
+      provider: AIProvider.LLAMA,
+      apiKey: 'local',
+      model: AIModel.LLAMA_32_1B,
+      baseURL,
       maxTokens: 4096,
       temperature: 0.7
     });

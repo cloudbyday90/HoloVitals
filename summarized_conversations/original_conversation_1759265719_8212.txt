@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "Now let's install the Anthropic SDK:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && npm install @anthropic-ai/sdk\n</execute-command>\n</function_calls>"}

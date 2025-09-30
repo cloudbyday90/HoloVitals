@@ -1,0 +1,51 @@
+      model: provider.model,
+      capabilities: provider.capabilities,
+      costs: provider.costs
+    };
+  }
+
+  /**
+   * List all registered providers with info
+   */
+  listProviders(): Array<{
+    name: string;
+    provider: AIProvider;
+    model: AIModel;
+    isActive: boolean;
+  }> {
+    const result: Array<{
+      name: string;
+      provider: AIProvider;
+      model: AIModel;
+      isActive: boolean;
+    }> = [];
+
+    for (const [name, provider] of this.providers) {
+      result.push({
+        name,
+        provider: provider.provider,
+        model: provider.model,
+        isActive: name === this.activeProvider
+      });
+    }
+
+    return result;
+  }
+
+  /**
+   * Update provider configuration
+   */
+  updateProviderConfig(
+    name: string,
+    config: Partial<AIProviderConfig>
+  ): void {
+    const provider = this.getProvider(name);
+    if (!provider) {
+      throw new Error(`Provider not found: ${name}`);
+    }
+    provider.updateConfig(config);
+  }
+
+  /**
+   * Get provider configuration
+   */

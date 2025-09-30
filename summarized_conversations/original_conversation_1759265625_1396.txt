@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Docker is not available. Let me check for PostgreSQL installation:\n\n<function_calls>\n<execute-command>\npsql --version\n</execute-command>\n</function_calls>'}

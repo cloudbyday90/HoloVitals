@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': '<function_calls>\n<str-replace file_path="medical-analysis-platform/prisma/seed.ts">\n    <old_str>import { PrismaClient } from \'@prisma/client\';\nimport * as bcrypt from \'bcrypt\';</old_str>\n    <new_str>import { PrismaClient } from \'@prisma/client\';\nimport * as bcrypt from \'bcryptjs\';</new_str>\n</str-replace>\n</function_calls>'}

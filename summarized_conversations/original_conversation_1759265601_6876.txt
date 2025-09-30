@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Perfect! Now I understand the correct format. The key is to use `defineConfig` from `"prisma/config"` (not just `"prisma"`). Let me create the correct configuration file:\n\n<function_calls>\n<delete-file file_path="medical-analysis-platform/prisma.config.js">\n</delete-file>\n</function_calls>'}

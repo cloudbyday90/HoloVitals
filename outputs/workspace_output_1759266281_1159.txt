@@ -1,0 +1,29 @@
+  // Initialize Claude if API key is present
+  if (process.env.ANTHROPIC_API_KEY) {
+    manager.registerProvider('claude-opus', {
+      provider: AIProvider.CLAUDE,
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      model: AIModel.CLAUDE_3_OPUS,
+      maxTokens: 4096,
+      temperature: 0.7
+    });
+
+    manager.registerProvider('claude-sonnet', {
+      provider: AIProvider.CLAUDE,
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      model: AIModel.CLAUDE_35_SONNET,
+      maxTokens: 4096,
+      temperature: 0.7
+    });
+
+    manager.registerProvider('claude-haiku', {
+      provider: AIProvider.CLAUDE,
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      model: AIModel.CLAUDE_3_HAIKU,
+      maxTokens: 4096,
+      temperature: 0.7
+    });
+  }
+
+  return manager;
+}

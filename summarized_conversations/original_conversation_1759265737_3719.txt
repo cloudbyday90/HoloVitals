@@ -1,0 +1,1 @@
+{'role': 'user', 'content': '/fast-deep-research We need to implement the newer models from Claude, OpenAI, etc. For example, ChatGPT 5 and Claude 3.5 Sonnet. We should be able to easily implement newer models into our service. \n\nAlternatively, I could use a local LLM, such as Llama, using Open WebUI. https://github.com/open-webui/open-webui'}

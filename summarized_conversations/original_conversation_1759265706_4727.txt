@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Let me get a better summary from the lcov.info file:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && cat coverage/lcov.info | grep -E "^(SF:|LF:|LH:)" | head -30\n</execute-command>\n</function_calls>'}

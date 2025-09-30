@@ -1,0 +1,50 @@
+      case 'max_tokens':
+        return 'length';
+      case 'content_filter':
+        return 'content_filter';
+      default:
+        return 'stop';
+    }
+  }
+
+  /**
+   * Handle HTTP errors
+   */
+  private async handleError(response: Response): Promise<never> {
+    const status = response.status;
+    let errorMessage = `HTTP ${status}: ${response.statusText}`;
+
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error?.message || errorMessage;
+    } catch {
+      // Use default error message
+    }
+
+    if (status === 429) {
+      throw new RateLimitError(this.provider);
+    } else if (status === 401 || status === 403) {
+      throw new AuthenticationError(this.provider);
+    } else if (status >= 400 && status < 500) {
+      throw new InvalidRequestError(this.provider, errorMessage);
+    } else {
+      throw new AIProviderError(errorMessage, this.provider, status);
+    }
+  }
+
+  /**
+   * Wrap unknown errors
+   */
+  private wrapError(error: any): AIProviderError {
+    if (error instanceof AIProviderError) {
+      return error;
+    }
+
+    return new AIProviderError(
+      error.message || 'Unknown error occurred',
+      this.provider,
+      undefined,
+      error
+    );
+  }
+}

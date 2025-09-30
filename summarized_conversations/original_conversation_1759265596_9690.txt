@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Let me check the Prisma version and see what format is expected. Let me try a simpler JavaScript format:\n\n<function_calls>\n<delete-file file_path="medical-analysis-platform/prisma.config.ts">\n</delete-file>\n</function_calls>'}
