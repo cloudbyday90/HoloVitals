@@ -1,0 +1,50 @@
+  @@index([status])
+}
+
+model PatientAllergy {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  allergen        String
+  type            String
+  reaction        String
+  severity        String
+  diagnosedDate   DateTime? @map("diagnosed_date")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_allergies")
+  @@index([repositoryId])
+}
+
+model PatientVitalSign {
+  id                      String    @id @default(uuid())
+  repositoryId            String    @map("repository_id")
+  date                    DateTime
+  bloodPressureSystolic   Int?      @map("blood_pressure_systolic")
+  bloodPressureDiastolic  Int?      @map("blood_pressure_diastolic")
+  heartRate               Int?      @map("heart_rate")
+  temperature             Float?
+  weight                  Float?
+  height                  Float?
+  bmi                     Float?
+  oxygenSaturation        Int?      @map("oxygen_saturation")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  
+  repository              PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_vital_signs")
+  @@index([repositoryId])
+  @@index([date])
+}
+
+model PatientProcedure {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  name            String
+  date            DateTime
+  performedBy     String?   @map("performed_by")
+  location        String?
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  

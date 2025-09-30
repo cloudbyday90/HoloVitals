@@ -39,6 +39,7 @@ model User {
   analysisQueue         AnalysisQueue[]
   chatbotCosts          ChatbotCost[]
   analysisCosts         AnalysisCost[]
+  contextOptimizations  ContextOptimization[]
   
   @@map("users")
 }
@@ -802,4 +803,25 @@ model IdentityChallenge {
   @@map("identity_challenges")
   @@index([repositoryId])
   @@index([expiresAt])
+}
+
+model ContextOptimization {
+  id                  String   @id @default(cuid())
+  userId              String
+  originalTokens      Int
+  optimizedTokens     Int
+  reductionPercentage Float
+  strategy            String
+  compressionRatio    Float
+  relevanceScore      Float
+  informationDensity  Float
+  processingTimeMs    Int
+  qualityScore        Float
+  createdAt           DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([strategy])
 }

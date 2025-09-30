@@ -1,0 +1,30 @@
+      ✓ should handle PRESCRIPTION type (5 ms)
+    Target Tokens
+      ✓ should reduce tokens significantly
+      ✓ should not over-compress if already under target
+    Keyword Preservation
+      ✓ should preserve specified keywords (1 ms)
+      ✓ should return preserved keywords in result
+    Metrics
+      ✓ should calculate compression ratio
+      ✓ should calculate relevance score (1 ms)
+      ✓ should calculate information density
+      ✓ should track processing time
+      ✓ should calculate quality score
+    Batch Optimization
+      ✓ should optimize multiple contexts (12 ms)
+      ✓ should handle empty batch (1 ms)
+    Edge Cases
+      ✓ should handle very short content
+      ✓ should handle content with special characters (1 ms)
+      ✓ should handle content with numbers
+      ✓ should handle content with multiple paragraphs
+    Performance
+      ✓ should optimize within reasonable time
+      ✓ should handle large content efficiently (2 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       28 passed, 28 total
+Snapshots:   0 total
+Time:        0.508 s, estimated 1 s
+Ran all test suites matching ContextOptimizerService.

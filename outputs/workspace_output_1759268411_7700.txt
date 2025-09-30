@@ -1,0 +1,20 @@
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_family_history")
+  @@index([repositoryId])
+}
+
+model IdentityChallenge {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  questions       String    @db.Text
+  expiresAt       DateTime  @map("expires_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  @@map("identity_challenges")
+  @@index([repositoryId])
+  @@index([expiresAt])
+}

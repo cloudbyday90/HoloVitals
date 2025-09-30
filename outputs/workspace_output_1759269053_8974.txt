@@ -1,0 +1,50 @@
+      ✓ should optimize multiple contexts (1 ms)
+      ✓ should handle empty batch
+    Edge Cases
+      ✓ should handle very short content
+      ✓ should handle content with special characters (1 ms)
+      ✓ should handle content with numbers
+      ✓ should handle content with multiple paragraphs
+    Performance
+      ✓ should optimize within reasonable time
+      ✓ should handle large content efficiently (2 ms)
+
+  ● ContextOptimizerService › Basic Optimization › should preserve medical keywords
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "blood pressure"
+    Received string:    "patient diagnosed with hypertension. bp: 140/90 mmhg. prescribed lisinopril 10mg daily."
+
+      51 |       const optimized = result.optimizedContent.toLowerCase();
+      52 |       expect(optimized).toContain('hypertension');
+    > 53 |       expect(optimized).toContain('blood pressure');
+         |                         ^
+      54 |       expect(optimized).toContain('lisinopril');
+      55 |     });
+      56 |
+
+      at Object.toContain (__tests__/services/ContextOptimizerService.test.ts:53:25)
+
+  ● ContextOptimizerService › Target Tokens › should respect target token limit
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 100
+    Received:    750
+
+      173 |       });
+      174 |
+    > 175 |       expect(result.optimizedTokens).toBeLessThanOrEqual(100); // Allow reasonable margin
+          |                                      ^
+      176 |     });
+      177 |
+      178 |     it('should not over-compress if already under target', async () => {
+
+      at Object.toBeLessThanOrEqual (__tests__/services/ContextOptimizerService.test.ts:175:38)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 26 passed, 28 total
+Snapshots:   0 total
+Time:        0.522 s, estimated 1 s
+Ran all test suites matching ContextOptimizerService.

@@ -1,0 +1,100 @@
+
+> medical-analysis-platform@0.1.0 test
+> jest ContextOptimizerService
+
+FAIL __tests__/services/ContextOptimizerService.test.ts
+  ContextOptimizerService
+    Singleton Pattern
+      ✓ should return the same instance (2 ms)
+    Basic Optimization
+      ✓ should optimize simple text (2 ms)
+      ✓ should preserve medical keywords (1 ms)
+      ✓ should handle empty content
+    Optimization Strategies
+      ✕ should apply AGGRESSIVE strategy with high reduction (1 ms)
+      ✕ should apply BALANCED strategy with moderate reduction (1 ms)
+      ✕ should apply CONSERVATIVE strategy with low reduction (1 ms)
+      ✓ should apply MINIMAL strategy with minimal reduction (8 ms)
+    Content Types
+      ✓ should handle MEDICAL_REPORT type (1 ms)
+      ✓ should handle LAB_RESULTS type (1 ms)
+      ✓ should handle PRESCRIPTION type (1 ms)
+    Target Tokens
+      ✕ should respect target token limit (1 ms)
+      ✓ should not over-compress if already under target
+    Keyword Preservation
+      ✓ should preserve specified keywords (1 ms)
+      ✓ should return preserved keywords in result (1 ms)
+    Metrics
+      ✓ should calculate compression ratio
+      ✓ should calculate relevance score (1 ms)
+      ✓ should calculate information density
+      ✕ should track processing time
+      ✓ should calculate quality score
+    Batch Optimization
+      ✓ should optimize multiple contexts (1 ms)
+      ✓ should handle empty batch
+    Edge Cases
+      ✓ should handle very short content (1 ms)
+      ✓ should handle content with special characters
+      ✓ should handle content with numbers
+      ✓ should handle content with multiple paragraphs (1 ms)
+    Performance
+      ✓ should optimize within reasonable time
+      ✓ should handle large content efficiently (3 ms)
+
+  ● ContextOptimizerService › Optimization Strategies › should apply AGGRESSIVE strategy with high reduction
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 40
+    Received:   25.82781456953642
+
+      83 |       });
+      84 |
+    > 85 |       expect(result.reductionPercentage).toBeGreaterThan(40);
+         |                                          ^
+      86 |       expect(result.strategy).toBe(OptimizationStrategy.AGGRESSIVE);
+      87 |     });
+      88 |
+
+      at Object.toBeGreaterThan (__tests__/services/ContextOptimizerService.test.ts:85:42)
+
+  ● ContextOptimizerService › Optimization Strategies › should apply BALANCED strategy with moderate reduction
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 20
+    Received:   11.258278145695364
+
+      93 |       });
+      94 |
+    > 95 |       expect(result.reductionPercentage).toBeGreaterThan(20);
+         |                                          ^
+      96 |       expect(result.reductionPercentage).toBeLessThan(50);
+      97 |       expect(result.strategy).toBe(OptimizationStrategy.BALANCED);
+      98 |     });
+
+      at Object.toBeGreaterThan (__tests__/services/ContextOptimizerService.test.ts:95:42)
+
+  ● ContextOptimizerService › Optimization Strategies › should apply CONSERVATIVE strategy with low reduction
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 10
+    Received:   8.609271523178808
+
+      104 |       });
+      105 |
+    > 106 |       expect(result.reductionPercentage).toBeGreaterThan(10);
+          |                                          ^
+      107 |       expect(result.reductionPercentage).toBeLessThan(30);
+      108 |       expect(result.strategy).toBe(OptimizationStrategy.CONSERVATIVE);
+      109 |     });
+
+      at Object.toBeGreaterThan (__tests__/services/ContextOptimizerService.test.ts:106:42)
+
+  ● ContextOptimizerService › Target Tokens › should respect target token limit
+
+    expect(received).toBeLessThanOrEqual(expected)
+
