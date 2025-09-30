@@ -42,6 +42,7 @@ model User {
   analysisCosts         AnalysisCost[]
   contextOptimizations  ContextOptimization[]
   analysisTasks         AnalysisTask[]
+    cloudInstances        CloudInstance[]
   
   @@map("users")
 }
@@ -270,34 +271,47 @@ model AnalysisQueue {
 // CLOUD INSTANCE TRACKING (New AI Architecture)
 // ============================================================================
 
-model CloudInstance {
-  id           String   @id @default(cuid())
-  
-  provider     String
-  region       String
-  instanceType String
-  instanceId   String   @unique
-  
-  model        String
-  
-  status       String   @default("provisioning")
-  
-  createdAt    DateTime @default(now())
-  readyAt      DateTime?
-  terminatedAt DateTime?
-  
-  costPerMinute Float
-  totalCost     Float   @default(0)
-  
-  tasks        AnalysisQueue[]
-  
-  metadata     Json?
-  
-  @@index([status])
-  @@index([createdAt])
-  @@index([provider, region])
-  @@map("cloud_instances")
-}
+  model CloudInstance {
+    id                  String    @id @default(cuid())
+    userId              String
+    user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    taskId              String?
+    task                AnalysisTask? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+    
+    provider            String
+    instanceType        String
+    region              String
+    cloudInstanceId     String?
+    
+    publicIp            String?
+    privateIp           String?
+    
+    status              String
+    
+    diskSizeGB          Int       @default(100)
+    autoTerminateMinutes Int      @default(60)
+    
+    costPerHour         Float
+    totalCost           Float     @default(0)
+    
+    purpose             String?
+    metadata            Json?
+    
+    tasks               AnalysisQueue[]
+    
+    createdAt           DateTime  @default(now())
+    terminatedAt        DateTime?
+    updatedAt           DateTime  @updatedAt
+    
+    @@index([userId])
+    @@index([taskId])
+    @@index([status])
+    @@index([provider])
+    @@index([createdAt])
+    @@map("cloud_instances")
+  }
+
 
 // ============================================================================
 // COST TRACKING (New AI Architecture)
@@ -849,6 +863,7 @@ model AnalysisTask {
   metadata                String?   @db.Text
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cloudInstances CloudInstance[]
 
   @@index([userId])
   @@index([status])
@@ -856,3 +871,4 @@ model AnalysisTask {
   @@index([type])
   @@index([createdAt])
 }
+
