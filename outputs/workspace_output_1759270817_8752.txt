@@ -1,0 +1,32 @@
+
+> medical-analysis-platform@0.1.0 test
+> jest AnalysisQueueService
+
+FAIL __tests__/services/AnalysisQueueService.test.ts
+
+
+  ● Test suite failed to run
+
+    ReferenceError: setImmediate is not defined
+
+      37 |       where: { id: testUserId }
+      38 |     });
+    > 39 |     await prisma.$disconnect();
+         |     ^
+      40 |   });
+      41 |
+      42 |   beforeEach(() => {
+
+      at node_modules/@prisma/client/src/runtime/core/engines/library/LibraryEngine.ts:469:32
+      at r (node_modules/@prisma/client/src/runtime/core/engines/library/LibraryEngine.ts:469:13)
+      at Object.callback [as runInChildSpan] (node_modules/@prisma/client/src/runtime/core/tracing/TracingHelper.ts:24:12)
+      at Ao.runInChildSpan (node_modules/@prisma/client/src/runtime/core/tracing/TracingHelper.ts:49:42)
+      at Qr.stop (node_modules/@prisma/client/src/runtime/core/engines/library/LibraryEngine.ts:495:54)
+      at Proxy.$disconnect (node_modules/@prisma/client/src/runtime/getPrismaClient.ts:473:9)
+      at Object.<anonymous> (__tests__/services/AnalysisQueueService.test.ts:39:5)
+
+Test Suites: 1 failed, 1 total
+Tests:       34 passed, 34 total
+Snapshots:   0 total
+Time:        0.834 s, estimated 1 s
+Ran all test suites matching AnalysisQueueService.

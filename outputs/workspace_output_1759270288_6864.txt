@@ -1,0 +1,9 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma config detected, skipping environment variable loading.
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "holovitals", schema "public"SHADOW_DATABASE_URL="postgresql://holovitals_user:holovitals_password_2025@localhost:5432/holovitals_shadow?schema=public" at "localhost:5432"
+
+Error: Schema engine error:
+ERROR: syntax error at or near "SHADOW_DATABASE_URL"
+

@@ -9,9 +9,34 @@ import {
   TaskType,
   AnalysisTask
 } from '@/lib/services/AnalysisQueueService';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 describe('AnalysisQueueService', () => {
   let service: AnalysisQueueService;
+  let testUserId: string;
+
+  beforeAll(async () => {
+    // Create a test user
+    const user = await prisma.user.create({
+      data: {
+        email: 'test-queue@example.com',
+        passwordHash: 'test-hash',
+      }
+    });
+    testUserId = user.id;
+  });
+
+  afterAll(async () => {
+    // Clean up test data
+    await prisma.analysisTask.deleteMany({
+      where: { userId: testUserId }
+    });
+    await prisma.user.delete({
+      where: { id: testUserId }
+    });
+  });
 
   beforeEach(() => {
     service = AnalysisQueueService.getInstance();
@@ -34,14 +59,14 @@ describe('AnalysisQueueService', () => {
   describe('Task Submission', () => {
     it('should submit a task with default priority', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-123' }
       });
 
       expect(task).toBeDefined();
       expect(task.id).toBeDefined();
-      expect(task.userId).toBe('user-123');
+      expect(task.userId).toBe(testUserId);
       expect(task.type).toBe(TaskType.DOCUMENT_ANALYSIS);
       expect(task.priority).toBe(TaskPriority.NORMAL);
       expect(task.status).toBe(TaskStatus.PENDING);
@@ -50,7 +75,7 @@ describe('AnalysisQueueService', () => {
 
     it('should submit a task with custom priority', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         priority: TaskPriority.URGENT,
         data: { documentId: 'doc-123' }
@@ -63,7 +88,7 @@ describe('AnalysisQueueService', () => {
       const metadata = { source: 'upload', filename: 'test.pdf' };
       
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-123' },
         metadata
@@ -77,7 +102,7 @@ describe('AnalysisQueueService', () => {
       service.on('taskSubmitted', eventSpy);
 
       await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-123' }
       });
@@ -89,7 +114,7 @@ describe('AnalysisQueueService', () => {
   describe('Task Retrieval', () => {
     it('should get task by ID', async () => {
       const submitted = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-123' }
       });
@@ -107,31 +132,31 @@ describe('AnalysisQueueService', () => {
 
     it('should get user tasks', async () => {
       await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-1' }
       });
 
       await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.CHAT_RESPONSE,
         data: { message: 'test' }
       });
 
-      const tasks = await service.getUserTasks('user-123');
+      const tasks = await service.getUserTasks(testUserId);
 
       expect(tasks.length).toBeGreaterThanOrEqual(2);
-      expect(tasks.every(t => t.userId === 'user-123')).toBe(true);
+      expect(tasks.every(t => t.userId === testUserId)).toBe(true);
     });
 
     it('should filter user tasks by status', async () => {
       await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-1' }
       });
 
-      const tasks = await service.getUserTasks('user-123', {
+      const tasks = await service.getUserTasks(testUserId, {
         status: TaskStatus.PENDING
       });
 
@@ -140,12 +165,12 @@ describe('AnalysisQueueService', () => {
 
     it('should filter user tasks by type', async () => {
       await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-1' }
       });
 
-      const tasks = await service.getUserTasks('user-123', {
+      const tasks = await service.getUserTasks(testUserId, {
         type: TaskType.DOCUMENT_ANALYSIS
       });
 
@@ -155,13 +180,13 @@ describe('AnalysisQueueService', () => {
     it('should limit user tasks', async () => {
       for (let i = 0; i < 10; i++) {
         await service.submitTask({
-          userId: 'user-123',
+          userId: testUserId,
           type: TaskType.DOCUMENT_ANALYSIS,
           data: { documentId: `doc-${i}` }
         });
       }
 
-      const tasks = await service.getUserTasks('user-123', { limit: 5 });
+      const tasks = await service.getUserTasks(testUserId, { limit: 5 });
 
       expect(tasks.length).toBeLessThanOrEqual(5);
     });
@@ -170,12 +195,12 @@ describe('AnalysisQueueService', () => {
   describe('Task Cancellation', () => {
     it('should cancel a pending task', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-123' }
       });
 
-      const cancelled = await service.cancelTask(task.id, 'user-123');
+      const cancelled = await service.cancelTask(task.id, testUserId);
 
       expect(cancelled).toBe(true);
 
@@ -185,19 +210,19 @@ describe('AnalysisQueueService', () => {
 
     it('should not cancel task for wrong user', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-123' }
       });
 
-      const cancelled = await service.cancelTask(task.id, 'user-456');
+      const cancelled = await service.cancelTask(task.id, 'wrong-user-id');
 
       expect(cancelled).toBe(false);
     });
 
     it('should not cancel completed task', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-123' }
       });
@@ -213,12 +238,12 @@ describe('AnalysisQueueService', () => {
       service.on('taskCancelled', eventSpy);
 
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-123' }
       });
 
-      await service.cancelTask(task.id, 'user-123');
+      await service.cancelTask(task.id, testUserId);
 
       expect(eventSpy).toHaveBeenCalledWith(task.id);
     });
@@ -236,7 +261,7 @@ describe('AnalysisQueueService', () => {
 
     it('should update task progress', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-123' }
       });
@@ -252,7 +277,7 @@ describe('AnalysisQueueService', () => {
       service.on('taskProgress', eventSpy);
 
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-123' }
       });
@@ -264,7 +289,7 @@ describe('AnalysisQueueService', () => {
 
     it('should clamp progress to 0-100 range', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-123' }
       });
@@ -282,7 +307,7 @@ describe('AnalysisQueueService', () => {
   describe('Priority Handling', () => {
     it('should set correct max retries for URGENT priority', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         priority: TaskPriority.URGENT,
         data: { documentId: 'doc-123' }
@@ -293,7 +318,7 @@ describe('AnalysisQueueService', () => {
 
     it('should set correct max retries for HIGH priority', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         priority: TaskPriority.HIGH,
         data: { documentId: 'doc-123' }
@@ -304,7 +329,7 @@ describe('AnalysisQueueService', () => {
 
     it('should set correct max retries for NORMAL priority', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         priority: TaskPriority.NORMAL,
         data: { documentId: 'doc-123' }
@@ -315,7 +340,7 @@ describe('AnalysisQueueService', () => {
 
     it('should set correct max retries for LOW priority', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         priority: TaskPriority.LOW,
         data: { documentId: 'doc-123' }
@@ -364,17 +389,17 @@ describe('AnalysisQueueService', () => {
     it('should handle multiple task submissions', async () => {
       const tasks = await Promise.all([
         service.submitTask({
-          userId: 'user-123',
+          userId: testUserId,
           type: TaskType.DOCUMENT_ANALYSIS,
           data: { documentId: 'doc-1' }
         }),
         service.submitTask({
-          userId: 'user-123',
+          userId: testUserId,
           type: TaskType.DOCUMENT_ANALYSIS,
           data: { documentId: 'doc-2' }
         }),
         service.submitTask({
-          userId: 'user-123',
+          userId: testUserId,
           type: TaskType.DOCUMENT_ANALYSIS,
           data: { documentId: 'doc-3' }
         })
@@ -388,7 +413,7 @@ describe('AnalysisQueueService', () => {
   describe('Task Types', () => {
     it('should handle DOCUMENT_ANALYSIS type', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: { documentId: 'doc-123' }
       });
@@ -398,7 +423,7 @@ describe('AnalysisQueueService', () => {
 
     it('should handle CHAT_RESPONSE type', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.CHAT_RESPONSE,
         data: { message: 'test' }
       });
@@ -408,7 +433,7 @@ describe('AnalysisQueueService', () => {
 
     it('should handle BATCH_PROCESSING type', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.BATCH_PROCESSING,
         data: { documents: ['doc-1', 'doc-2'] }
       });
@@ -418,7 +443,7 @@ describe('AnalysisQueueService', () => {
 
     it('should handle REPORT_GENERATION type', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.REPORT_GENERATION,
         data: { reportType: 'summary' }
       });
@@ -430,7 +455,7 @@ describe('AnalysisQueueService', () => {
   describe('Edge Cases', () => {
     it('should handle empty data object', async () => {
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: {}
       });
@@ -454,7 +479,7 @@ describe('AnalysisQueueService', () => {
       };
 
       const task = await service.submitTask({
-        userId: 'user-123',
+        userId: testUserId,
         type: TaskType.DOCUMENT_ANALYSIS,
         data: complexData
       });

@@ -1,0 +1,1 @@
+DATABASE_URL="postgresql://holovitals_user:holovitals_password_2025@localhost:5432/holovitals?schema=public"SHADOW_DATABASE_URL="postgresql://holovitals_user:holovitals_password_2025@localhost:5432/holovitals_shadow?schema=public"

@@ -1,0 +1,50 @@
+      ✓ should return the same instance (2 ms)
+    Task Submission
+      ✓ should submit a task with default priority (55 ms)
+      ✓ should submit a task with custom priority (2 ms)
+      ✓ should submit a task with metadata (2 ms)
+      ✓ should emit taskSubmitted event (2 ms)
+    Task Retrieval
+      ✓ should get task by ID (3 ms)
+      ✓ should return null for non-existent task (1 ms)
+      ✓ should get user tasks (4 ms)
+      ✓ should filter user tasks by status (2 ms)
+      ✓ should filter user tasks by type (3 ms)
+      ✓ should limit user tasks (6 ms)
+    Task Cancellation
+      ✓ should cancel a pending task (3 ms)
+      ✓ should not cancel task for wrong user (2 ms)
+      ✓ should not cancel completed task (1 ms)
+      ✓ should emit taskCancelled event (3 ms)
+    Task Processing
+      ✓ should register a task processor
+      ✓ should update task progress (3 ms)
+      ✓ should emit taskProgress event (2 ms)
+      ✓ should clamp progress to 0-100 range (3 ms)
+    Priority Handling
+      ✓ should set correct max retries for URGENT priority (1 ms)
+      ✓ should set correct max retries for HIGH priority (1 ms)
+      ✓ should set correct max retries for NORMAL priority (1 ms)
+      ✓ should set correct max retries for LOW priority (2 ms)
+    Queue Statistics
+      ✓ should get queue statistics (21 ms)
+      ✓ should have non-negative statistics (2 ms)
+    Concurrent Processing
+      ✓ should set max concurrent tasks (1 ms)
+      ✓ should handle multiple task submissions (5 ms)
+    Task Types
+      ✓ should handle DOCUMENT_ANALYSIS type (1 ms)
+      ✓ should handle CHAT_RESPONSE type (1 ms)
+      ✓ should handle BATCH_PROCESSING type (1 ms)
+      ✓ should handle REPORT_GENERATION type (1 ms)
+    Edge Cases
+      ✓ should handle empty data object (1 ms)
+      ✓ should handle complex data object (1 ms)
+    Cleanup
+      ✓ should clean up old tasks (1 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       34 passed, 34 total
+Snapshots:   0 total
+Time:        0.723 s, estimated 1 s
+Ran all test suites matching AnalysisQueueService.

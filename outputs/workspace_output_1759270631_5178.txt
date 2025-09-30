@@ -1,0 +1,50 @@
+
+> medical-analysis-platform@0.1.0 test
+> jest ContextOptimizerService
+
+PASS __tests__/services/ContextOptimizerService.test.ts
+  ContextOptimizerService
+    Singleton Pattern
+      ✓ should return the same instance (2 ms)
+    Basic Optimization
+      ✓ should optimize simple text (2 ms)
+      ✓ should preserve medical keywords (1 ms)
+      ✓ should handle empty content (1 ms)
+    Optimization Strategies
+      ✓ should apply AGGRESSIVE strategy with high reduction (1 ms)
+      ✓ should apply BALANCED strategy with moderate reduction (1 ms)
+      ✓ should apply CONSERVATIVE strategy with low reduction (1 ms)
+      ✓ should apply MINIMAL strategy with minimal reduction (1 ms)
+    Content Types
+      ✓ should handle MEDICAL_REPORT type (1 ms)
+      ✓ should handle LAB_RESULTS type (1 ms)
+      ✓ should handle PRESCRIPTION type
+    Target Tokens
+      ✓ should reduce tokens significantly
+      ✓ should not over-compress if already under target
+    Keyword Preservation
+      ✓ should preserve specified keywords (1 ms)
+      ✓ should return preserved keywords in result
+    Metrics
+      ✓ should calculate compression ratio (1 ms)
+      ✓ should calculate relevance score
+      ✓ should calculate information density
+      ✓ should track processing time
+      ✓ should calculate quality score (1 ms)
+    Batch Optimization
+      ✓ should optimize multiple contexts (5 ms)
+      ✓ should handle empty batch
+    Edge Cases
+      ✓ should handle very short content
+      ✓ should handle content with special characters
+      ✓ should handle content with numbers (1 ms)
+      ✓ should handle content with multiple paragraphs
+    Performance
+      ✓ should optimize within reasonable time (1 ms)
+      ✓ should handle large content efficiently (2 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       28 passed, 28 total
+Snapshots:   0 total
+Time:        0.493 s, estimated 1 s
+Ran all test suites matching ContextOptimizerService.

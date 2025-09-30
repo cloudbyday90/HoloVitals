@@ -1,0 +1,200 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma config detected, skipping environment variable loading.
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "holovitals", schema "public" at "localhost:5432"
+
+Drift detected: Your database schema is not in sync with your migration history.
+
+The following is a summary of the differences between the expected database schema given your migrations files, and the actual schema of the database.
+
+It should be understood as the set of changes to get from the expected schema to the actual schema.
+
+If you are running this the first time on an existing database, please make sure to read this documentation page:
+https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate/troubleshooting-development
+
+[+] Added tables
+  - access_logs
+  - ai_interactions
+  - analysis_costs
+  - analysis_queue
+  - analysis_sessions
+  - audit_logs
+  - chat_conversations
+  - chat_messages
+  - chatbot_costs
+  - cloud_instances
+  - consent_grants
+  - document_embeddings
+  - document_links
+  - documents
+  - extracted_data
+  - identity_challenges
+  - instance_costs
+  - model_performance
+  - notifications
+  - ocr_results
+  - patient_allergies
+  - patient_diagnoses
+  - patient_family_history
+  - patient_immunizations
+  - patient_medications
+  - patient_procedures
+  - patient_repositories
+  - patient_vital_signs
+  - patients
+  - prompt_optimizations
+  - prompt_splits
+  - security_alerts
+  - system_health
+  - user_sessions
+  - users
+
+[*] Changed the `access_logs` table
+  [+] Added index on columns (consent_id)
+  [+] Added index on columns (specialist_id)
+  [+] Added index on columns (timestamp)
+  [+] Added foreign key on columns (consent_id)
+
+[*] Changed the `ai_interactions` table
+  [+] Added foreign key on columns (session_id)
+
+[*] Changed the `analysis_costs` table
+  [+] Added index on columns (timestamp)
+  [+] Added index on columns (userId)
+  [+] Added foreign key on columns (userId)
+
+[*] Changed the `analysis_queue` table
+  [+] Added index on columns (createdAt)
+  [+] Added index on columns (priority, createdAt)
+  [+] Added index on columns (status)
+  [+] Added index on columns (userId)
+  [+] Added foreign key on columns (instanceId)
+  [+] Added foreign key on columns (userId)
+
+[*] Changed the `analysis_sessions` table
+  [+] Added foreign key on columns (patient_id)
+  [+] Added foreign key on columns (user_id)
+
+[*] Changed the `audit_logs` table
+  [+] Added index on columns (action)
+  [+] Added index on columns (requires_review)
+  [+] Added index on columns (resource)
+  [+] Added index on columns (severity)
+  [+] Added index on columns (timestamp)
+  [+] Added index on columns (user_id)
+  [+] Added foreign key on columns (user_id)
+
+[*] Changed the `chat_conversations` table
+  [+] Added index on columns (lastMessageAt)
+  [+] Added index on columns (userId)
+  [+] Added foreign key on columns (userId)
+
+[*] Changed the `chat_messages` table
+  [+] Added index on columns (conversationId)
+  [+] Added index on columns (timestamp)
+  [+] Added foreign key on columns (conversationId)
+
+[*] Changed the `chatbot_costs` table
+  [+] Added index on columns (timestamp)
+  [+] Added index on columns (userId)
+  [+] Added foreign key on columns (userId)
+
+[*] Changed the `cloud_instances` table
+  [+] Added index on columns (createdAt)
+  [+] Added unique index on columns (instanceId)
+  [+] Added index on columns (provider, region)
+  [+] Added index on columns (status)
+
+[*] Changed the `consent_grants` table
+  [+] Added index on columns (expires_at)
+  [+] Added index on columns (patient_id)
+  [+] Added index on columns (specialist_id)
+  [+] Added index on columns (status)
+  [+] Added foreign key on columns (patient_id)
+  [+] Added foreign key on columns (specialist_id)
+
+[*] Changed the `document_embeddings` table
+  [+] Added foreign key on columns (document_id)
+
+[*] Changed the `document_links` table
+  [+] Added unique index on columns (source_document_id, target_document_id)
+  [+] Added foreign key on columns (source_document_id)
+  [+] Added foreign key on columns (target_document_id)
+
+[*] Changed the `documents` table
+  [+] Added foreign key on columns (patient_id)
+  [+] Added foreign key on columns (user_id)
+
+[*] Changed the `extracted_data` table
+  [+] Added foreign key on columns (document_id)
+
+[*] Changed the `identity_challenges` table
+  [+] Added index on columns (expires_at)
+  [+] Added index on columns (repository_id)
+
+[*] Changed the `instance_costs` table
+  [+] Added index on columns (createdAt)
+  [+] Added index on columns (model)
+  [+] Added index on columns (provider)
+
+[*] Changed the `model_performance` table
+  [+] Added index on columns (model)
+  [+] Added index on columns (periodStart)
+
+[*] Changed the `notifications` table
+  [+] Added index on columns (created_at)
+  [+] Added index on columns (patient_id)
+  [+] Added index on columns (read)
+
+[*] Changed the `ocr_results` table
+  [+] Added foreign key on columns (document_id)
+
+[*] Changed the `patient_allergies` table
+  [+] Added index on columns (repository_id)
+  [+] Added foreign key on columns (repository_id)
+
+[*] Changed the `patient_diagnoses` table
+  [+] Added index on columns (diagnosed_date)
+  [+] Added index on columns (repository_id)
+  [+] Added foreign key on columns (repository_id)
+
+[*] Changed the `patient_family_history` table
+  [+] Added index on columns (repository_id)
+  [+] Added foreign key on columns (repository_id)
+
+[*] Changed the `patient_immunizations` table
+  [+] Added index on columns (date)
+  [+] Added index on columns (repository_id)
+  [+] Added foreign key on columns (repository_id)
+
+[*] Changed the `patient_medications` table
+  [+] Added index on columns (repository_id)
+  [+] Added index on columns (status)
+  [+] Added foreign key on columns (repository_id)
+
+[*] Changed the `patient_procedures` table
+  [+] Added index on columns (date)
+  [+] Added index on columns (repository_id)
+  [+] Added foreign key on columns (repository_id)
+
+[*] Changed the `patient_repositories` table
+  [+] Added index on columns (composite_identity_hash)
+  [+] Added unique index on columns (composite_identity_hash)
+  [+] Added unique index on columns (primary_identity_hash)
+  [+] Added index on columns (user_id)
+  [+] Added unique index on columns (user_id)
+
+[*] Changed the `patient_vital_signs` table
+  [+] Added index on columns (date)
+  [+] Added index on columns (repository_id)
+  [+] Added foreign key on columns (repository_id)
+
+[*] Changed the `patients` table
+  [+] Added foreign key on columns (user_id)
+
+[*] Changed the `prompt_optimizations` table
+  [+] Added index on columns (createdAt)
+
+[*] Changed the `prompt_splits` table
+  [+] Added index on columns (order)

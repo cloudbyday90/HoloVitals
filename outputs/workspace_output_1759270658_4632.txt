@@ -1,0 +1,80 @@
+      at ei.handleAndLogRequestError (node_modules/@prisma/client/src/runtime/RequestHandler.ts:174:12)
+      at ei.request (node_modules/@prisma/client/src/runtime/RequestHandler.ts:143:12)
+      at a (node_modules/@prisma/client/src/runtime/getPrismaClient.ts:833:24)
+      at AnalysisQueueService.submitTask (lib/services/AnalysisQueueService.ts:136:18)
+      at Object.<anonymous> (__tests__/services/AnalysisQueueService.test.ts:410:20)
+
+  ● AnalysisQueueService › Task Types › should handle REPORT_GENERATION type
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.analysisTask.create()` invocation:
+
+
+    Foreign key constraint violated on the constraint: `AnalysisTask_userId_fkey`
+
+      134 |
+      135 |     // Create task in database
+    > 136 |     const task = await prisma.analysisTask.create({
+          |                  ^
+      137 |       data: {
+      138 |         userId: request.userId,
+      139 |         type: request.type,
+
+      at ei.handleRequestError (node_modules/@prisma/client/src/runtime/RequestHandler.ts:228:13)
+      at ei.handleAndLogRequestError (node_modules/@prisma/client/src/runtime/RequestHandler.ts:174:12)
+      at ei.request (node_modules/@prisma/client/src/runtime/RequestHandler.ts:143:12)
+      at a (node_modules/@prisma/client/src/runtime/getPrismaClient.ts:833:24)
+      at AnalysisQueueService.submitTask (lib/services/AnalysisQueueService.ts:136:18)
+      at Object.<anonymous> (__tests__/services/AnalysisQueueService.test.ts:420:20)
+
+  ● AnalysisQueueService › Edge Cases › should handle empty data object
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.analysisTask.create()` invocation:
+
+
+    Foreign key constraint violated on the constraint: `AnalysisTask_userId_fkey`
+
+      134 |
+      135 |     // Create task in database
+    > 136 |     const task = await prisma.analysisTask.create({
+          |                  ^
+      137 |       data: {
+      138 |         userId: request.userId,
+      139 |         type: request.type,
+
+      at ei.handleRequestError (node_modules/@prisma/client/src/runtime/RequestHandler.ts:228:13)
+      at ei.handleAndLogRequestError (node_modules/@prisma/client/src/runtime/RequestHandler.ts:174:12)
+      at ei.request (node_modules/@prisma/client/src/runtime/RequestHandler.ts:143:12)
+      at a (node_modules/@prisma/client/src/runtime/getPrismaClient.ts:833:24)
+      at AnalysisQueueService.submitTask (lib/services/AnalysisQueueService.ts:136:18)
+      at Object.<anonymous> (__tests__/services/AnalysisQueueService.test.ts:432:20)
+
+  ● AnalysisQueueService › Edge Cases › should handle complex data object
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.analysisTask.create()` invocation:
+
+
+    Foreign key constraint violated on the constraint: `AnalysisTask_userId_fkey`
+
+      134 |
+      135 |     // Create task in database
+    > 136 |     const task = await prisma.analysisTask.create({
+          |                  ^
+      137 |       data: {
+      138 |         userId: request.userId,
+      139 |         type: request.type,
+
+      at ei.handleRequestError (node_modules/@prisma/client/src/runtime/RequestHandler.ts:228:13)
+      at ei.handleAndLogRequestError (node_modules/@prisma/client/src/runtime/RequestHandler.ts:174:12)
+      at ei.request (node_modules/@prisma/client/src/runtime/RequestHandler.ts:143:12)
+      at a (node_modules/@prisma/client/src/runtime/getPrismaClient.ts:833:24)
+      at AnalysisQueueService.submitTask (lib/services/AnalysisQueueService.ts:136:18)
+      at Object.<anonymous> (__tests__/services/AnalysisQueueService.test.ts:456:20)
+
+Test Suites: 1 failed, 1 total
+Tests:       27 failed, 7 passed, 34 total
+Snapshots:   0 total
+Time:        0.721 s, estimated 1 s
+Ran all test suites matching AnalysisQueueService.

@@ -1,0 +1,8 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma config detected, skipping environment variable loading.
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "holovitals", schema "public" at "localhost:5432"
+
+🚀  Your database is now in sync with your Prisma schema. Done in 119ms
+
