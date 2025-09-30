@@ -1,0 +1,46 @@
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   ../MIGRATION_COMPLETE.md
+	new file:   ../PHASE_2_COMPLETE.md
+	modified:   prisma.config.ts
+	modified:   prisma/seed.ts
+	new file:   prisma/tsconfig.json
+	modified:   todo.md
+	new file:   ../outputs/workspace_output_1759259802_4376.txt
+	new file:   ../outputs/workspace_output_1759259814_930.txt
+	new file:   ../outputs/workspace_output_1759259892_7338.txt
+	new file:   ../outputs/workspace_output_1759259957_8393.txt
+	new file:   ../outputs/workspace_output_1759261659_2679.txt
+	new file:   ../outputs/workspace_output_1759261683_5808.txt
+	new file:   ../outputs/workspace_output_1759261700_6815.txt
+	new file:   ../outputs/workspace_output_1759261728_7944.txt
+	new file:   ../outputs/workspace_output_1759261791_6122.txt
+	new file:   ../outputs/workspace_output_1759261805_1940.txt
+	new file:   ../outputs/workspace_output_1759261810_5272.txt
+	new file:   ../outputs/workspace_output_1759261824_8128.txt
+	new file:   ../outputs/workspace_output_1759261843_1982.txt
+	new file:   ../outputs/workspace_output_1759261883_4331.txt
+	new file:   ../outputs/workspace_output_1759261920_1655.txt
+	new file:   ../outputs/workspace_output_1759261961_7907.txt
+	new file:   ../outputs/workspace_output_1759261980_231.txt
+	new file:   ../outputs/workspace_output_1759262000_4404.txt
+	new file:   ../outputs/workspace_output_1759262044_2207.txt
+	new file:   ../outputs/workspace_output_1759262079_6968.txt
+	new file:   ../outputs/workspace_output_1759262128_5464.txt
+	new file:   ../outputs/workspace_output_1759262156_4021.txt
+	new file:   ../outputs/workspace_output_1759262232_8888.txt
+	new file:   ../outputs/workspace_output_1759262244_7138.txt
+	new file:   ../outputs/workspace_output_1759262266_1847.txt
+	new file:   ../outputs/workspace_output_1759262287_784.txt
+	new file:   ../outputs/workspace_output_1759262298_9574.txt
+	new file:   ../outputs/workspace_output_1759262357_7415.txt
+	new file:   ../outputs/workspace_output_1759262379_3853.txt
+	new file:   ../outputs/workspace_output_1759262441_6841.txt
+	new file:   ../outputs/workspace_output_1759262592_435.txt
+	new file:   ../outputs/workspace_output_1759262611_2323.txt
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	../outputs/workspace_output_1759262628_6463.txt
+
