@@ -1,0 +1,5 @@
+c844ec0 feat: Add Patient Search & Management Interface
+d7d4f38 feat: Add EHR Connection Wizard UI components
+020e4da feat: Add RESTful API endpoints for EHR integrations
+94524d2 feat: Add database migrations and 7 EHR integrations covering 75%+ market
+a40e7d9 feat: Complete remaining HIPAA compliance features (#2)

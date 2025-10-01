@@ -1,0 +1,11 @@
+./medical-analysis-platform/prisma/schema-backup.prisma
+./medical-analysis-platform/prisma/schema.prisma
+./medical-analysis-platform/prisma/schema-updates-error-handling.prisma
+./prisma/schema-dev-qa-repositories.prisma
+./prisma/schema-emergency-recovery.prisma
+./prisma/schema-ai-extensions.prisma
+./prisma/schema-medical-standardization.prisma
+./prisma/schema-athenahealth-eclinicalworks.prisma
+./prisma/schema-compliance-additions.prisma
+./prisma/schema-hipaa-additional.prisma
+./prisma/schema-hipaa-compliance.prisma

@@ -1,0 +1,3 @@
+app/api/ehr/athenahealth/enhanced-sync/route.ts
+app/api/ehr/eclinicalworks/enhanced-sync/route.ts
+app/api/ehr/patients/[patientId]/sync/route.ts

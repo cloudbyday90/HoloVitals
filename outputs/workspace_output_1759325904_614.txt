@@ -1,0 +1,100 @@
+diff --git a/HIPAA_COMPLIANCE_ARCHITECTURE.md b/HIPAA_COMPLIANCE_ARCHITECTURE.md
+new file mode 100644
+index 0000000..f040159
+--- /dev/null
++++ b/HIPAA_COMPLIANCE_ARCHITECTURE.md
+@@ -0,0 +1,474 @@
++# HIPAA Compliance Architecture for HoloVitals
++
++## Overview
++This document outlines the comprehensive HIPAA compliance architecture for the HoloVitals platform, ensuring protection of Protected Health Information (PHI) and adherence to HIPAA Security Rule requirements.
++
++## HIPAA Security Rule Components
++
++### 1. Administrative Safeguards
++- **Security Management Process**
++  - Risk Analysis
++  - Risk Management
++  - Sanction Policy
++  - Information System Activity Review
++
++- **Assigned Security Responsibility**
++  - Designated Security Officer
++  - Security Team Structure
++
++- **Workforce Security**
++  - Authorization/Supervision
++  - Workforce Clearance
++  - Termination Procedures
++
++- **Information Access Management**
++  - Isolating Healthcare Clearinghouse Functions
++  - Access Authorization
++  - Access Establishment and Modification
++
++- **Security Awareness and Training**
++  - Security Reminders
++  - Protection from Malicious Software
++  - Log-in Monitoring
++  - Password Management
++
++- **Security Incident Procedures**
++  - Response and Reporting
++
++- **Contingency Plan**
++  - Data Backup Plan
++  - Disaster Recovery Plan
++  - Emergency Mode Operation Plan
++  - Testing and Revision Procedures
++  - Applications and Data Criticality Analysis
++
++- **Evaluation**
++  - Periodic Security Evaluations
++
++- **Business Associate Contracts**
++  - Written Contract or Other Arrangement
++
++### 2. Physical Safeguards
++- **Facility Access Controls**
++  - Contingency Operations
++  - Facility Security Plan
++  - Access Control and Validation Procedures
++  - Maintenance Records
++
++- **Workstation Use**
++  - Proper Workstation Functions
++
++- **Workstation Security**
++  - Physical Safeguards for Workstations
++
++- **Device and Media Controls**
++  - Disposal
++  - Media Re-use
++  - Accountability
++  - Data Backup and Storage
++
++### 3. Technical Safeguards
++- **Access Control**
++  - Unique User Identification
++  - Emergency Access Procedure
++  - Automatic Logoff
++  - Encryption and Decryption
++
++- **Audit Controls**
++  - Hardware, Software, and Procedural Mechanisms
++
++- **Integrity**
++  - Mechanisms to Authenticate Electronic PHI
++
++- **Person or Entity Authentication**
++  - Procedures to Verify Identity
++
++- **Transmission Security**
++  - Integrity Controls
++  - Encryption
++
++## System Architecture
++
++### Core Components
++
++```

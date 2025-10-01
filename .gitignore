@@ -29,4 +29,14 @@ bin/
 .vscode/
 
 ### Mac OS ###
-.DS_Store
+.DS_Storeoutputs/
+summarized_conversations/
+# Archived schema files
+prisma/archive/
+
+# Legacy directories (to be reviewed)
+# medical-analysis-platform/
+# src/
+
+# Output files
+outputs/

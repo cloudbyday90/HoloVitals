@@ -1,0 +1,14 @@
+[feature/database-migrations-and-ehr-integrations 020e4da] feat: Add RESTful API endpoints for EHR integrations
+ 13 files changed, 2682 insertions(+), 22 deletions(-)
+ create mode 100644 API_DOCUMENTATION.md
+ create mode 100644 API_ENDPOINTS_COMPLETE.md
+ create mode 100644 GITHUB_DEPLOYMENT_COMPLETE.md
+ create mode 100644 app/api/ehr/connect/route.ts
+ create mode 100644 app/api/ehr/disconnect/route.ts
+ create mode 100644 app/api/ehr/patients/[patientId]/allergies/route.ts
+ create mode 100644 app/api/ehr/patients/[patientId]/encounters/route.ts
+ create mode 100644 app/api/ehr/patients/[patientId]/labs/route.ts
+ create mode 100644 app/api/ehr/patients/[patientId]/medications/route.ts
+ create mode 100644 app/api/ehr/patients/[patientId]/sync/route.ts
+ create mode 100644 app/api/ehr/patients/search/route.ts
+ create mode 100644 lib/middleware/apiMiddleware.ts

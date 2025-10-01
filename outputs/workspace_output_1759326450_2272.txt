@@ -1,0 +1,14 @@
+model AuditLog {
+model UserSession {
+model Role {
+model Permission {
+model RolePermission {
+model UserRole {
+model AccessRequest {
+model SecurityAlert {
+model BreachIncident {
+model EncryptionKey {
+model PatientConsent {
+model DataRetentionPolicy {
+model SecurityConfiguration {
+model ComplianceReport {

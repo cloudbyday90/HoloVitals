@@ -1,0 +1,71 @@
+On branch feature/database-migrations-and-ehr-integrations
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	modified:   .gitignore
+	new file:   DATABASE_AND_EHR_DEPLOYMENT_SUMMARY.md
+	new file:   DATABASE_MIGRATION_GUIDE.md
+	new file:   DEPLOYMENT_SUMMARY.md
+	new file:   EHR_INTEGRATIONS_COMPLETE.md
+	new file:   PROJECT_COMPLETION_SUMMARY.md
+	new file:   lib/services/ehr/AllscriptsEnhancedService.ts
+	new file:   lib/services/ehr/CernerEnhancedService.ts
+	new file:   lib/services/ehr/MeditechEnhancedService.ts
+	new file:   lib/services/ehr/NextGenEnhancedService.ts
+	new file:   lib/services/ehr/UnifiedEHRService.ts
+	new file:   merge-schemas.py
+	new file:   prisma/schema.prisma
+	new file:   prisma/seed.ts
+	new file:   scripts/init-database.sh
+	modified:   todo.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	outputs/workspace_output_1759324950_1121.txt
+	outputs/workspace_output_1759324971_4282.txt
+	outputs/workspace_output_1759324976_4468.txt
+	outputs/workspace_output_1759325005_4819.txt
+	outputs/workspace_output_1759325897_233.txt
+	outputs/workspace_output_1759325904_614.txt
+	outputs/workspace_output_1759325910_944.txt
+	outputs/workspace_output_1759325925_1632.txt
+	outputs/workspace_output_1759325940_8822.txt
+	outputs/workspace_output_1759325952_9533.txt
+	outputs/workspace_output_1759325960_4268.txt
+	outputs/workspace_output_1759325965_1783.txt
+	outputs/workspace_output_1759325975_8312.txt
+	outputs/workspace_output_1759325983_6686.txt
+	outputs/workspace_output_1759325991_8308.txt
+	outputs/workspace_output_1759325998_5453.txt
+	outputs/workspace_output_1759326004_7222.txt
+	outputs/workspace_output_1759326010_6856.txt
+	outputs/workspace_output_1759326015_8259.txt
+	outputs/workspace_output_1759326082_233.txt
+	outputs/workspace_output_1759326390_3758.txt
+	outputs/workspace_output_1759326404_2542.txt
+	outputs/workspace_output_1759326412_4796.txt
+	outputs/workspace_output_1759326415_9740.txt
+	outputs/workspace_output_1759326420_3004.txt
+	outputs/workspace_output_1759326425_6609.txt
+	outputs/workspace_output_1759326429_9227.txt
+	outputs/workspace_output_1759326437_6753.txt
+	outputs/workspace_output_1759326441_8358.txt
+	outputs/workspace_output_1759326445_9906.txt
+	outputs/workspace_output_1759326450_2272.txt
+	outputs/workspace_output_1759326454_6626.txt
+	outputs/workspace_output_1759326458_5206.txt
+	outputs/workspace_output_1759326463_7465.txt
+	outputs/workspace_output_1759326468_184.txt
+	outputs/workspace_output_1759326472_7338.txt
+	outputs/workspace_output_1759326477_1322.txt
+	outputs/workspace_output_1759326482_7075.txt
+	outputs/workspace_output_1759326487_7293.txt
+	outputs/workspace_output_1759326513_3345.txt
+	outputs/workspace_output_1759326518_9571.txt
+	outputs/workspace_output_1759326591_412.txt
+	outputs/workspace_output_1759327892_1118.txt
+	outputs/workspace_output_1759327899_8740.txt
+	outputs/workspace_output_1759327906_1743.txt
+	outputs/workspace_output_1759327912_3194.txt
+	outputs/workspace_output_1759327922_56.txt
+	outputs/workspace_output_1759327929_7965.txt
+

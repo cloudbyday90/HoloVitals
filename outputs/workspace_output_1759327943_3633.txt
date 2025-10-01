@@ -1,0 +1,16 @@
+[feature/database-migrations-and-ehr-integrations 94524d2] feat: Add database migrations and 7 EHR integrations covering 75%+ market
+ 16 files changed, 9821 insertions(+), 59 deletions(-)
+ create mode 100644 DATABASE_AND_EHR_DEPLOYMENT_SUMMARY.md
+ create mode 100644 DATABASE_MIGRATION_GUIDE.md
+ create mode 100644 DEPLOYMENT_SUMMARY.md
+ create mode 100644 EHR_INTEGRATIONS_COMPLETE.md
+ create mode 100644 PROJECT_COMPLETION_SUMMARY.md
+ create mode 100644 lib/services/ehr/AllscriptsEnhancedService.ts
+ create mode 100644 lib/services/ehr/CernerEnhancedService.ts
+ create mode 100644 lib/services/ehr/MeditechEnhancedService.ts
+ create mode 100644 lib/services/ehr/NextGenEnhancedService.ts
+ create mode 100644 lib/services/ehr/UnifiedEHRService.ts
+ create mode 100644 merge-schemas.py
+ create mode 100644 prisma/schema.prisma
+ create mode 100644 prisma/seed.ts
+ create mode 100755 scripts/init-database.sh

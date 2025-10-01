@@ -1,0 +1,27 @@
+[feature/complete-hipaa-features ee96f15] feat: Complete remaining HIPAA compliance features
+ 26 files changed, 3790 insertions(+), 59 deletions(-)
+ create mode 100644 HIPAA_FEATURES_COMPLETE.md
+ create mode 100644 app/api/auth/2fa/backup-codes/route.ts
+ create mode 100644 app/api/auth/2fa/disable/route.ts
+ create mode 100644 app/api/auth/2fa/enable/route.ts
+ create mode 100644 app/api/auth/2fa/setup/route.ts
+ create mode 100644 app/api/auth/2fa/status/route.ts
+ create mode 100644 app/api/auth/2fa/verify/route.ts
+ create mode 100644 app/api/files/download/[fileId]/route.ts
+ create mode 100644 app/api/files/search/route.ts
+ create mode 100644 app/api/files/upload/route.ts
+ create mode 100644 app/api/patient-rights/access/route.ts
+ create mode 100644 app/api/patient-rights/amendment/route.ts
+ create mode 100644 app/api/patient-rights/disclosures/route.ts
+ create mode 100644 app/api/patient-rights/restriction/route.ts
+ create mode 100644 lib/middleware/twoFactorMiddleware.ts
+ create mode 100644 lib/services/PatientRightsService.ts
+ create mode 100644 lib/services/SecureFileStorageService.ts
+ create mode 100644 lib/services/TwoFactorAuthService.ts
+ create mode 100644 outputs/workspace_output_1759324190_8222.txt
+ create mode 100644 outputs/workspace_output_1759324203_8424.txt
+ create mode 100644 outputs/workspace_output_1759324213_9342.txt
+ create mode 100644 outputs/workspace_output_1759324235_6035.txt
+ create mode 100644 outputs/workspace_output_1759324937_9225.txt
+ create mode 100644 outputs/workspace_output_1759324943_8295.txt
+ create mode 100644 prisma/schema-hipaa-additional.prisma

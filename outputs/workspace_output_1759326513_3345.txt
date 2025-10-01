@@ -1,0 +1,99 @@
+Main schema has 53 models and 10 enums
+
+schema-medical-standardization.prisma: 9 models, 4 enums
+  + Added model: LOINCCode
+  + Added model: LOINCUnit
+  + Added model: ReferenceRange
+  + Added model: CodeMapping
+  + Added model: LabResultStandardization
+  + Added model: SNOMEDCode
+  + Added model: RxNormCode
+  + Added model: ICD10Code
+  + Added model: CPTCode
+  + Added enum: LOINCCategory
+  + Added enum: ComponentType
+  + Added enum: UnitSystem
+  + Added enum: ReferenceRangeType
+
+schema-athenahealth-eclinicalworks.prisma: 2 models, 0 enums
+  + Added model: AthenaHealthSpecificData
+  + Added model: EClinicalWorksSpecificData
+
+schema-hipaa-compliance.prisma: 14 models, 19 enums
+  - Skipped duplicate model: AuditLog
+  - Skipped duplicate model: UserSession
+  + Added model: Role
+  + Added model: Permission
+  + Added model: RolePermission
+  + Added model: UserRole
+  + Added model: AccessRequest
+  - Skipped duplicate model: SecurityAlert
+  + Added model: BreachIncident
+  + Added model: EncryptionKey
+  + Added model: PatientConsent
+  + Added model: DataRetentionPolicy
+  + Added model: SecurityConfiguration
+  + Added model: ComplianceReport
+  + Added enum: AuditEventType
+  + Added enum: AuditEventCategory
+  + Added enum: AuditOutcome
+  + Added enum: RiskLevel
+  + Added enum: PermissionScope
+  + Added enum: AccessUrgency
+  + Added enum: AccessRequestStatus
+  + Added enum: SecurityAlertType
+  + Added enum: AlertSeverity
+  + Added enum: AlertStatus
+  + Added enum: BreachType
+  + Added enum: NotificationStatus
+  + Added enum: InvestigationStatus
+  + Added enum: KeyType
+  + Added enum: KeyStatus
+  + Added enum: ConsentType
+  + Added enum: ConsentStatus
+  + Added enum: ComplianceReportType
+  + Added enum: ComplianceStatus
+
+schema-hipaa-additional.prisma: 9 models, 8 enums
+  + Added model: User2FA
+  + Added model: SecureFile
+  + Added model: FileAccessGrant
+  + Added model: PatientAccessRequest
+  + Added model: PatientAmendmentRequest
+  + Added model: PatientRestrictionRequest
+  + Added model: PatientCommunicationRequest
+  + Added model: AuditLogArchive
+  + Added model: AccessReview
+  + Added enum: TwoFactorMethod
+  + Added enum: AccessRequestType
+  + Added enum: DeliveryMethod
+  + Added enum: RestrictionType
+  + Added enum: CommunicationType
+  + Added enum: RequestStatus
+  + Added enum: AccessReviewType
+  + Added enum: ReviewStatus
+
+schema-compliance-additions.prisma: 10 models, 6 enums
+  - Skipped duplicate model: User
+  + Added model: BreachNotification
+  + Added model: LegalAgreement
+  - Skipped duplicate model: PatientConsent
+  + Added model: DataPortabilityRequest
+  + Added model: DataRectificationRequest
+  + Added model: EncryptionKeyRotation
+  + Added model: Subprocessor
+  + Added model: ComplianceChecklist
+  + Added model: TrainingRecord
+  + Added enum: DataRegion
+  + Added enum: Jurisdiction
+  - Skipped duplicate enum: BreachType
+  + Added enum: BreachSeverity
+  - Skipped duplicate enum: NotificationStatus
+  + Added enum: AgreementType
+
+✅ Consolidated schema written to prisma/schema-consolidated.prisma
+Total: 92 models, 45 enums
+
+🎉 Schema consolidation complete!
+   Models: 92
+   Enums: 45

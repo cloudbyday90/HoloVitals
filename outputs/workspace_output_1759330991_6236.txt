@@ -1,0 +1,17 @@
+[feature/database-migrations-and-ehr-integrations c844ec0] feat: Add Patient Search & Management Interface
+ 16 files changed, 2785 insertions(+), 44 deletions(-)
+ create mode 100644 PATIENT_SEARCH_IMPLEMENTATION.md
+ create mode 100644 app/(dashboard)/patients/page.tsx
+ create mode 100644 components/patients/PatientCard.tsx
+ create mode 100644 components/patients/PatientDetailView.tsx
+ create mode 100644 components/patients/PatientList.tsx
+ create mode 100644 components/patients/PatientSearch.tsx
+ create mode 100644 lib/hooks/usePatientSearch.ts
+ create mode 100644 lib/types/patient.ts
+ create mode 100644 outputs/workspace_output_1759329145_2598.txt
+ create mode 100644 outputs/workspace_output_1759329152_5962.txt
+ create mode 100644 outputs/workspace_output_1759329168_1835.txt
+ create mode 100644 outputs/workspace_output_1759330606_6301.txt
+ create mode 100644 outputs/workspace_output_1759330631_7941.txt
+ create mode 100644 outputs/workspace_output_1759330635_6268.txt
+ create mode 100644 outputs/workspace_output_1759330982_8325.txt
