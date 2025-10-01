@@ -1,0 +1,28 @@
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   ../RBAC_PUSH_COMPLETE.md
+	new file:   ERROR_HANDLING_COMPLETE.md
+	new file:   app/api/errors/log/route.ts
+	new file:   app/error.tsx
+	new file:   app/global-error.tsx
+	new file:   app/not-found.tsx
+	new file:   components/ErrorBoundary.tsx
+	new file:   components/Toaster.tsx
+	new file:   components/ui/toast.tsx
+	modified:   dev_server.log
+	new file:   docs/ERROR_HANDLING.md
+	new file:   docs/ERROR_HANDLING_QUICK_START.md
+	new file:   hooks/useToast.tsx
+	new file:   lib/errors/AppError.ts
+	new file:   lib/errors/ErrorLogger.ts
+	new file:   lib/errors/errorHandler.ts
+	new file:   lib/utils/errorUtils.ts
+	new file:   prisma/schema-updates-error-handling.prisma
+	modified:   prisma/schema.prisma
+	modified:   ../outputs/workspace_output_1759278102_620.txt
+	new file:   ../outputs/workspace_output_1759278121_645.txt
+	new file:   ../outputs/workspace_output_1759278146_4707.txt
+	new file:   ../outputs/workspace_output_1759278815_1604.txt
+	new file:   ../outputs/workspace_output_1759278989_6636.txt
+

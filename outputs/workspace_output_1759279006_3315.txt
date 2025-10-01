@@ -1,0 +1,23 @@
+[main 8e1cf6e] feat: Implement comprehensive error handling system
+ 24 files changed, 4359 insertions(+)
+ create mode 100644 RBAC_PUSH_COMPLETE.md
+ create mode 100644 medical-analysis-platform/ERROR_HANDLING_COMPLETE.md
+ create mode 100644 medical-analysis-platform/app/api/errors/log/route.ts
+ create mode 100644 medical-analysis-platform/app/error.tsx
+ create mode 100644 medical-analysis-platform/app/global-error.tsx
+ create mode 100644 medical-analysis-platform/app/not-found.tsx
+ create mode 100644 medical-analysis-platform/components/ErrorBoundary.tsx
+ create mode 100644 medical-analysis-platform/components/Toaster.tsx
+ create mode 100644 medical-analysis-platform/components/ui/toast.tsx
+ create mode 100644 medical-analysis-platform/docs/ERROR_HANDLING.md
+ create mode 100644 medical-analysis-platform/docs/ERROR_HANDLING_QUICK_START.md
+ create mode 100644 medical-analysis-platform/hooks/useToast.tsx
+ create mode 100644 medical-analysis-platform/lib/errors/AppError.ts
+ create mode 100644 medical-analysis-platform/lib/errors/ErrorLogger.ts
+ create mode 100644 medical-analysis-platform/lib/errors/errorHandler.ts
+ create mode 100644 medical-analysis-platform/lib/utils/errorUtils.ts
+ create mode 100644 medical-analysis-platform/prisma/schema-updates-error-handling.prisma
+ create mode 100644 outputs/workspace_output_1759278121_645.txt
+ create mode 100644 outputs/workspace_output_1759278146_4707.txt
+ create mode 100644 outputs/workspace_output_1759278815_1604.txt
+ create mode 100644 outputs/workspace_output_1759278989_6636.txt

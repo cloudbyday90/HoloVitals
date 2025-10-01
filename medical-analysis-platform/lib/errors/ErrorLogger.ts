@@ -213,7 +213,6 @@ export class ErrorLogger {
    * Send critical error alerts
    */
   private async sendCriticalAlert(entry: ErrorLogEntry): Promise<void> {
-    // TODO: Implement alert mechanism (email, Slack, PagerDuty, etc.)
     console.error('🚨 CRITICAL ALERT:', {
       message: entry.message,
       code: entry.code,
@@ -221,24 +220,22 @@ export class ErrorLogger {
       timestamp: entry.timestamp,
     });
 
-    // Create notification in database
+    // Import alert service dynamically to avoid circular dependency
     try {
-      await prisma.notification.create({
-        data: {
-          type: 'CRITICAL_ERROR',
-          title: 'Critical System Error',
-          message: `${entry.message} (${entry.code})`,
-          severity: 'CRITICAL',
-          metadata: JSON.stringify({
-            errorCode: entry.code,
-            endpoint: entry.endpoint,
-            timestamp: entry.timestamp,
-          }),
-          createdAt: new Date(),
-        },
-      });
+      const { errorAlertService } = await import('../services/ErrorAlertService');
+      
+      await errorAlertService.sendCriticalAlert(
+        entry.id || 'unknown',
+        entry.message,
+        {
+          code: entry.code,
+          endpoint: entry.endpoint,
+          userId: entry.userId,
+          timestamp: entry.timestamp,
+        }
+      );
     } catch (error) {
-      console.error('Failed to create critical error notification:', error);
+      console.error('Failed to send critical error alert:', error);
     }
   }
 
