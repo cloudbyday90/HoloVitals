@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { DocumentCard } from '@/components/documents/DocumentCard';
 import { PDFViewer } from '@/components/documents/PDFViewer';
 import { ImageViewer } from '@/components/documents/ImageViewer';
+import { DocumentUploadModal } from '@/components/documents/DocumentUploadModal';
 import { Document, DocumentType, DocumentFilter, DocumentSort, DocumentSortField, SortDirection } from '@/lib/types/document-viewer';
 import { Search, Upload, Grid3x3, List, SlidersHorizontal, Download, Star } from 'lucide-react';
 import {
@@ -33,6 +34,7 @@ export default function DocumentsPage() {
   const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.DESC);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [viewerType, setViewerType] = useState<'pdf' | 'image' | null>(null);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   useEffect(() => {
     fetchDocuments();
@@ -164,6 +166,10 @@ export default function DocumentsPage() {
     setViewerType(null);
   };
 
+  const handleUploadComplete = () => {
+    fetchDocuments();
+  };
+
   return (
     <>
       <div className="container mx-auto p-6 space-y-6">
@@ -180,7 +186,7 @@ export default function DocumentsPage() {
               <Download className="h-4 w-4 mr-2" />
               Export All
             </Button>
-            <Button>
+            <Button onClick={() => setUploadModalOpen(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Upload Document
             </Button>
@@ -398,6 +404,13 @@ export default function DocumentsPage() {
           onShare={() => handleShareDocument(selectedDocument)}
         />
       )}
+
+      {/* Upload Modal */}
+      <DocumentUploadModal
+        open={uploadModalOpen}
+        onClose={() => setUploadModalOpen(false)}
+        onUploadComplete={handleUploadComplete}
+      />
     </>
   );
 }

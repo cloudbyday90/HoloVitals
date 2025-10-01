@@ -14,7 +14,7 @@
 - [x] Add document categorization (Lab Reports, Imaging, Clinical Notes, etc.)
 - [x] Add search and filtering
 - [x] Add sorting (date, type, provider)
-- [ ] Add document upload functionality
+- [x] Add document upload functionality
 
 ## 3. PDF Viewer
 - [x] Create PDFViewer component
@@ -45,11 +45,11 @@
 - [ ] Add tags and categories
 
 ## 6. Document Actions
-- [ ] Add download functionality
+- [x] Add download functionality
+- [x] Add print functionality
+- [x] Add delete functionality (with confirmation)
+- [x] Add favorite/bookmark functionality
 - [ ] Add share with provider functionality
-- [ ] Add print functionality
-- [ ] Add delete functionality (with confirmation)
-- [ ] Add favorite/bookmark functionality
 - [ ] Add document notes/annotations
 
 ## 7. Document Organization
@@ -67,12 +67,12 @@
 - [ ] Add search suggestions
 
 ## 9. API Integration
-- [ ] Create document upload API endpoint
-- [ ] Create document download API endpoint
-- [ ] Create document metadata API endpoint
+- [x] Create document upload API endpoint
+- [x] Create document download API endpoint (integrated in documents page)
+- [x] Create document metadata API endpoint
+- [x] Add proper error handling and validation
 - [ ] Create document search API endpoint
 - [ ] Create document annotation API endpoint
-- [ ] Add proper error handling and validation
 
 ## 10. Security & Privacy
 - [ ] Implement secure document storage
