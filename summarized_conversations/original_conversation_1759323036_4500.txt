@@ -1,0 +1,1 @@
+{'role': 'user', 'content': "<tool_result> <create-file> ToolResult(success=False, output='Error creating file: Failed to create sandbox: column Runner.used does not exist') </create-file> </tool_result>"}

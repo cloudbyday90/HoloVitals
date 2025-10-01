@@ -1,0 +1,13 @@
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   docs/COMPLIANCE_GAP_ANALYSIS_SUMMARY.md
+	new file:   docs/COMPLIANCE_IMPLEMENTATION_ROADMAP.md
+	new file:   docs/MULTI_JURISDICTION_COMPLIANCE_ANALYSIS.md
+	new file:   docs/MULTI_JURISDICTION_COMPLIANCE_COMPLETE.md
+	modified:   outputs/workspace_output_1759320794_2260.txt
+	new file:   outputs/workspace_output_1759320807_2956.txt
+	new file:   outputs/workspace_output_1759320813_6050.txt
+	new file:   outputs/workspace_output_1759322911_2745.txt
+	new file:   prisma/schema-compliance-additions.prisma
+

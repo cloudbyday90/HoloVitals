@@ -1,0 +1,1 @@
+{'role': 'user', 'content': '/fast-deep-research so for the purposes of what we are building in this chat, what would we need to do to implement from a legality perspective and a practicality perspective'}

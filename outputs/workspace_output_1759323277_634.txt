@@ -1,0 +1,11 @@
+total 120
+drwxr-xr-x  3 root root  4096 Oct  1 12:47 .
+drwxr-xr-x 12 root root  4096 Oct  1 12:53 ..
+-rw-r--r--  1 root root  9319 Sep 30 18:19 schema-ai-extensions.prisma
+-rw-r--r--  1 root root  3258 Oct  1 12:10 schema-athenahealth-eclinicalworks.prisma
+-rw-r--r--  1 root root 12634 Oct  1 12:47 schema-compliance-additions.prisma
+-rw-r--r--  1 root root 19269 Sep 30 16:50 schema-dev-qa-repositories.prisma
+-rw-r--r--  1 root root 21857 Sep 30 17:14 schema-emergency-recovery.prisma
+-rw-r--r--  1 root root 21742 Sep 30 17:53 schema-hipaa-compliance.prisma
+-rw-r--r--  1 root root  9743 Oct  1 11:32 schema-medical-standardization.prisma
+drwxr-xr-x  2 root root    48 Oct  1 11:34 seeds
