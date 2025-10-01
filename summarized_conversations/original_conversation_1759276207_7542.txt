@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Let me try a different approach and run the tests in a tmux session:\n\n<function_calls>\n<execute-command>\ntmux new-session -d -s test_service4 "cd medical-analysis-platform && npm test -- InstanceProvisionerService.test.ts 2>&1 | tee test_output.log"\n</execute-command>\n</function_calls>'}

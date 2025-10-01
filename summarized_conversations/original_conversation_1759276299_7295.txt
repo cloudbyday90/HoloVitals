@@ -1,0 +1,1 @@
+{'role': 'user', 'content': "Let's work on building service-specific UI pages (Documents, Chat, Queue, Instances, Costs)"}

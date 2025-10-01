@@ -1,0 +1,1 @@
+{'role': 'user', 'content': "<tool_result> <wait> ToolResult(success=True, output='Waited 10 seconds') </wait> </tool_result>"}

@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': '<function_calls>\n<execute-command>\ntmux capture-pane -pt test_service4\n</execute-command>\n</function_calls>'}

@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "Great! The dev server is running. Let me check if it's accessible:\n\n<function_calls>\n<execute-command>\ncurl -s http://localhost:3000 | head -20\n</execute-command>\n</function_calls>"}

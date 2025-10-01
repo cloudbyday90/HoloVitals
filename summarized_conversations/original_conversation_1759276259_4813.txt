@@ -1,0 +1,1 @@
+{'role': 'user', 'content': '<tool_result> <execute-command> ToolResult(success=True, output=\'{\\n  "output": "   app/layout.tsx\\\\n   app/page.tsx\\\\n   app/dashboard/page.tsx\\\\n   app/dashboard/analyze/[id]/page.tsx\\\\n",\\n  "exit_code": 0,\\n  "cwd": "/workspace"\\n}\') </execute-command> </tool_result>'}

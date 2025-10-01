@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Let me try running a simpler validation test first:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && node -e "const service = require(\'./lib/services/InstanceProvisionerService.ts\'); console.log(\'Service loaded successfully\');"\n</execute-command>\n</function_calls>'}

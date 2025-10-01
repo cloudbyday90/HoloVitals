@@ -19,6 +19,7 @@ model User {
   id                    String    @id @default(uuid())
   email                 String    @unique
   passwordHash          String    @map("password_hash")
+  role                  String    @default("PATIENT") // OWNER, ADMIN, DOCTOR, PATIENT, SUPPORT, ANALYST
   mfaEnabled            Boolean   @default(false) @map("mfa_enabled")
   mfaSecret             String?   @map("mfa_secret")
   mfaBackupCodes        String?   @map("mfa_backup_codes")
@@ -34,6 +35,7 @@ model User {
   consentRequestsAsPatient ConsentGrant[] @relation("PatientConsents")
   consentRequestsAsSpecialist ConsentGrant[] @relation("SpecialistConsents")
   auditLogs             AuditLog[]
+  accessLogs            AccessLog[]
   
   // AI Architecture Relations
   chatConversations     ChatConversation[]
@@ -870,5 +872,32 @@ model AnalysisTask {
   @@index([priority])
   @@index([type])
   @@index([createdAt])
+}
+
+
+
+// ============================================================================
+// ACCESS CONTROL & AUDIT LOGGING
+// ============================================================================
+
+model AccessLog {
+  id           String   @id @default(uuid())
+  userId       String
+  action       String
+  resourceType String
+  resourceId   String?
+  allowed      Boolean
+  reason       String?
+  ipAddress    String?
+  userAgent    String?
+  timestamp    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([timestamp])
+  @@index([allowed])
+  @@index([resourceType])
+  @@map("access_logs")
 }
 

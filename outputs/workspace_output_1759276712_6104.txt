@@ -1,0 +1,30 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { 
+  Home, 
+  FileText, 
+  MessageSquare, 
+  ListTodo, 
+  Server, 
+  DollarSign, 
+  Settings,
+  ChevronLeft,
+  ChevronRight,
+  Zap
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface SidebarProps {
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+const navigation = [
+  { name: 'Overview', href: '/dashboard', icon: Home },
+  { name: 'Documents', href: '/dashboard/documents', icon: FileText },
+  { name: 'AI Chat', href: '/dashboard/chat', icon: MessageSquare },
+  { name: 'Queue', href: '/dashboard/queue', icon: ListTodo },
+  { name: 'Instances', href: '/dashboard/instances', icon: Server },
+  { name: 'Costs', href: '/dashboard/costs', icon: DollarSign },

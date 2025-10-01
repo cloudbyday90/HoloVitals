@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': '<function_calls>\n<execute-command>\ncd medical-analysis-platform && npx jest __tests__/services/InstanceProvisionerService.test.ts --testTimeout=120000 --maxWorkers=1 2>&1 | head -200\n</execute-command>\n</function_calls>'}

@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': '<function_calls>\n<wait duration="20">\n</wait>\n</function_calls>'}
