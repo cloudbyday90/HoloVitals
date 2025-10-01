@@ -156,3 +156,4 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
     </>
   );
 }
+export default Sidebar;

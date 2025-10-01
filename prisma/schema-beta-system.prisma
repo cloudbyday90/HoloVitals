@@ -1,0 +1,138 @@
+// Beta Testing System Schema
+// Add these models to your main schema.prisma file
+
+model BetaCode {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  maxUses       Int      @default(1)
+  usedCount     Int      @default(0)
+  expiresAt     DateTime?
+  createdAt     DateTime @default(now())
+  createdBy     String
+  
+  // Limits for this code (in MB for storage)
+  tokenLimit    Int      @default(3000000)  // 3M tokens
+  storageLimit  Int      @default(500)      // 500MB
+  
+  // Status
+  isActive      Boolean  @default(true)
+  
+  // Relationships
+  users         User[]
+  
+  @@index([code])
+  @@index([isActive])
+  @@index([createdAt])
+}
+
+model User {
+  // ... existing fields
+  
+  // Beta Testing
+  betaCodeId    String?
+  betaCode      BetaCode? @relation(fields: [betaCodeId], references: [id])
+  isBetaTester  Boolean   @default(false)
+  betaJoinedAt  DateTime?
+  
+  // Token Tracking
+  tokensUsed    Int       @default(0)
+  tokensLimit   Int       @default(0)
+  tokensResetAt DateTime?
+  
+  // Storage Tracking (in MB)
+  storageUsed   Int       @default(0)  // MB used
+  storageLimit  Int       @default(0)  // MB limit
+  
+  // Relationships
+  tokenUsage    TokenUsage[]
+  fileUploads   FileUpload[]
+  
+  @@index([isBetaTester])
+  @@index([betaCodeId])
+}
+
+model TokenUsage {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  tokensUsed    Int
+  operation     String   // 'chat', 'analysis', 'insights', 'document_analysis', etc.
+  metadata      Json?    // Additional context
+  timestamp     DateTime @default(now())
+  
+  @@index([userId, timestamp])
+  @@index([operation])
+}
+
+model FileUpload {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  fileName      String
+  fileSize      Int      // Size in bytes
+  fileSizeMB    Float    // Size in MB (for easier querying)
+  fileType      String
+  filePath      String
+  uploadedAt    DateTime @default(now())
+  
+  // Metadata
+  documentType  String?  // 'lab_result', 'prescription', 'medical_record', etc.
+  isDeleted     Boolean  @default(false)
+  deletedAt     DateTime?
+  
+  @@index([userId, uploadedAt])
+  @@index([isDeleted])
+}
+
+model BetaFeedback {
+  id            String   @id @default(cuid())
+  userId        String
+  
+  // Feedback details
+  type          String   // 'bug', 'feature_request', 'general', 'improvement'
+  title         String
+  description   String   @db.Text
+  severity      String?  // 'low', 'medium', 'high', 'critical'
+  
+  // Status
+  status        String   @default("open") // 'open', 'in_progress', 'resolved', 'closed'
+  priority      String?  // 'low', 'medium', 'high'
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  resolvedAt    DateTime?
+  resolvedBy    String?
+  
+  // Additional context
+  metadata      Json?    // Browser info, page URL, etc.
+  
+  @@index([userId, createdAt])
+  @@index([status])
+  @@index([type])
+}
+
+model BetaAnalytics {
+  id            String   @id @default(cuid())
+  userId        String
+  
+  // Event tracking
+  eventType     String   // 'page_view', 'feature_used', 'error', 'conversion', etc.
+  eventName     String
+  eventData     Json?
+  
+  // Session info
+  sessionId     String?
+  timestamp     DateTime @default(now())
+  
+  // Context
+  page          String?
+  userAgent     String?
+  ipAddress     String?
+  
+  @@index([userId, timestamp])
+  @@index([eventType])
+  @@index([sessionId])
+}
