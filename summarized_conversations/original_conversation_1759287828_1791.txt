@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': '<function_calls>\n<execute-command>\nsudo -u postgres psql -d holovitals -c "\\dt" | grep -E "subscriptions|token_|file_uploads|payment_intents"\n</execute-command>\n</function_calls>'}

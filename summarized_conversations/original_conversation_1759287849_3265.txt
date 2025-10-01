@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': '<function_calls>\n<execute-command>\ncd medical-analysis-platform && cat ../PRICING_SYSTEM_COMPLETE.md | head -100\n</execute-command>\n</function_calls>'}

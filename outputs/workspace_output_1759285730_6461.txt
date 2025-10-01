@@ -1,0 +1,18 @@
+[main 2b1dd5d] feat: Add multi-provider EHR support (Phase 4 complete)
+ 18 files changed, 2676 insertions(+), 15 deletions(-)
+ create mode 100644 EHR_INTEGRATION_PHASE1_COMPLETE.md
+ create mode 100644 medical-analysis-platform/app/api/ehr/providers/route.ts
+ create mode 100644 medical-analysis-platform/docs/MULTI_PROVIDER_SUPPORT.md
+ create mode 100644 medical-analysis-platform/lib/config/ehr-providers.ts
+ create mode 100644 medical-analysis-platform/lib/connectors/AllscriptsConnector.ts
+ create mode 100644 medical-analysis-platform/lib/connectors/AthenaHealthConnector.ts
+ create mode 100644 medical-analysis-platform/lib/connectors/BaseEHRConnector.ts
+ create mode 100644 medical-analysis-platform/lib/connectors/CernerConnector.ts
+ create mode 100644 medical-analysis-platform/lib/connectors/ConnectorFactory.ts
+ create mode 100644 medical-analysis-platform/lib/connectors/EClinicalWorksConnector.ts
+ create mode 100644 medical-analysis-platform/lib/connectors/EpicConnector.ts
+ create mode 100644 medical-analysis-platform/lib/connectors/NextGenConnector.ts
+ create mode 100644 medical-analysis-platform/lib/services/ProviderDiscoveryService.ts
+ create mode 100644 outputs/workspace_output_1759284720_4202.txt
+ create mode 100644 outputs/workspace_output_1759284743_1654.txt
+ create mode 100644 outputs/workspace_output_1759285692_2015.txt

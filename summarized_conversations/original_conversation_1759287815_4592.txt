@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "Good, now we only have one of each. The issue is that these models don't have the User relation. Let me check what fields they have:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && sed -n '575,595p' prisma/schema.prisma\n</execute-command>\n</function_calls>"}

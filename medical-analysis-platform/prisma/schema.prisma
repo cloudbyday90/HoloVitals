@@ -1226,6 +1226,7 @@ model EHRConnection {
   user                  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   fhirResources         FHIRResource[]
   syncHistory           SyncHistory[]
+  bulkExportJobs        BulkExportJob[]
   
   @@index([userId])
   @@index([status])
@@ -1269,6 +1270,7 @@ model FHIRResource {
   updatedAt             DateTime          @updatedAt @map("updated_at")
   
   connection            EHRConnection     @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  epicSpecificData      EpicSpecificData?
   
   @@unique([connectionId, fhirId, resourceType])
   @@index([connectionId])
@@ -1365,3 +1367,89 @@ model ProviderConfiguration {
   @@index([enabled])
   @@map("provider_configurations")
 }
+
+
+// ============================================================================
+// EPIC-SPECIFIC MODELS
+// ============================================================================
+
+model BulkExportJob {
+  id                    String            @id @default(uuid())
+  connectionId          String            @map("connection_id")
+  exportType            BulkExportType    @map("export_type")
+  status                BulkExportStatus  @default(INITIATED)
+  
+  // Export URLs
+  kickoffUrl            String?           @map("kickoff_url")
+  statusUrl             String?           @map("status_url")
+  outputUrls            String?           @db.Text @map("output_urls") // JSON array
+  
+  // Export parameters
+  resourceTypes         String?           @db.Text @map("resource_types") // JSON array
+  since                 DateTime?         // Only resources modified after this date
+  
+  // Progress tracking
+  startedAt             DateTime          @default(now()) @map("started_at")
+  completedAt           DateTime?         @map("completed_at")
+  expiresAt             DateTime?         @map("expires_at")
+  
+  // Metrics
+  resourceCount         Int               @default(0) @map("resource_count")
+  totalSize             BigInt            @default(0) @map("total_size") // bytes
+  
+  // Error tracking
+  errorMessage          String?           @db.Text @map("error_message")
+  errorDetails          String?           @db.Text @map("error_details") // JSON
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: additional export details
+  
+  connection            EHRConnection     @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  
+  @@index([connectionId])
+  @@index([status])
+  @@index([startedAt])
+  @@map("bulk_export_jobs")
+}
+
+model EpicSpecificData {
+  id                    String            @id @default(uuid())
+  resourceId            String            @unique @map("resource_id")
+  
+  // Epic-specific extensions
+  extensions            String?           @db.Text // JSON: Epic FHIR extensions
+  customFields          String?           @db.Text @map("custom_fields") // JSON: Epic custom fields
+  
+  // Enhanced data
+  clinicalNotes         String?           @db.Text @map("clinical_notes")
+  labResultDetails      String?           @db.Text @map("lab_result_details") // JSON
+  imagingMetadata       String?           @db.Text @map("imaging_metadata") // JSON
+  carePlanDetails       String?           @db.Text @map("care_plan_details") // JSON
+  encounterDetails      String?           @db.Text @map("encounter_details") // JSON
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  resource              FHIRResource      @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  
+  @@index([resourceId])
+  @@map("epic_specific_data")
+}
+
+enum BulkExportType {
+  PATIENT
+  GROUP
+  SYSTEM
+}
+
+enum BulkExportStatus {
+  INITIATED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  EXPIRED
+  CANCELLED
+}
+

@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Perfect! The database migration was successful. Now let\'s verify the new tables were created:\n\n<function_calls>\n<execute-command>\nsudo -u postgres psql -d holovitals -c "\\dt" | grep -E "ehr_|fhir_|sync_|provider_"\n</execute-command>\n</function_calls>'}

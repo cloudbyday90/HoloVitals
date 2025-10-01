@@ -1,0 +1,1 @@
+{'role': 'user', 'content': "Let's work on the medical retrieval system from EHR platforms as I discussed before, like fasten-onprem. "}

@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "Now let's run the database migration to add the new EHR tables:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && sudo service postgresql start && sleep 2 && npx prisma db push\n</execute-command>\n</function_calls>"}

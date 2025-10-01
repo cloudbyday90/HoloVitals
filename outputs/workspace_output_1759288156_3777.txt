@@ -1,0 +1,15 @@
+model SyncHistory {
+  id                    String            @id @default(uuid())
+  connectionId          String            @map("connection_id")
+  status                SyncStatus        @default(QUEUED)
+  syncType              String            @default("incremental") @map("sync_type") // incremental, full
+  
+  // Sync metrics
+  startedAt             DateTime?         @map("started_at")
+  completedAt           DateTime?         @map("completed_at")
+  duration              Int?              // seconds
+  
+  // Resources synced
+  resourcesQueried      Int               @default(0) @map("resources_queried")
+  resourcesCreated      Int               @default(0) @map("resources_created")
+  resourcesUpdated      Int               @default(0) @map("resources_updated")

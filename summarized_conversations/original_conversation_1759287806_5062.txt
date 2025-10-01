@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "The database server isn't running. Let me start PostgreSQL and then run the migration:\n\n<function_calls>\n<execute-command>\nsudo service postgresql start && sleep 2 && cd medical-analysis-platform && npx prisma db push\n</execute-command>\n</function_calls>"}

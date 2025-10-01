@@ -2,7 +2,7 @@
 
 **Goal**: Build a medical data retrieval system that connects to Epic and other EHR platforms using FHIR APIs to automatically pull patient medical records, including PDFs and clinical documents.
 
-**Status**: 20% Complete  
+**Status**: 0% Complete  
 **Estimated Time**: 3-4 weeks
 
 ---
@@ -32,68 +32,31 @@
 
 ---
 
-## Phase 2: Epic-Specific Features (Current) 🔄 IN PROGRESS
+## Phase 2: Epic Integration (Week 2)
 
-### 2.1 Epic-Specific Resource Types [x]
-- [x] Implement DiagnosticReport support (lab results, imaging reports)
-- [x] Implement CarePlan support (treatment plans, care coordination)
-- [x] Implement Encounter support (visits, appointments, hospitalizations)
-- [x] Implement Goal support (patient health goals)
-- [x] Implement ServiceRequest support (orders, referrals)
-- [x] Add Epic-specific extensions handling
+### 2.1 Epic SMART on FHIR Authentication
+- [ ] Implement Epic OAuth2 authorization flow
+- [ ] Create Epic app registration helper
+- [ ] Build patient authorization UI
+- [ ] Implement token refresh mechanism
+- [ ] Add Epic sandbox testing support
 
-### 2.2 Epic Bulk Data Export [x]
-- [x] Implement FHIR Bulk Data Export ($export operation)
-- [x] Support Group-level export (all patients in a group)
-- [x] Support Patient-level export (single patient)
-- [x] Handle NDJSON format parsing
-- [x] Implement polling for export completion
-- [x] Download and process export files
+### 2.2 Epic FHIR API Integration
+- [ ] Implement Patient resource retrieval
+- [ ] Implement DocumentReference queries
+- [ ] Implement Observation (labs) retrieval
+- [ ] Implement Condition (diagnoses) retrieval
+- [ ] Implement MedicationRequest retrieval
+- [ ] Implement AllergyIntolerance retrieval
+- [ ] Implement Immunization retrieval
+- [ ] Implement Procedure retrieval
 
-### 2.3 Epic App Orchard Integration [x]
-- [x] Research Epic App Orchard requirements
-- [x] Document production app registration process
-- [x] Create Epic-specific configuration guide
-- [x] Add Epic App Orchard metadata
-
-### 2.4 Epic-Specific Optimizations [x]
-- [x] Implement Epic's preferred search parameters
-- [x] Add Epic-specific rate limiting (10 requests/second)
-- [x] Optimize pagination for Epic's response sizes
-- [x] Handle Epic-specific error codes
-- [x] Implement Epic's recommended retry logic
-
-### 2.5 Enhanced Data Extraction [x]
-- [x] Extract clinical notes from DiagnosticReport
-- [x] Parse lab results with reference ranges
-- [x] Extract imaging study metadata
-- [x] Process care plan activities and goals
-- [x] Extract encounter diagnoses and procedures
-
-### 2.6 Epic Service Extensions [x]
-- [x] Create EpicEnhancedService extending EHRSyncService
-- [x] Add bulk export methods
-- [x] Add enhanced resource fetching
-- [x] Add Epic-specific data transformations
-
-### 2.7 API Endpoints [x]
-- [x] POST /api/ehr/epic/bulk-export - Initiate bulk export
-- [x] GET /api/ehr/epic/bulk-export/:id - Check export status
-- [x] POST /api/ehr/epic/enhanced-sync - Enhanced sync with all resources
-- [x] GET /api/ehr/epic/capabilities - Get Epic-specific capabilities
-
-### 2.8 Database Schema Updates [x]
-- [x] Add bulk_export_jobs table
-- [x] Add epic_specific_data table for extensions
-- [x] Update fhir_resources table with Epic-specific fields
-- [x] Add indexes for Epic-specific queries
-
-### 2.9 Documentation [x]
-- [x] Create EPIC_INTEGRATION.md guide (100+ pages)
-- [x] Document bulk export process
-- [x] Document App Orchard registration
-- [x] Add Epic-specific examples
-- [x] Create troubleshooting guide
+### 2.3 Document Retrieval
+- [ ] Implement PDF download from DocumentReference
+- [ ] Support Base64-encoded documents
+- [ ] Support external document URLs
+- [ ] Implement document type detection
+- [ ] Add document validation and virus scanning
 
 ---
 
@@ -229,12 +192,84 @@
 
 ---
 
-## Success Criteria for Phase 2 (Epic-Specific)
-- [ ] All Epic-specific resource types supported
-- [ ] Bulk export fully functional
-- [ ] Enhanced data extraction working
-- [ ] All tests passing
-- [ ] Complete documentation
-- [ ] Production-ready code
+## Key Features to Implement
 
-## Estimated Time for Phase 2: 2-3 days
+### 1. SMART on FHIR Authentication
+- OAuth2 authorization code flow
+- Patient-facing app registration
+- Automatic token refresh
+- Secure token storage
+
+### 2. Comprehensive Data Retrieval
+- Patient demographics
+- Clinical documents (PDFs, CCDAs)
+- Lab results and observations
+- Medications and prescriptions
+- Diagnoses and conditions
+- Allergies and intolerances
+- Immunization records
+- Procedures and surgeries
+
+### 3. Intelligent Sync
+- Incremental updates (only new data)
+- Conflict resolution
+- Error recovery
+- Progress tracking
+- Cost estimation
+
+### 4. Multi-Provider Support
+- Epic (MyChart)
+- Cerner/Oracle Health
+- 100+ healthcare systems
+- Extensible connector framework
+
+### 5. Cost Integration
+- Automatic token estimation
+- Free upload limit application
+- Cost tracking per provider
+- Budget alerts
+
+---
+
+## Technical Stack
+
+### Backend
+- TypeScript/Node.js
+- FHIR Client library (fhir.js or custom)
+- OAuth2 client (simple-oauth2)
+- Background jobs (Bull/BullMQ)
+- Prisma ORM
+
+### Standards
+- FHIR R4
+- SMART on FHIR
+- OAuth 2.0
+- HL7 standards
+
+### Security
+- Token encryption (AES-256-GCM)
+- HTTPS only
+- HIPAA-compliant logging
+- Audit trails
+
+---
+
+## Success Metrics
+
+- [ ] Successfully connect to Epic sandbox
+- [ ] Retrieve patient data from Epic
+- [ ] Download and process PDF documents
+- [ ] Sync 100+ resources in <5 minutes
+- [ ] Support 5+ EHR providers
+- [ ] Maintain 99.9% sync success rate
+- [ ] Complete HIPAA compliance audit
+
+---
+
+## Next Immediate Steps
+
+1. Create FHIR client infrastructure
+2. Set up Epic sandbox account
+3. Implement SMART on FHIR auth flow
+4. Build database schema
+5. Create first Epic connector

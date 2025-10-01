@@ -1,0 +1,43 @@
+model FHIRResource {
+  id                    String            @id @default(uuid())
+  connectionId          String            @map("connection_id")
+  resourceType          FHIRResourceType  @map("resource_type")
+  fhirId                String            @map("fhir_id") // Resource ID from FHIR server
+  fhirVersion           String            @default("R4") @map("fhir_version")
+  
+  // Raw FHIR data
+  rawData               String            @db.Text @map("raw_data") // JSON string of FHIR resource
+  
+  // Extracted metadata for quick access
+  title                 String?
+  description           String?           @db.Text
+  date                  DateTime?
+  category              String?
+  status                String?
+  
+  // Document-specific fields
+  contentType           String?           @map("content_type") // e.g., "application/pdf"
+  contentUrl            String?           @map("content_url") @db.Text
+  contentSize           Int?              @map("content_size") // bytes
+  documentDownloaded    Boolean           @default(false) @map("document_downloaded")
+  localFilePath         String?           @map("local_file_path")
+  
+  // Processing status
+  processed             Boolean           @default(false)
+  processedAt           DateTime?         @map("processed_at")
+  tokensUsed            Int?              @map("tokens_used")
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: additional resource-specific data
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  connection            EHRConnection     @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  
+  @@unique([connectionId, fhirId, resourceType])
+  @@index([connectionId])
+  @@index([resourceType])
+  @@index([date])
+  @@index([processed])
+  @@map("fhir_resources")
+}

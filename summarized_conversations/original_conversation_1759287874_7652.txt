@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'The User model is missing the EHR relation. Let me check if it was added:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && grep -A 5 "EHR Integration Relations" prisma/schema.prisma\n</execute-command>\n</function_calls>'}

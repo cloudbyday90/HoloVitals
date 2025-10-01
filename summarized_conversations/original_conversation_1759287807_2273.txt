@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'There are duplicate model definitions in the schema. Let me check and fix this:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && grep -n "^model AccessLog" prisma/schema.prisma\n</execute-command>\n</function_calls>'}

@@ -1,0 +1,1 @@
+{'role': 'user', 'content': '/fast-deep-research would it be possible to access EHR systems, like Epic, using a process similar to fasten-health - https://github.com/fastenhealth/fasten-onprem. The idea would be to pull health data, such as PDFs.'}

@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': "There are duplicate models. Let me remove the duplicates:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && sed -n '891,920p' prisma/schema.prisma\n</execute-command>\n</function_calls>"}

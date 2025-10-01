@@ -1,0 +1,22 @@
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   ../EHR_INTEGRATION_PHASE1_COMPLETE.md
+	new file:   app/api/ehr/providers/route.ts
+	new file:   docs/MULTI_PROVIDER_SUPPORT.md
+	new file:   lib/config/ehr-providers.ts
+	new file:   lib/connectors/AllscriptsConnector.ts
+	new file:   lib/connectors/AthenaHealthConnector.ts
+	new file:   lib/connectors/BaseEHRConnector.ts
+	new file:   lib/connectors/CernerConnector.ts
+	new file:   lib/connectors/ConnectorFactory.ts
+	new file:   lib/connectors/EClinicalWorksConnector.ts
+	new file:   lib/connectors/EpicConnector.ts
+	new file:   lib/connectors/NextGenConnector.ts
+	new file:   lib/services/ProviderDiscoveryService.ts
+	modified:   ../outputs/workspace_output_1759284697_2117.txt
+	new file:   ../outputs/workspace_output_1759284720_4202.txt
+	new file:   ../outputs/workspace_output_1759284743_1654.txt
+	new file:   ../outputs/workspace_output_1759285692_2015.txt
+	modified:   ../todo.md
+

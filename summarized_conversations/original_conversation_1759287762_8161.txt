@@ -1,0 +1,1 @@
+{'role': 'user', 'content': '<tool_result> <str-replace> ToolResult(success=False, output="String \'enum Role {\\n  OWNER\\n  ADMIN\\n  DOCTOR\\n  PATIENT\\n  SUPPORT\\n  ANALYST\\n}\' not found in file") </str-replace> </tool_result>'}

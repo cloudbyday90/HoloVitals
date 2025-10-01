@@ -1,0 +1,20 @@
+  supportsImmunization  Boolean           @default(true) @map("supports_immunization")
+  supportsProcedure     Boolean           @default(true) @map("supports_procedure")
+  
+  // Rate limiting
+  rateLimit             Int?              @map("rate_limit") // requests per minute
+  
+  // Status
+  enabled               Boolean           @default(true)
+  isSandbox             Boolean           @default(false) @map("is_sandbox")
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: additional provider-specific config
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  @@unique([provider, providerName])
+  @@index([provider])
+  @@index([enabled])
+  @@map("provider_configurations")
+}

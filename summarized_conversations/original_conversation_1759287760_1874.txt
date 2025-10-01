@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': '<function_calls>\n<execute-command>\nfind . -name "schema.prisma" -type f 2>/dev/null | head -5\n</execute-command>\n</function_calls>'}

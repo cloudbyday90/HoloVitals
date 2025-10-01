@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'I see - there are two different AccessLog models (one for consent, one for RBAC). Let me check the full schema structure:\n\n<function_calls>\n<execute-command>\ncd medical-analysis-platform && grep -n "^model AccessLog\\|^model Notification" prisma/schema.prisma\n</execute-command>\n</function_calls>'}
