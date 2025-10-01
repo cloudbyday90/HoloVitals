@@ -1,0 +1,19 @@
+[main 75ebe56] feat: Add athenahealth and eClinicalWorks EHR integrations
+ 18 files changed, 3258 insertions(+)
+ create mode 100644 app/api/ehr/athenahealth/bulk-export/[jobId]/route.ts
+ create mode 100644 app/api/ehr/athenahealth/bulk-export/route.ts
+ create mode 100644 app/api/ehr/athenahealth/capabilities/route.ts
+ create mode 100644 app/api/ehr/athenahealth/enhanced-sync/route.ts
+ create mode 100644 app/api/ehr/eclinicalworks/bulk-export/[jobId]/route.ts
+ create mode 100644 app/api/ehr/eclinicalworks/bulk-export/route.ts
+ create mode 100644 app/api/ehr/eclinicalworks/capabilities/route.ts
+ create mode 100644 app/api/ehr/eclinicalworks/enhanced-sync/route.ts
+ create mode 100644 docs/ATHENAHEALTH_ECLINICALWORKS_COMPLETE.md
+ create mode 100644 docs/ATHENAHEALTH_INTEGRATION.md
+ create mode 100644 docs/ECLINICALWORKS_INTEGRATION.md
+ create mode 100644 lib/services/AthenaHealthEnhancedService.ts
+ create mode 100644 lib/services/EClinicalWorksEnhancedService.ts
+ create mode 100644 outputs/workspace_output_1759320318_9553.txt
+ create mode 100644 outputs/workspace_output_1759320323_131.txt
+ create mode 100644 outputs/workspace_output_1759320794_2260.txt
+ create mode 100644 prisma/schema-athenahealth-eclinicalworks.prisma

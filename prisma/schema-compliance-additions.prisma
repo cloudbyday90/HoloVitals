@@ -1,0 +1,464 @@
+// Compliance Additions Schema
+// Add this to your main schema.prisma file
+
+// Data Regions
+enum DataRegion {
+  US_EAST
+  US_WEST
+  EU_WEST
+  EU_CENTRAL
+  CA_CENTRAL
+  UK
+}
+
+// Jurisdictions
+enum Jurisdiction {
+  USA
+  CANADA_ONTARIO
+  CANADA_ALBERTA
+  CANADA_BC
+  EU
+  UK
+}
+
+// Breach Types
+enum BreachType {
+  UNAUTHORIZED_ACCESS
+  DATA_LOSS
+  DATA_THEFT
+  RANSOMWARE
+  SYSTEM_COMPROMISE
+  INSIDER_THREAT
+  ACCIDENTAL_DISCLOSURE
+}
+
+// Breach Severity
+enum BreachSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// Notification Status
+enum NotificationStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+// Legal Agreement Types
+enum AgreementType {
+  BAA
+  DPA
+  CONSENT
+  TERMS_OF_SERVICE
+  PRIVACY_POLICY
+}
+
+// Update User model to include data residency
+model User {
+  // ... existing fields ...
+  
+  // Data Residency
+  dataRegion      DataRegion?   @default(US_EAST)
+  jurisdiction    Jurisdiction? @default(USA)
+  
+  // Compliance
+  consentRecords  PatientConsent[]
+  legalAgreements LegalAgreement[]
+  
+  // Relations (add to existing)
+  athenaHealthData      AthenaHealthSpecificData[]
+  eClinicalWorksData    EClinicalWorksSpecificData[]
+}
+
+// Breach Notification Model
+model BreachNotification {
+  id                              String          @id @default(cuid())
+  
+  // Breach Details
+  breachType                      BreachType
+  severity                        BreachSeverity
+  discoveryDate                   DateTime
+  affectedUsers                   Int
+  affectedRecords                 Int
+  description                     String          @db.Text
+  containmentActions              String[]
+  
+  // Affected Data
+  affectedDataTypes               String[]        // e.g., ["PHI", "PII", "Financial"]
+  affectedUserIds                 String[]        // List of affected user IDs
+  
+  // Notification Tracking - HIPAA (60 days)
+  hipaaNotificationStatus         NotificationStatus @default(PENDING)
+  hipaaNotificationDate           DateTime?
+  hipaaIndividualsNotified        Int             @default(0)
+  
+  // Notification Tracking - GDPR (72 hours)
+  gdprNotificationStatus          NotificationStatus @default(PENDING)
+  gdprNotificationDate            DateTime?
+  gdprIndividualsNotified         Int             @default(0)
+  
+  // Notification Tracking - PHIPA (immediate if harm)
+  phipaNotificationStatus         NotificationStatus @default(PENDING)
+  phipaNotificationDate           DateTime?
+  phipaIndividualsNotified        Int             @default(0)
+  
+  // Regulatory Reporting - USA
+  hhsReported                     Boolean         @default(false)
+  hhsReportDate                   DateTime?
+  hhsReportNumber                 String?
+  
+  // Regulatory Reporting - EU
+  supervisoryAuthorityReported    Boolean         @default(false)
+  supervisoryAuthorityReportDate  DateTime?
+  supervisoryAuthority            String?         // e.g., "ICO", "CNIL"
+  
+  // Regulatory Reporting - Canada
+  privacyCommissionerReported     Boolean         @default(false)
+  privacyCommissionerReportDate   DateTime?
+  privacyCommissioner             String?         // e.g., "IPC Ontario"
+  
+  // Media Notification (if >500 affected)
+  mediaNotificationRequired       Boolean         @default(false)
+  mediaNotificationDate           DateTime?
+  
+  // Resolution
+  resolved                        Boolean         @default(false)
+  resolvedDate                    DateTime?
+  resolutionNotes                 String?         @db.Text
+  
+  // Post-Incident Review
+  postIncidentReviewCompleted     Boolean         @default(false)
+  postIncidentReviewDate          DateTime?
+  lessonsLearned                  String?         @db.Text
+  preventiveMeasures              String[]
+  
+  // Metadata
+  createdAt                       DateTime        @default(now())
+  updatedAt                       DateTime        @updatedAt
+  createdBy                       String
+  
+  @@index([severity])
+  @@index([discoveryDate])
+  @@index([hipaaNotificationStatus])
+  @@index([gdprNotificationStatus])
+  @@index([phipaNotificationStatus])
+  @@index([resolved])
+}
+
+// Legal Agreement Model
+model LegalAgreement {
+  id              String        @id @default(cuid())
+  
+  // Agreement Details
+  type            AgreementType
+  version         String        @default("1.0")
+  
+  // Parties
+  partyName       String
+  partyEmail      String
+  partyRole       String?       // e.g., "Covered Entity", "Controller"
+  
+  // User Association (if applicable)
+  userId          String?
+  user            User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Dates
+  signedDate      DateTime
+  effectiveDate   DateTime
+  expirationDate  DateTime?
+  
+  // Status
+  status          String        @default("ACTIVE") // ACTIVE, EXPIRED, TERMINATED, PENDING
+  
+  // Document
+  documentUrl     String
+  documentHash    String        // SHA-256 hash for integrity
+  signatureData   Json          // Digital signature details
+  
+  // Renewal
+  renewalRequired Boolean       @default(false)
+  renewalDate     DateTime?
+  renewalReminder DateTime?
+  
+  // Termination
+  terminatedDate  DateTime?
+  terminationReason String?
+  
+  // Metadata
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  @@index([type])
+  @@index([status])
+  @@index([expirationDate])
+  @@index([userId])
+  @@index([partyEmail])
+}
+
+// Patient Consent Model (Enhanced)
+model PatientConsent {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Consent Types
+  treatmentConsent       Boolean  @default(false)
+  dataProcessingConsent  Boolean  @default(false)
+  researchConsent        Boolean  @default(false)
+  marketingConsent       Boolean  @default(false)
+  ehrIntegrationConsent  Boolean  @default(false)
+  dataSharingConsent     Boolean  @default(false)
+  
+  // Jurisdiction-specific
+  jurisdiction    String   // USA, CANADA_ONTARIO, EU, etc.
+  consentType     String   // IMPLIED, EXPLICIT
+  
+  // Consent details
+  consentDate     DateTime
+  consentMethod   String   // WEB, EMAIL, PAPER, VERBAL
+  ipAddress       String?
+  userAgent       String?
+  consentText     String   @db.Text // Full text of consent
+  
+  // Specific purposes
+  purposes        String[] // Detailed list of purposes
+  
+  // Data categories
+  dataCategories  String[] // Types of data covered
+  
+  // Third-party sharing
+  thirdParties    String[] // List of third parties data may be shared with
+  
+  // Revocation
+  revoked         Boolean  @default(false)
+  revokedDate     DateTime?
+  revokedReason   String?
+  revokedMethod   String?  // WEB, EMAIL, PAPER, VERBAL
+  
+  // Renewal (for time-limited consents)
+  expirationDate  DateTime?
+  renewalRequired Boolean  @default(false)
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([jurisdiction])
+  @@index([revoked])
+  @@index([consentType])
+  @@index([expirationDate])
+}
+
+// Data Portability Request Model
+model DataPortabilityRequest {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Request Details
+  format          String   // JSON, XML, CSV
+  includeDocuments Boolean @default(true)
+  includeEHRData  Boolean @default(true)
+  
+  // Status
+  status          String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  
+  // Output
+  exportUrl       String?
+  exportSize      Int?     // Size in bytes
+  expirationDate  DateTime? // URL expiration (7 days)
+  
+  // Processing
+  startedAt       DateTime?
+  completedAt     DateTime?
+  errorMessage    String?
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Data Rectification Request Model
+model DataRectificationRequest {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Request Details
+  dataType        String   // e.g., "DIAGNOSIS", "MEDICATION", "PERSONAL_INFO"
+  recordId        String?  // ID of specific record to correct
+  currentValue    String   @db.Text
+  requestedValue  String   @db.Text
+  reason          String   @db.Text
+  
+  // Status
+  status          String   @default("PENDING") // PENDING, UNDER_REVIEW, APPROVED, REJECTED, COMPLETED
+  
+  // Review
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  reviewNotes     String?  @db.Text
+  
+  // Resolution
+  approved        Boolean?
+  completedAt     DateTime?
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([dataType])
+}
+
+// Encryption Key Rotation Log
+model EncryptionKeyRotation {
+  id              String   @id @default(cuid())
+  
+  // Key Details
+  keyId           String
+  keyType         String   // DATABASE, FILE_STORAGE, BACKUP
+  region          DataRegion
+  
+  // Rotation
+  oldKeyId        String?
+  newKeyId        String
+  rotationDate    DateTime
+  rotationReason  String   // SCHEDULED, COMPROMISE, COMPLIANCE
+  
+  // Status
+  status          String   @default("COMPLETED") // IN_PROGRESS, COMPLETED, FAILED
+  affectedRecords Int      @default(0)
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  performedBy     String
+  
+  @@index([keyId])
+  @@index([rotationDate])
+  @@index([region])
+}
+
+// Subprocessor Model
+model Subprocessor {
+  id              String   @id @default(cuid())
+  
+  // Subprocessor Details
+  name            String
+  description     String
+  website         String?
+  
+  // Services
+  services        String[] // e.g., ["Cloud Hosting", "Email Delivery"]
+  dataProcessed   String[] // e.g., ["PHI", "PII", "Payment Data"]
+  
+  // Location
+  locations       String[] // Countries where data is processed
+  
+  // Agreements
+  baaStatus       String   @default("PENDING") // PENDING, SIGNED, EXPIRED
+  baaSigned       DateTime?
+  baaExpiration   DateTime?
+  dpaStatus       String   @default("PENDING")
+  dpaSigned       DateTime?
+  dpaExpiration   DateTime?
+  
+  // Compliance
+  soc2Certified   Boolean  @default(false)
+  iso27001Certified Boolean @default(false)
+  hipaaCompliant  Boolean  @default(false)
+  gdprCompliant   Boolean  @default(false)
+  
+  // Status
+  status          String   @default("ACTIVE") // ACTIVE, INACTIVE, TERMINATED
+  
+  // Notifications
+  lastNotificationDate DateTime?
+  notificationsSent    Int      @default(0)
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([status])
+  @@index([baaStatus])
+  @@index([dpaStatus])
+}
+
+// Compliance Checklist Model
+model ComplianceChecklist {
+  id              String   @id @default(cuid())
+  
+  // Checklist Details
+  jurisdiction    Jurisdiction
+  category        String   // ENCRYPTION, LEGAL, BREACH_RESPONSE, etc.
+  requirement     String
+  description     String   @db.Text
+  
+  // Status
+  status          String   @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, COMPLETED
+  completedDate   DateTime?
+  completedBy     String?
+  
+  // Evidence
+  evidenceUrl     String?
+  evidenceNotes   String?  @db.Text
+  
+  // Priority
+  priority        String   // CRITICAL, HIGH, MEDIUM, LOW
+  dueDate         DateTime?
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([jurisdiction])
+  @@index([status])
+  @@index([priority])
+  @@index([dueDate])
+}
+
+// Training Record Model
+model TrainingRecord {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Training Details
+  trainingType    String   // HIPAA, GDPR, PHIPA, SECURITY, INCIDENT_RESPONSE
+  trainingTitle   String
+  trainingUrl     String?
+  
+  // Completion
+  status          String   @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, COMPLETED
+  startedAt       DateTime?
+  completedAt     DateTime?
+  score           Int?     // If assessment included
+  
+  // Certification
+  certificateUrl  String?
+  certificateExpiration DateTime?
+  
+  // Renewal
+  renewalRequired Boolean  @default(false)
+  renewalDate     DateTime?
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([trainingType])
+  @@index([status])
+  @@index([certificateExpiration])
+}

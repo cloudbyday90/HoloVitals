@@ -1,0 +1,22 @@
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   app/api/ehr/athenahealth/bulk-export/[jobId]/route.ts
+	new file:   app/api/ehr/athenahealth/bulk-export/route.ts
+	new file:   app/api/ehr/athenahealth/capabilities/route.ts
+	new file:   app/api/ehr/athenahealth/enhanced-sync/route.ts
+	new file:   app/api/ehr/eclinicalworks/bulk-export/[jobId]/route.ts
+	new file:   app/api/ehr/eclinicalworks/bulk-export/route.ts
+	new file:   app/api/ehr/eclinicalworks/capabilities/route.ts
+	new file:   app/api/ehr/eclinicalworks/enhanced-sync/route.ts
+	new file:   docs/ATHENAHEALTH_ECLINICALWORKS_COMPLETE.md
+	new file:   docs/ATHENAHEALTH_INTEGRATION.md
+	new file:   docs/ECLINICALWORKS_INTEGRATION.md
+	new file:   lib/services/AthenaHealthEnhancedService.ts
+	new file:   lib/services/EClinicalWorksEnhancedService.ts
+	modified:   outputs/workspace_output_1759320313_3648.txt
+	new file:   outputs/workspace_output_1759320318_9553.txt
+	new file:   outputs/workspace_output_1759320323_131.txt
+	new file:   outputs/workspace_output_1759320794_2260.txt
+	new file:   prisma/schema-athenahealth-eclinicalworks.prisma
+
