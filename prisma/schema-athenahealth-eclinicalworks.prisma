@@ -1,0 +1,118 @@
+// athenahealth and eClinicalWorks Enhanced Schema
+// Add this to your main schema.prisma file
+
+// athenahealth-specific data model
+model AthenaHealthSpecificData {
+  id              String   @id @default(cuid())
+  
+  // Resource reference
+  resourceType    String
+  resourceId      String   @unique
+  
+  // User reference
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // DiagnosticReport fields
+  reportType      String?
+  status          String?
+  category        String?
+  effectiveDateTime DateTime?
+  issued          DateTime?
+  conclusion      String?
+  presentedForm   Json?    // Array of attachments
+  
+  // CarePlan fields
+  intent          String?
+  title           String?
+  description     String?
+  period          Json?    // { start, end }
+  activities      Json?    // Array of activities
+  
+  // Encounter fields
+  class           String?
+  type            String?
+  reasonCode      Json?    // Array of reason codes
+  diagnosis       Json?    // Array of diagnoses
+  hospitalization Json?    // Hospitalization details
+  
+  // Appointment fields
+  appointmentType String?
+  start           DateTime?
+  end             DateTime?
+  minutesDuration Int?
+  comment         String?
+  
+  // DocumentReference fields
+  date            DateTime?
+  content         Json?    // Array of content attachments
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([resourceType])
+  @@index([resourceId])
+}
+
+// eClinicalWorks-specific data model
+model EClinicalWorksSpecificData {
+  id              String   @id @default(cuid())
+  
+  // Resource reference
+  resourceType    String
+  resourceId      String   @unique
+  
+  // User reference
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // DiagnosticReport fields
+  reportType      String?
+  status          String?
+  category        String?
+  effectiveDateTime DateTime?
+  issued          DateTime?
+  conclusion      String?
+  presentedForm   Json?    // Array of attachments
+  
+  // CarePlan fields
+  intent          String?
+  title           String?
+  description     String?
+  period          Json?    // { start, end }
+  activities      Json?    // Array of activities
+  
+  // Encounter fields
+  class           String?
+  type            String?
+  reasonCode      Json?    // Array of reason codes
+  diagnosis       Json?    // Array of diagnoses
+  hospitalization Json?    // Hospitalization details
+  
+  // Communication fields
+  category        String?
+  priority        String?
+  medium          Json?    // Array of communication mediums
+  subject         String?
+  topic           String?
+  sent            DateTime?
+  received        DateTime?
+  payload         Json?    // Array of message payloads
+  
+  // Task fields
+  code            String?
+  authoredOn      DateTime?
+  lastModified    DateTime?
+  executionPeriod Json?    // { start, end }
+  note            Json?    // Array of notes
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([resourceType])
+  @@index([resourceId])
+}
