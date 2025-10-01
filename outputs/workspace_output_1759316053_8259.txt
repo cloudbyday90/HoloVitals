@@ -1,0 +1,21 @@
+[main 1ec6fec] Phase 2b: Allscripts-Specific Features Implementation
+ 20 files changed, 4837 insertions(+), 3 deletions(-)
+ create mode 100644 NEXT_STEPS.md
+ create mode 100644 PHASE_2_EPIC_SUMMARY.md
+ create mode 100644 SESSION_SUMMARY.md
+ create mode 100644 medical-analysis-platform/app/api/ehr/allscripts/bulk-export/[id]/route.ts
+ create mode 100644 medical-analysis-platform/app/api/ehr/allscripts/bulk-export/route.ts
+ create mode 100644 medical-analysis-platform/app/api/ehr/allscripts/capabilities/route.ts
+ create mode 100644 medical-analysis-platform/app/api/ehr/allscripts/enhanced-sync/route.ts
+ create mode 100644 medical-analysis-platform/docs/ALLSCRIPTS_INTEGRATION.md
+ create mode 100644 medical-analysis-platform/docs/PHASE_2B_ALLSCRIPTS_COMPLETE.md
+ create mode 100644 medical-analysis-platform/lib/services/AllscriptsEnhancedService.ts
+ create mode 100644 outputs/workspace_output_1759288945_5832.txt
+ create mode 100644 outputs/workspace_output_1759288965_9233.txt
+ create mode 100644 outputs/workspace_output_1759288987_6949.txt
+ create mode 100644 outputs/workspace_output_1759289080_4127.txt
+ create mode 100644 outputs/workspace_output_1759289099_2267.txt
+ create mode 100644 outputs/workspace_output_1759289166_2628.txt
+ create mode 100644 outputs/workspace_output_1759289294_5578.txt
+ create mode 100644 outputs/workspace_output_1759315593_5265.txt
+ create mode 100644 outputs/workspace_output_1759316019_1250.txt

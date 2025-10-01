@@ -1,0 +1,8 @@
+## Estimated Time for Phase 2b: 1 week
+
+---
+
+### 2.1 Epic-Specific Resource Types [x]
+- [x] Implement DiagnosticReport support (lab results, imaging reports)
+- [x] Implement CarePlan support (treatment plans, care coordination)
+- [x] Implement Encounter support (visits, appointments, hospitalizations)
