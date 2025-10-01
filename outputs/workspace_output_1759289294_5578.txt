@@ -1,0 +1,20 @@
+# HoloVitals EHR Integration System - Fasten-OnPrem Style
+
+**Goal**: Build a medical data retrieval system that connects to Epic and other EHR platforms using FHIR APIs to automatically pull patient medical records, including PDFs and clinical documents.
+
+**Status**: 20% Complete  
+**Estimated Time**: 3-4 weeks
+
+---
+
+## Phase 1: FHIR Foundation & Architecture (Week 1) ✅ COMPLETE
+
+### 1.1 FHIR Client Infrastructure ✅
+- [x] Create base FHIR client with R4 support
+- [x] Implement SMART on FHIR authentication flow
+- [x] Create OAuth2 token management service
+- [x] Build FHIR resource parser and validator
+- [x] Implement error handling and retry logic
+
+### 1.2 Database Schema for EHR Data ✅
+- [x] Create EHRConnection model (provider, credentials, status)

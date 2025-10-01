@@ -1,0 +1,13 @@
+**Current Phase**: Phase 2b - Allscripts-Specific Features
+**Estimated Time**: 2-3 weeks remaining
+
+---
+
+## Phase 1: FHIR Foundation & Architecture (Week 1) ✅ COMPLETE
+--
+## Phase 2b: Allscripts-Specific Features (Current) 🔄 IN PROGRESS
+
+### 2.1 Epic-Specific Resource Types [x]
+- [x] Implement DiagnosticReport support (lab results, imaging reports)
+- [x] Implement CarePlan support (treatment plans, care coordination)
+- [x] Implement Encounter support (visits, appointments, hospitalizations)
