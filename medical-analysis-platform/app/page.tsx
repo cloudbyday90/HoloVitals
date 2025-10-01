@@ -12,7 +12,7 @@ export default function HomePage() {
           <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Medical Document Analysis Platform
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-gray-800 mb-8">
             Advanced AI-powered analysis of your medical documents with intelligent context management and cross-referencing capabilities
           </p>
           <div className="flex gap-4 justify-center">
@@ -115,7 +115,7 @@ export default function HomePage() {
               </div>
               <div>
                 <h3 className="text-xl font-semibold mb-2">Upload Your Documents</h3>
-                <p className="text-gray-600">
+                <p className="text-gray-800">
                   Upload medical documents including bloodwork results, imaging reports, after-care summaries, and prescriptions in PDF or image format.
                 </p>
               </div>
@@ -127,7 +127,7 @@ export default function HomePage() {
               </div>
               <div>
                 <h3 className="text-xl font-semibold mb-2">Automatic Processing</h3>
-                <p className="text-gray-600">
+                <p className="text-gray-800">
                   Our advanced OCR technology extracts text and structured data from your documents, identifying key information like test results, dates, and values.
                 </p>
               </div>
@@ -139,7 +139,7 @@ export default function HomePage() {
               </div>
               <div>
                 <h3 className="text-xl font-semibold mb-2">AI Analysis</h3>
-                <p className="text-gray-600">
+                <p className="text-gray-800">
                   Ask questions about your documents and get intelligent answers. Our AI cross-references related documents and maintains context for accurate analysis.
                 </p>
               </div>
@@ -151,7 +151,7 @@ export default function HomePage() {
               </div>
               <div>
                 <h3 className="text-xl font-semibold mb-2">Track Trends</h3>
-                <p className="text-gray-600">
+                <p className="text-gray-800">
                   View trends over time, compare results, and get insights about changes in your health metrics with comprehensive visualizations.
                 </p>
               </div>
@@ -175,7 +175,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="border-t mt-16 py-8">
-        <div className="container mx-auto px-4 text-center text-gray-600">
+        <div className="container mx-auto px-4 text-center text-gray-800">
           <p className="mb-2">
             <strong>Medical Disclaimer:</strong> This platform is for informational purposes only and should not replace professional medical advice, diagnosis, or treatment.
           </p>

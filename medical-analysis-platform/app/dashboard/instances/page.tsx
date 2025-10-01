@@ -186,9 +186,9 @@ export default function InstancesPage() {
       case 'STOPPING':
         return <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />;
       case 'TERMINATED':
-        return <XCircle className="w-4 h-4 text-gray-600" />;
+        return <XCircle className="w-4 h-4 text-gray-800" />;
       default:
-        return <Activity className="w-4 h-4 text-gray-400" />;
+        return <Activity className="w-4 h-4 text-gray-600" />;
     }
   };
 
@@ -218,7 +218,7 @@ export default function InstancesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold mb-2">Cloud Instances</h1>
-          <p className="text-gray-600">Manage your ephemeral GPU instances</p>
+          <p className="text-gray-800">Manage your ephemeral GPU instances</p>
         </div>
         <Dialog open={showProvisionDialog} onOpenChange={setShowProvisionDialog}>
           <DialogTrigger asChild>
@@ -327,7 +327,7 @@ export default function InstancesPage() {
                   onChange={(e) => setProvisionForm({ ...provisionForm, autoTerminateMinutes: parseInt(e.target.value) })}
                   min={5}
                 />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-700">
                   Instance will automatically terminate after this duration
                 </p>
               </div>
@@ -368,10 +368,10 @@ export default function InstancesPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Total Instances
             </CardTitle>
-            <Server className="w-4 h-4 text-gray-500" />
+            <Server className="w-4 h-4 text-gray-700" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
@@ -380,7 +380,7 @@ export default function InstancesPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Running
             </CardTitle>
             <Activity className="w-4 h-4 text-green-500" />
@@ -392,7 +392,7 @@ export default function InstancesPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Hourly Cost
             </CardTitle>
             <DollarSign className="w-4 h-4 text-blue-500" />
@@ -406,7 +406,7 @@ export default function InstancesPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Total Cost
             </CardTitle>
             <DollarSign className="w-4 h-4 text-purple-500" />
@@ -424,9 +424,9 @@ export default function InstancesPage() {
         {instances.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <Server className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <Server className="w-16 h-16 text-gray-600 mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">No instances</h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-800 mb-4">
                 Provision your first GPU instance to get started
               </p>
               <Button onClick={() => setShowProvisionDialog(true)}>
@@ -452,22 +452,22 @@ export default function InstancesPage() {
                         </span>
                       </div>
 
-                      <p className="text-sm text-gray-600 mb-3">{instance.purpose}</p>
+                      <p className="text-sm text-gray-800 mb-3">{instance.purpose}</p>
 
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
+                        <div className="flex items-center gap-2 text-gray-800">
                           <MapPin className="w-4 h-4" />
                           <span>{instance.region}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-600">
+                        <div className="flex items-center gap-2 text-gray-800">
                           <DollarSign className="w-4 h-4" />
                           <span>${instance.costPerHour}/hr</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-600">
+                        <div className="flex items-center gap-2 text-gray-800">
                           <Clock className="w-4 h-4" />
                           <span>{instance.autoTerminateMinutes}min</span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-600">
+                        <div className="flex items-center gap-2 text-gray-800">
                           <Zap className="w-4 h-4" />
                           <span>${instance.totalCost.toFixed(2)} total</span>
                         </div>
@@ -477,18 +477,18 @@ export default function InstancesPage() {
                         <div className="mt-3 p-3 bg-gray-50 rounded-lg">
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                              <span className="text-gray-600">Public IP:</span>
+                              <span className="text-gray-800">Public IP:</span>
                               <span className="ml-2 font-mono">{instance.publicIp}</span>
                             </div>
                             <div>
-                              <span className="text-gray-600">Private IP:</span>
+                              <span className="text-gray-800">Private IP:</span>
                               <span className="ml-2 font-mono">{instance.privateIp}</span>
                             </div>
                           </div>
                         </div>
                       )}
 
-                      <div className="mt-3 text-xs text-gray-500">
+                      <div className="mt-3 text-xs text-gray-700">
                         Created: {instance.createdAt.toLocaleString()}
                         {instance.terminatedAt && (
                           <> • Terminated: {instance.terminatedAt.toLocaleString()}</>

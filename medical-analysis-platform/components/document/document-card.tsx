@@ -88,7 +88,7 @@ export function DocumentCard({
       
       <CardContent>
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-gray-800">
             <Calendar className="w-4 h-4" />
             <span>
               {documentDate 

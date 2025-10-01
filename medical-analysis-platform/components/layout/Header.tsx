@@ -34,7 +34,7 @@ export default function Header({ onMenuClick, sidebarOpen }: HeaderProps) {
 
           {/* Search Bar */}
           <div className="hidden md:flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 w-64 lg:w-96">
-            <Search className="w-4 h-4 text-gray-500" />
+            <Search className="w-4 h-4 text-gray-700" />
             <input
               type="text"
               placeholder="Search documents, chats..."
@@ -56,7 +56,7 @@ export default function Header({ onMenuClick, sidebarOpen }: HeaderProps) {
             <DropdownMenuContent align="end" className="w-80">
               <DropdownMenuLabel>Notifications</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <div className="p-4 text-sm text-gray-500 text-center">
+              <div className="p-4 text-sm text-gray-700 text-center">
                 No new notifications
               </div>
             </DropdownMenuContent>
@@ -75,7 +75,7 @@ export default function Header({ onMenuClick, sidebarOpen }: HeaderProps) {
               <DropdownMenuLabel>
                 <div>
                   <p className="font-medium">John Doe</p>
-                  <p className="text-xs text-gray-500">john@example.com</p>
+                  <p className="text-xs text-gray-700">john@example.com</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />

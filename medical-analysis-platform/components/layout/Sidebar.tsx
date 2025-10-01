@@ -111,7 +111,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   >
                     <Icon className="w-5 h-5" />
                     <span className="flex-1">{item.name}</span>
-                    <Lock className="w-3 h-3 text-gray-400" />
+                    <Lock className="w-3 h-3 text-gray-600" />
                   </Link>
                 </OwnerOnly>
               );
@@ -132,7 +132,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   >
                     <Icon className="w-5 h-5" />
                     <span className="flex-1">{item.name}</span>
-                    <Lock className="w-3 h-3 text-gray-400" />
+                    <Lock className="w-3 h-3 text-gray-600" />
                   </Link>
                 </AdminOnly>
               );

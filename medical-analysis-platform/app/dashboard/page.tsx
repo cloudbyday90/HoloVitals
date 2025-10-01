@@ -41,7 +41,7 @@ export default function DashboardPage() {
       {/* Welcome Section */}
       <div>
         <h1 className="text-3xl font-bold mb-2">Welcome back!</h1>
-        <p className="text-gray-600">Here's what's happening with your medical analysis platform today.</p>
+        <p className="text-gray-800">Here's what's happening with your medical analysis platform today.</p>
       </div>
 
       {/* Stats Grid */}
@@ -49,14 +49,14 @@ export default function DashboardPage() {
         {/* Documents */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Documents
             </CardTitle>
-            <FileText className="w-4 h-4 text-gray-500" />
+            <FileText className="w-4 h-4 text-gray-700" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.documents}</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-700 mt-1">
               <span className="text-green-600">+2</span> from last week
             </p>
           </CardContent>
@@ -65,14 +65,14 @@ export default function DashboardPage() {
         {/* Conversations */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               AI Conversations
             </CardTitle>
-            <MessageSquare className="w-4 h-4 text-gray-500" />
+            <MessageSquare className="w-4 h-4 text-gray-700" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.conversations}</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-700 mt-1">
               <span className="text-green-600">+3</span> from last week
             </p>
           </CardContent>
@@ -81,14 +81,14 @@ export default function DashboardPage() {
         {/* Active Tasks */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Active Tasks
             </CardTitle>
-            <Activity className="w-4 h-4 text-gray-500" />
+            <Activity className="w-4 h-4 text-gray-700" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.activeTasks}</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-700 mt-1">
               {stats.activeInstances} instance running
             </p>
           </CardContent>
@@ -97,14 +97,14 @@ export default function DashboardPage() {
         {/* Today's Cost */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Today's Cost
             </CardTitle>
-            <DollarSign className="w-4 h-4 text-gray-500" />
+            <DollarSign className="w-4 h-4 text-gray-700" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${stats.todayCost}</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-700 mt-1">
               ${stats.monthlyCost} this month
             </p>
           </CardContent>
@@ -123,18 +123,18 @@ export default function DashboardPage() {
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Tokens Saved</p>
+              <p className="text-sm text-gray-800 mb-1">Tokens Saved</p>
               <p className="text-3xl font-bold text-green-600">
                 {stats.tokensSaved.toLocaleString()}
               </p>
-              <p className="text-xs text-gray-500 mt-1">40% reduction</p>
+              <p className="text-xs text-gray-700 mt-1">40% reduction</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600 mb-1">Cost Saved</p>
+              <p className="text-sm text-gray-800 mb-1">Cost Saved</p>
               <p className="text-3xl font-bold text-green-600">
                 ${stats.costSaved}
               </p>
-              <p className="text-xs text-gray-500 mt-1">This month</p>
+              <p className="text-xs text-gray-700 mt-1">This month</p>
             </div>
           </div>
         </CardContent>
@@ -203,7 +203,7 @@ export default function DashboardPage() {
                     <p className="text-sm font-medium truncate">
                       {activity.title}
                     </p>
-                    <p className="text-xs text-gray-500">{activity.time}</p>
+                    <p className="text-xs text-gray-700">{activity.time}</p>
                   </div>
                 </div>
               ))}

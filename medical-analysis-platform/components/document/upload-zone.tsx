@@ -106,7 +106,7 @@ export function UploadZone({
                 <p className="text-lg font-semibold mb-2">
                   Drop your medical documents here
                 </p>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-gray-700 mb-4">
                   or click to browse files
                 </p>
                 <Button type="button" variant="outline">
@@ -115,7 +115,7 @@ export function UploadZone({
                 </Button>
               </div>
               
-              <div className="text-xs text-gray-400 mt-4">
+              <div className="text-xs text-gray-600 mt-4">
                 <p>Supported formats: PDF, PNG, JPEG</p>
                 <p>Maximum file size: {maxSize}MB</p>
               </div>

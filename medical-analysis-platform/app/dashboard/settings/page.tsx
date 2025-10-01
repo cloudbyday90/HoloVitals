@@ -27,7 +27,7 @@ export default function SettingsPage() {
     <div className="p-6 max-w-6xl mx-auto">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-2">Manage your account settings and preferences</p>
+        <p className="text-gray-800 mt-2">Manage your account settings and preferences</p>
       </div>
 
       <div className="bg-white rounded-lg shadow">
@@ -45,7 +45,7 @@ export default function SettingsPage() {
                     ${
                       activeTab === tab.id
                         ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        : 'border-transparent text-gray-700 hover:text-gray-700 hover:border-gray-300'
                     }
                   `}
                 >
@@ -64,7 +64,7 @@ export default function SettingsPage() {
             <div className="space-y-6">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-1">Profile Information</h2>
-                <p className="text-sm text-gray-600">Update your account profile information</p>
+                <p className="text-sm text-gray-800">Update your account profile information</p>
               </div>
               
               <div className="space-y-4">
@@ -101,7 +101,7 @@ export default function SettingsPage() {
                     type="text"
                     value={session?.user?.role || 'user'}
                     disabled
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
                   />
                 </div>
 
@@ -126,14 +126,14 @@ export default function SettingsPage() {
             <div className="space-y-6">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-1">Notification Preferences</h2>
-                <p className="text-sm text-gray-600">Manage how you receive notifications</p>
+                <p className="text-sm text-gray-800">Manage how you receive notifications</p>
               </div>
               
               <div className="space-y-4">
                 <div className="flex items-center justify-between py-3">
                   <div>
                     <p className="font-medium text-gray-900">Email Notifications</p>
-                    <p className="text-sm text-gray-500">Receive email updates about your account</p>
+                    <p className="text-sm text-gray-700">Receive email updates about your account</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -144,7 +144,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between py-3">
                   <div>
                     <p className="font-medium text-gray-900">Analysis Complete</p>
-                    <p className="text-sm text-gray-500">Get notified when document analysis is complete</p>
+                    <p className="text-sm text-gray-700">Get notified when document analysis is complete</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -155,7 +155,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between py-3">
                   <div>
                     <p className="font-medium text-gray-900">Weekly Summary</p>
-                    <p className="text-sm text-gray-500">Receive weekly summary of your activity</p>
+                    <p className="text-sm text-gray-700">Receive weekly summary of your activity</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" />
@@ -181,7 +181,7 @@ export default function SettingsPage() {
             <div className="space-y-6">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-1">Security Settings</h2>
-                <p className="text-sm text-gray-600">Manage your account security</p>
+                <p className="text-sm text-gray-800">Manage your account security</p>
               </div>
               
               <div className="space-y-4">
@@ -236,7 +236,7 @@ export default function SettingsPage() {
             <div className="space-y-6">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-1">API Keys</h2>
-                <p className="text-sm text-gray-600">Manage your API keys for external integrations</p>
+                <p className="text-sm text-gray-800">Manage your API keys for external integrations</p>
               </div>
               
               <div className="space-y-4">
@@ -282,14 +282,14 @@ export default function SettingsPage() {
             <div className="space-y-6">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-1">Appearance</h2>
-                <p className="text-sm text-gray-600">Customize how the application looks</p>
+                <p className="text-sm text-gray-800">Customize how the application looks</p>
               </div>
               
               <div className="space-y-4">
                 <div className="flex items-center justify-between py-3">
                   <div>
                     <p className="font-medium text-gray-900">Dark Mode</p>
-                    <p className="text-sm text-gray-500">Enable dark mode theme</p>
+                    <p className="text-sm text-gray-700">Enable dark mode theme</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" />
@@ -300,7 +300,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between py-3">
                   <div>
                     <p className="font-medium text-gray-900">Compact View</p>
-                    <p className="text-sm text-gray-500">Use compact layout for lists</p>
+                    <p className="text-sm text-gray-700">Use compact layout for lists</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" />

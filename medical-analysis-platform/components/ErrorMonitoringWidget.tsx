@@ -90,7 +90,7 @@ export function ErrorMonitoringWidget() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-bold">{stats.total}</p>
-                <p className="text-sm text-gray-600">Total errors (24h)</p>
+                <p className="text-sm text-gray-800">Total errors (24h)</p>
               </div>
               <div className="flex items-center gap-1">
                 {stats.trend.change > 0 ? (

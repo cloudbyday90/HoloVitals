@@ -129,7 +129,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             </h1>
 
             {/* Error Description */}
-            <p className="text-center text-gray-600 mb-8">
+            <p className="text-center text-gray-800 mb-8">
               We're sorry for the inconvenience. An unexpected error has occurred.
             </p>
 
@@ -192,7 +192,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
             {/* Help Text */}
             <div className="mt-8 text-center">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-700">
                 If this problem persists, please{' '}
                 <a
                   href="/support"

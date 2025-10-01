@@ -53,7 +53,7 @@ export default function Error({
         </h1>
 
         {/* Error Description */}
-        <p className="text-center text-gray-600 mb-8">
+        <p className="text-center text-gray-800 mb-8">
           We encountered an unexpected error. Our team has been notified and is working on a fix.
         </p>
 
@@ -106,7 +106,7 @@ export default function Error({
 
         {/* Help Text */}
         <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-700">
             If this problem persists, please{' '}
             <a
               href="/support"

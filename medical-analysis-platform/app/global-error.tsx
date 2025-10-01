@@ -34,7 +34,7 @@ export default function GlobalError({
               Application Error
             </h1>
 
-            <p className="text-gray-600 mb-8">
+            <p className="text-gray-800 mb-8">
               A critical error occurred. Please try refreshing the page.
             </p>
 

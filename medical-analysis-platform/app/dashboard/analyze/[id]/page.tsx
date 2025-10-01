@@ -96,7 +96,7 @@ What would you like to know more about?`;
             </Button>
           </Link>
           <h1 className="text-3xl font-bold">Document Analysis</h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-800 mt-2">
             AI-powered analysis and insights
           </p>
         </div>
@@ -112,25 +112,25 @@ What would you like to know more about?`;
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <FileText className="w-5 h-5 text-gray-600 mt-0.5" />
+                  <FileText className="w-5 h-5 text-gray-800 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-600">File Name</p>
+                    <p className="text-sm text-gray-800">File Name</p>
                     <p className="font-medium">{document.fileName}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Tag className="w-5 h-5 text-gray-600 mt-0.5" />
+                  <Tag className="w-5 h-5 text-gray-800 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-600">Document Type</p>
+                    <p className="text-sm text-gray-800">Document Type</p>
                     <p className="font-medium capitalize">{document.documentType}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-gray-600 mt-0.5" />
+                  <Calendar className="w-5 h-5 text-gray-800 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-600">Document Date</p>
+                    <p className="text-sm text-gray-800">Document Date</p>
                     <p className="font-medium">{document.documentDate.toLocaleDateString()}</p>
                   </div>
                 </div>
@@ -153,10 +153,10 @@ What would you like to know more about?`;
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-800">
                         {item.value} {item.unit}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-700">
                         Range: {item.range}
                       </p>
                     </div>

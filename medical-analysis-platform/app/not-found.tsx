@@ -28,7 +28,7 @@ export default function NotFound() {
         </h2>
 
         {/* Description */}
-        <p className="text-center text-gray-600 mb-8">
+        <p className="text-center text-gray-800 mb-8">
           The page you're looking for doesn't exist or has been moved.
         </p>
 
@@ -62,7 +62,7 @@ export default function NotFound() {
               className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all text-center"
             >
               <div className="text-sm font-medium text-gray-900">Dashboard</div>
-              <div className="text-xs text-gray-500 mt-1">Overview</div>
+              <div className="text-xs text-gray-700 mt-1">Overview</div>
             </Link>
 
             <Link
@@ -70,7 +70,7 @@ export default function NotFound() {
               className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all text-center"
             >
               <div className="text-sm font-medium text-gray-900">Documents</div>
-              <div className="text-xs text-gray-500 mt-1">Manage files</div>
+              <div className="text-xs text-gray-700 mt-1">Manage files</div>
             </Link>
 
             <Link
@@ -78,14 +78,14 @@ export default function NotFound() {
               className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all text-center"
             >
               <div className="text-sm font-medium text-gray-900">AI Chat</div>
-              <div className="text-xs text-gray-500 mt-1">Get help</div>
+              <div className="text-xs text-gray-700 mt-1">Get help</div>
             </Link>
           </div>
         </div>
 
         {/* Help Text */}
         <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-700">
             Need help?{' '}
             <Link
               href="/support"
