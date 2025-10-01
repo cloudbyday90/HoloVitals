@@ -1,0 +1,50 @@
+  progress                Int       @default(0)
+  data                    String    @db.Text
+  result                  String?   @db.Text
+  error                   String?   @db.Text
+  retryCount              Int       @default(0)
+  maxRetries              Int       @default(2)
+  estimatedCompletionTime DateTime?
+  startedAt               DateTime?
+  completedAt             DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  metadata                String?   @db.Text
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cloudInstances CloudInstance[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([priority])
+  @@index([type])
+  @@index([createdAt])
+}
+
+
+
+// ============================================================================
+// ACCESS CONTROL & AUDIT LOGGING
+// ============================================================================
+
+model AccessLog {
+  id           String   @id @default(uuid())
+  userId       String
+  action       String
+  resourceType String
+  resourceId   String?
+  allowed      Boolean
+  reason       String?
+  ipAddress    String?
+  userAgent    String?
+  timestamp    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([timestamp])
+  @@index([allowed])
+  @@index([resourceType])
+  @@map("access_logs")
+}
+
