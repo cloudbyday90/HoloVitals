@@ -31,3 +31,12 @@ bin/
 ### Mac OS ###
 .DS_Storeoutputs/
 summarized_conversations/
+# Archived schema files
+prisma/archive/
+
+# Legacy directories (to be reviewed)
+# medical-analysis-platform/
+# src/
+
+# Output files
+outputs/
