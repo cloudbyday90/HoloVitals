@@ -1,103 +1,43 @@
-# HoloVitals Clinical Document Viewer
+# HoloVitals - Next Phase Implementation Todo
 
-## 1. Planning & Architecture
-- [x] Review document storage and FHIR resource models
-- [x] Design document viewer layout and components
-- [x] Plan PDF rendering strategy
-- [x] Plan image viewing capabilities
-- [x] Design document organization system
+## Phase 1: Navigation Update
+- [x] Add AI Insights link to dashboard navigation
+- [x] Update layout with proper icons and routing
+- [x] Add Patients, Clinical Data, and Billing links
+- [ ] Test navigation functionality
 
-## 2. Document Library & List
-- [x] Create DocumentLibrary main page
-- [x] Create DocumentCard component
-- [x] Create DocumentList component with grid/list views
-- [x] Add document categorization (Lab Reports, Imaging, Clinical Notes, etc.)
-- [x] Add search and filtering
-- [x] Add sorting (date, type, provider)
-- [x] Add document upload functionality
+## Phase 2: Patient Search Interface
+- [x] Create patient search types and interfaces
+- [x] Implement patient search service
+- [x] Create patient search API endpoints
+- [x] Patient search UI components already exist
+- [x] Patient search page already exists
+- [x] Advanced filters and sorting already implemented
 
-## 3. PDF Viewer
-- [x] Create PDFViewer component
-- [x] Add zoom controls (zoom in, zoom out)
-- [x] Add print functionality
-- [x] Add fullscreen mode
-- [ ] Integrate advanced PDF library (react-pdf or pdf.js)
-- [ ] Add page navigation (next, previous, jump to page)
-- [ ] Add thumbnail sidebar
-- [ ] Add text selection and copy
-- [ ] Add annotation support (highlight, notes)
+## Phase 3: Clinical Data Viewer
+- [ ] Create clinical data types
+- [ ] Implement clinical data service
+- [ ] Create clinical data API endpoints
+- [ ] Build clinical data viewer components
+- [ ] Create clinical data viewer page
+- [ ] Add data export functionality
 
-## 4. Image Viewer
-- [x] Create ImageViewer component
-- [x] Add zoom and pan functionality
-- [x] Add rotation controls
-- [x] Add fullscreen mode
-- [ ] Add brightness/contrast adjustments
-- [ ] Support multiple image formats (JPEG, PNG, DICOM)
-- [ ] Add image gallery for multiple images
+## Phase 4: Payment System with Stripe
+- [ ] Install Stripe dependencies
+- [ ] Set up Stripe configuration
+- [ ] Create payment types and interfaces
+- [ ] Implement Stripe payment service
+- [ ] Create payment API endpoints
+- [ ] Build payment UI components
+- [ ] Add PayPal integration
+- [ ] Add Google Pay integration
+- [ ] Add Apple Pay integration
+- [ ] Create subscription management
+- [ ] Add payment history and receipts
+- [ ] Implement webhook handlers
 
-## 5. Document Details & Metadata
-- [ ] Create DocumentDetailModal component
-- [ ] Display document metadata (date, provider, type, size)
-- [ ] Show document description and notes
-- [ ] Add related documents section
-- [ ] Add document history/versions
-- [ ] Add tags and categories
-
-## 6. Document Actions
-- [x] Add download functionality
-- [x] Add print functionality
-- [x] Add delete functionality (with confirmation)
-- [x] Add favorite/bookmark functionality
-- [ ] Add share with provider functionality
-- [ ] Add document notes/annotations
-
-## 7. Document Organization
-- [ ] Create folder/category system
-- [ ] Add document tagging
-- [ ] Add custom categories
-- [ ] Add bulk operations (move, delete, download)
-- [ ] Add document collections/albums
-
-## 8. Search & Filter
-- [ ] Implement full-text search
-- [ ] Add advanced filters (date range, type, provider, tags)
-- [ ] Add saved searches
-- [ ] Add search history
-- [ ] Add search suggestions
-
-## 9. API Integration
-- [x] Create document upload API endpoint
-- [x] Create document download API endpoint (integrated in documents page)
-- [x] Create document metadata API endpoint
-- [x] Add proper error handling and validation
-- [ ] Create document search API endpoint
-- [ ] Create document annotation API endpoint
-
-## 10. Security & Privacy
-- [ ] Implement secure document storage
-- [ ] Add access control and permissions
-- [ ] Add audit logging for document access
-- [ ] Implement document encryption
-- [ ] Add watermarking for sensitive documents
-
-## 11. Performance Optimization
-- [ ] Implement lazy loading for documents
-- [ ] Add document caching
-- [ ] Optimize PDF rendering performance
-- [ ] Add progressive loading for large files
-- [ ] Implement thumbnail generation
-
-## 12. Testing & Documentation
-- [ ] Test PDF viewer with various PDF types
-- [ ] Test image viewer with various formats
-- [ ] Test document upload and download
-- [ ] Test search and filtering
-- [ ] Create user documentation
-- [ ] Create API documentation
-
-## 13. Deployment
-- [x] Commit changes to Git
-- [x] Push to GitHub
-- [x] Create pull request (#5)
-- [x] Create deployment summary
+## Phase 5: Testing & Documentation
+- [ ] Test all new features
+- [ ] Create documentation
+- [ ] Commit and push to GitHub
+- [ ] Create pull request
