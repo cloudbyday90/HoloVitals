@@ -29,14 +29,15 @@ interface SidebarProps {
 
 const navigation = [
   { name: 'Overview', href: '/dashboard', icon: Home, public: true },
-  { name: 'AI Insights', href: '/ai-insights', icon: Sparkles, public: true },
-  { name: 'Patients', href: '/patients', icon: Users, public: true },
-  { name: 'Clinical Data', href: '/clinical', icon: Activity, public: true },
+  { name: 'AI Insights', href: '/dashboard/ai-insights', icon: Sparkles, public: true },
+  { name: 'Patients', href: '/dashboard/patients', icon: Users, public: true },
+  { name: 'Clinical Data', href: '/dashboard/clinical', icon: Activity, public: true },
   { name: 'Documents', href: '/dashboard/documents', icon: FileText, public: true },
   { name: 'AI Chat', href: '/dashboard/chat', icon: MessageSquare, public: true },
-  { name: 'Billing', href: '/billing', icon: CreditCard, public: true },
+  { name: 'Billing', href: '/dashboard/billing', icon: CreditCard, public: true },
   { name: 'Queue', href: '/dashboard/queue', icon: ListTodo, adminOnly: true },
   { name: 'Instances', href: '/dashboard/instances', icon: Server, adminOnly: true },
+  { name: 'Beta Codes', href: '/dashboard/admin/beta-codes', icon: Settings, adminOnly: true },
   { name: 'Costs', href: '/dashboard/costs', icon: DollarSign, ownerOnly: true },
 ];
 
