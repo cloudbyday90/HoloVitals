@@ -97,7 +97,7 @@
 - [ ] Create API documentation
 
 ## 13. Deployment
-- [ ] Commit changes to Git
-- [ ] Push to GitHub
-- [ ] Create pull request
-- [ ] Create deployment summary
+- [x] Commit changes to Git
+- [x] Push to GitHub
+- [x] Create pull request (#5)
+- [x] Create deployment summary
