@@ -1,0 +1,21 @@
+model AccessLog {
+  id            String    @id @default(uuid())
+  consentId     String    @map("consent_id")
+  specialistId  String    @map("specialist_id")
+  action        String
+  resource      String
+  ipAddress     String?   @map("ip_address")
+  userAgent     String?   @map("user_agent")
+  details       String?   @db.Text
+  timestamp     DateTime  @default(now())
+  success       Boolean   @default(true)
+  
+  consent       ConsentGrant @relation(fields: [consentId], references: [id], onDelete: Cascade)
+  
+  @@map("access_logs")
+  @@index([consentId])
+  @@index([specialistId])
+  @@index([timestamp])
+}
+
+// ============================================================================

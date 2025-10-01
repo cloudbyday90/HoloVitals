@@ -1,73 +1,80 @@
-# HoloVitals UI & AI Architecture Implementation Plan
+# HoloVitals Pricing & Token System Implementation
 
-## Phase 1: Core Documentation ✅ COMPLETE
-- [x] Create UI Architecture documentation (50+ pages)
-- [x] Create AI Architecture documentation (80+ pages)
-- [x] Create Cloud Infrastructure documentation (60+ pages)
-- [x] Create Database Schema Extensions (15 new tables)
-- [x] Create Implementation Summary (40+ pages)
-- [x] Create Quick Start Guide for developers (30+ pages)
-- [x] Create System Diagrams and Visual Documentation (50+ pages)
-- [x] Create Final Summary document (30+ pages)
-- [x] Create comprehensive Documentation Index (20+ pages)
+## 1. Database Schema Design ✅ COMPLETE
+- [x] Create SubscriptionTier enum (BASIC, PROFESSIONAL, ENTERPRISE)
+- [x] Create Subscription model with tier, status, billing cycle
+- [x] Create TokenBalance model with balance, used, purchased tracking
+- [x] Create TokenTransaction model for all token movements
+- [x] Create FileUpload model with size, cost estimate, processing status
+- [x] Create PaymentIntent model for one-time purchases
+- [x] Add indexes for performance
+- [x] Create migration script
+- [x] Run database migration successfully
 
-**Total Documentation: 360+ pages across 8 comprehensive documents**
+## 2. Pricing Configuration Service
+- [x] Define tier pricing structure (monthly cost, initial tokens, free upload limits)
+- [x] Create token cost calculator (per MB, per operation type)
+- [x] Create file size analyzer (estimate tokens needed)
+- [x] Create cost estimation service (before processing)
+- [x] Define token costs per AI operation (chat, analysis, optimization)
 
-## Phase 2: Database Schema Updates ⏳ IN PROGRESS (90% Complete)
+## 3. Subscription Management Service
+- [x] Create subscription creation/upgrade/downgrade logic
+- [x] Implement monthly token refresh (automatic balance top-up)
+- [x] Handle subscription status (active, past_due, cancelled)
+- [x] Implement grace period for expired subscriptions
+- [x] Create subscription change workflow
 
-### Completed ✅
-- [x] Add analysis queue tables to schema
-- [x] Add instance tracking tables
-- [x] Add cost tracking tables
-- [x] Add chatbot conversation tables
-- [x] Generate Prisma Client
-- [x] Create database setup scripts
-- [x] Create seed data
-- [x] Update package.json with db scripts
-- [x] Create Phase 2 documentation
-- [x] Create Phase 2 completion checklist
+## 4. Token Management Service
+- [x] Implement token balance tracking
+- [x] Create token deduction logic (with validation)
+- [x] Implement token purchase system (one-time add-ons)
+- [x] Create token transaction logging
+- [x] Implement free upload limit tracking (per tier)
+- [x] Create token usage analytics
 
-### Remaining ⏳
-- [ ] Set up PostgreSQL database server
-- [ ] Run database migrations
-- [ ] Execute seed script
-- [ ] Verify all tables created
-- [ ] Test database operations
-- [ ] Verify Prisma Studio access
+## 5. File Upload & Cost Analysis
+- [x] Create large file upload handler (up to 1GB)
+- [x] Implement chunked upload for large files
+- [x] Create pre-processing cost estimator
+- [x] Implement cost approval workflow
+- [x] Create multi-month processing scheduler (for low-balance users)
+- [x] Handle free upload limit exemptions
 
-**Total: 40+ database tables designed and ready for deployment**
+## 6. API Endpoints
+- [x] POST /api/subscriptions - Create/upgrade subscription
+- [x] GET /api/subscriptions/current - Get user's subscription
+- [x] POST /api/tokens/purchase - Buy additional tokens
+- [x] GET /api/tokens/balance - Get token balance
+- [x] POST /api/uploads/estimate - Estimate upload cost
+- [x] POST /api/uploads - Upload file with cost approval
+- [x] GET /api/pricing - Get pricing tiers
 
-**See:** `docs/PHASE_2_COMPLETION_CHECKLIST.md` for detailed testing procedures
+## 7. UI Components
+- [ ] Create pricing page with tier comparison
+- [ ] Create subscription management dashboard
+- [ ] Create token balance widget
+- [ ] Create file upload with cost preview
+- [ ] Create payment modal for token purchases
+- [ ] Create upgrade/downgrade flow
 
-## Phase 3: Service Implementation
-- [ ] Implement LightweightChatbotService
-- [ ] Implement ContextOptimizerService
-- [ ] Implement AnalysisQueueService
-- [ ] Implement InstanceProvisionerService
-- [ ] Create service integration tests
+## 8. Documentation
+- [x] Create pricing documentation
+- [x] Create token system guide
+- [x] Create API documentation
+- [x] Create user guide for file uploads
 
-## Phase 4: UI Components
-- [ ] Create main dashboard component
-- [ ] Create chat interface component
-- [ ] Create onboarding flow components
-- [ ] Create document upload component
-- [ ] Create settings/profile component
+## 9. Testing
+- [ ] Test subscription creation and upgrades
+- [ ] Test token balance tracking
+- [ ] Test free upload limits
+- [ ] Test cost estimation accuracy
+- [ ] Test large file uploads
+- [ ] Test multi-month processing logic
 
-## Phase 5: API Routes
-- [ ] Create chatbot API endpoint
-- [ ] Create document upload API endpoint
-- [ ] Create analysis queue API endpoints
-- [ ] Create user profile API endpoints
-
-## Phase 6: Integration & Testing
-- [ ] Test end-to-end workflow
-- [ ] Test ephemeral instance lifecycle
-- [ ] Test cost optimization
-- [ ] Test HIPAA compliance
-- [ ] Performance testing
-
-## Phase 7: Deployment Preparation
-- [ ] Set up Azure infrastructure
-- [ ] Configure monitoring and alerts
-- [ ] Set up CI/CD pipeline
-- [ ] Create deployment documentation
+## 10. Integration & Deployment
+- [ ] Integrate with existing services
+- [ ] Add to error monitoring
+- [ ] Add to audit logging
+- [ ] Update RBAC permissions
+- [ ] Deploy to production

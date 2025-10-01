@@ -1,0 +1,1 @@
+{'role': 'user', 'content': '<tool_result> <execute-command> ToolResult(success=True, output=\'{\\n  "output": "\\\\u0002\\\\u0002\\\\u0002To https://github.com/cloudbyday90/HoloVitals.git\\\\n\\\\u0002\\\\u0002\\\\u0002   1a6c025..9ea0d9b  main -> main\\\\n",\\n  "exit_code": 0,\\n  "cwd": "/workspace"\\n}\') </execute-command> </tool_result>'}

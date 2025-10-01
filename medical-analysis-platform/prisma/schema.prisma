@@ -35,9 +35,9 @@ model User {
   consentRequestsAsPatient ConsentGrant[] @relation("PatientConsents")
   consentRequestsAsSpecialist ConsentGrant[] @relation("SpecialistConsents")
   auditLogs             AuditLog[]
-  accessLogs            AccessLog[]
+  rbacAccessLogs        RBACAccessLog[]
   errorLogs             ErrorLog[]
-  notifications         Notification[]
+  systemNotifications   SystemNotification[]
   
   // AI Architecture Relations
   chatConversations     ChatConversation[]
@@ -47,6 +47,12 @@ model User {
   contextOptimizations  ContextOptimization[]
   analysisTasks         AnalysisTask[]
     cloudInstances        CloudInstance[]
+    
+    // Subscription & Pricing Relations
+    subscription          Subscription?
+    tokenBalance          TokenBalance?
+    fileUploads           FileUpload[]
+    paymentIntents        PaymentIntent[]
   
   @@map("users")
 }
@@ -882,27 +888,6 @@ model AnalysisTask {
 // ACCESS CONTROL & AUDIT LOGGING
 // ============================================================================
 
-model AccessLog {
-  id           String   @id @default(uuid())
-  userId       String
-  action       String
-  resourceType String
-  resourceId   String?
-  allowed      Boolean
-  reason       String?
-  ipAddress    String?
-  userAgent    String?
-  timestamp    DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([timestamp])
-  @@index([allowed])
-  @@index([resourceType])
-  @@map("access_logs")
-}
-
 // ============================================================================
 // ERROR HANDLING & LOGGING
 // ============================================================================
@@ -933,7 +918,209 @@ model ErrorLog {
   @@map("error_logs")
 }
 
-model Notification {
+// ============================================================================
+// SUBSCRIPTION & PRICING SYSTEM
+// ============================================================================
+
+enum SubscriptionTier {
+  BASIC         // $9.99/month, 10MB free upload, 100K tokens/month
+  PROFESSIONAL  // $29.99/month, 25MB free upload, 500K tokens/month
+  ENTERPRISE    // $99.99/month, 100MB free upload, 2M tokens/month
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+  TRIAL
+}
+
+enum TokenTransactionType {
+  INITIAL_DEPOSIT      // First-time subscription tokens
+  MONTHLY_REFRESH      // Monthly token top-up
+  PURCHASE             // One-time token purchase
+  DEDUCTION            // Token usage
+  REFUND               // Token refund
+  BONUS                // Promotional tokens
+  ADJUSTMENT           // Manual adjustment
+}
+
+enum FileProcessingStatus {
+  PENDING              // Awaiting cost approval
+  APPROVED             // Cost approved, queued for processing
+  PROCESSING           // Currently being processed
+  COMPLETED            // Successfully processed
+  FAILED               // Processing failed
+  CANCELLED            // User cancelled
+  SCHEDULED            // Multi-month processing scheduled
+}
+
+model Subscription {
+  id                    String              @id @default(uuid())
+  userId                String              @unique @map("user_id")
+  tier                  SubscriptionTier
+  status                SubscriptionStatus  @default(ACTIVE)
+  monthlyPrice          Float               @map("monthly_price") // In USD
+  billingCycleStart     DateTime            @map("billing_cycle_start")
+  billingCycleEnd       DateTime            @map("billing_cycle_end")
+  nextBillingDate       DateTime?           @map("next_billing_date")
+  cancelledAt           DateTime?           @map("cancelled_at")
+  trialEndsAt           DateTime?           @map("trial_ends_at")
+  metadata              String?             @db.Text // JSON: payment method, billing address, etc.
+  createdAt             DateTime            @default(now()) @map("created_at")
+  updatedAt             DateTime            @updatedAt @map("updated_at")
+
+  user                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenBalance          TokenBalance?
+  subscriptionHistory   SubscriptionHistory[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([nextBillingDate])
+  @@map("subscriptions")
+}
+
+model SubscriptionHistory {
+  id                String              @id @default(uuid())
+  subscriptionId    String              @map("subscription_id")
+  fromTier          SubscriptionTier?   @map("from_tier")
+  toTier            SubscriptionTier    @map("to_tier")
+  fromStatus        SubscriptionStatus? @map("from_status")
+  toStatus          SubscriptionStatus  @map("to_status")
+  reason            String?             @db.Text
+  changedAt         DateTime            @default(now()) @map("changed_at")
+
+  subscription      Subscription        @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+  @@index([changedAt])
+  @@map("subscription_history")
+}
+
+model TokenBalance {
+  id                    String      @id @default(uuid())
+  userId                String      @unique @map("user_id")
+  subscriptionId        String      @unique @map("subscription_id")
+  currentBalance        Int         @default(0) @map("current_balance") // Available tokens
+  totalEarned           Int         @default(0) @map("total_earned")    // Lifetime earned
+  totalUsed             Int         @default(0) @map("total_used")      // Lifetime used
+  totalPurchased        Int         @default(0) @map("total_purchased") // Lifetime purchased
+  freeUploadUsed        Int         @default(0) @map("free_upload_used") // Bytes used from free upload limit
+  lastRefreshDate       DateTime?   @map("last_refresh_date")
+  createdAt             DateTime    @default(now()) @map("created_at")
+  updatedAt             DateTime    @updatedAt @map("updated_at")
+
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription          Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  transactions          TokenTransaction[]
+
+  @@index([userId])
+  @@index([subscriptionId])
+  @@map("token_balances")
+}
+
+model TokenTransaction {
+  id                String                @id @default(uuid())
+  tokenBalanceId    String                @map("token_balance_id")
+  type              TokenTransactionType
+  amount            Int                   // Positive for credits, negative for debits
+  balanceBefore     Int                   @map("balance_before")
+  balanceAfter      Int                   @map("balance_after")
+  description       String?               @db.Text
+  referenceId       String?               @map("reference_id") // Link to related entity (upload, chat, etc.)
+  referenceType     String?               @map("reference_type") // Type of reference (FileUpload, ChatMessage, etc.)
+  metadata          String?               @db.Text // JSON: additional details
+  createdAt         DateTime              @default(now()) @map("created_at")
+
+  tokenBalance      TokenBalance          @relation(fields: [tokenBalanceId], references: [id], onDelete: Cascade)
+
+  @@index([tokenBalanceId])
+  @@index([type])
+  @@index([referenceId])
+  @@index([createdAt])
+  @@map("token_transactions")
+}
+
+model FileUpload {
+  id                    String                @id @default(uuid())
+  userId                String                @map("user_id")
+  fileName              String                @map("file_name")
+  filePath              String                @map("file_path")
+  fileSize              Int                   @map("file_size") // In bytes
+  mimeType              String                @map("mime_type")
+  status                FileProcessingStatus  @default(PENDING)
+  estimatedTokens       Int?                  @map("estimated_tokens")
+  estimatedCost         Float?                @map("estimated_cost") // In USD
+  actualTokens          Int?                  @map("actual_tokens")
+  actualCost            Float?                @map("actual_cost") // In USD
+  processingStartedAt   DateTime?             @map("processing_started_at")
+  processingCompletedAt DateTime?             @map("processing_completed_at")
+  scheduledMonths       Int?                  @map("scheduled_months") // For multi-month processing
+  currentMonth          Int?                  @map("current_month") // Current processing month
+  errorMessage          String?               @db.Text @map("error_message")
+  usedFreeUpload        Boolean               @default(false) @map("used_free_upload") // Whether this used free upload limit
+  metadata              String?               @db.Text // JSON: processing details, chunks, etc.
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("file_uploads")
+}
+
+model PaymentIntent {
+  id                String    @id @default(uuid())
+  userId            String    @map("user_id")
+  amount            Float     // In USD
+  currency          String    @default("USD")
+  status            String    // pending, succeeded, failed, cancelled
+  paymentMethod     String?   @map("payment_method") // stripe, paypal, etc.
+  paymentMethodId   String?   @map("payment_method_id") // External payment ID
+  tokensPurchased   Int?      @map("tokens_purchased")
+  description       String?   @db.Text
+  metadata          String?   @db.Text // JSON: additional payment details
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("payment_intents")
+}
+
+
+// ============================================================================
+// RBAC ACCESS LOGGING
+// ============================================================================
+
+model RBACAccessLog {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  action       String
+  resourceType String   @map("resource_type")
+  resourceId   String?  @map("resource_id")
+  allowed      Boolean
+  reason       String?
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  timestamp    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([timestamp])
+  @@index([allowed])
+  @@index([resourceType])
+  @@map("rbac_access_logs")
+}
+
+model SystemNotification {
   id        String   @id @default(uuid())
   type      String   // CRITICAL_ERROR, INFO, WARNING, etc.
   title     String
@@ -941,14 +1128,13 @@ model Notification {
   severity  String   // LOW, MEDIUM, HIGH, CRITICAL
   metadata  String?  @db.Text // JSON string
   read      Boolean  @default(false)
-  userId    String?
-  createdAt DateTime @default(now())
+  userId    String?  @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([createdAt])
   @@index([read])
-  @@map("notifications")
+  @@map("system_notifications")
 }
-

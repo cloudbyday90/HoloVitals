@@ -1,0 +1,20 @@
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   ../ERROR_HANDLING_PUSH_COMPLETE.md
+	new file:   ../PROJECT_STATUS_SUMMARY.md
+	new file:   ERROR_MONITORING_COMPLETE.md
+	new file:   app/api/admin/errors/alerts/route.ts
+	new file:   app/api/admin/errors/export/route.ts
+	new file:   app/api/admin/errors/route.ts
+	new file:   app/api/admin/errors/stats/route.ts
+	new file:   app/dashboard/admin/errors/page.tsx
+	new file:   components/ErrorMonitoringWidget.tsx
+	new file:   docs/ERROR_MONITORING_DASHBOARD.md
+	modified:   lib/errors/ErrorLogger.ts
+	new file:   lib/services/ErrorAlertService.ts
+	modified:   ../outputs/workspace_output_1759278989_6636.txt
+	new file:   ../outputs/workspace_output_1759279006_3315.txt
+	new file:   ../outputs/workspace_output_1759279066_2880.txt
+	new file:   ../outputs/workspace_output_1759279661_7299.txt
+

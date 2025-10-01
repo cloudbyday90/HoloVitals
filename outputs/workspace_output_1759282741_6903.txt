@@ -1,0 +1,9 @@
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "holovitals", schema "public" at "localhost:5432"
+
+🚀  Your database is now in sync with your Prisma schema. Done in 212ms
+
+Running generate... (Use --skip-generate to skip the generators)
+[2K[1A[2K[GRunning generate... - Prisma Client
+[2K[1A[2K[G✔ Generated Prisma Client (v6.16.3) to ./node_modules/@prisma/client in 390ms
+

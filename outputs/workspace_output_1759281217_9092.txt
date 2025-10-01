@@ -1,0 +1,16 @@
+  // AI Architecture Relations
+  chatConversations     ChatConversation[]
+  analysisQueue         AnalysisQueue[]
+  chatbotCosts          ChatbotCost[]
+  analysisCosts         AnalysisCost[]
+  contextOptimizations  ContextOptimization[]
+  analysisTasks         AnalysisTask[]
+    cloudInstances        CloudInstance[]
+  
+  @@map("users")
+}
+
+model Patient {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  firstName     String?   @map("first_name")

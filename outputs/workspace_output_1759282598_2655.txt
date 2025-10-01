@@ -1,0 +1,21 @@
+  $
+  patients              Patient[]$
+  documents             Document[]$
+  analysisSessions      AnalysisSession[]$
+  sessions              UserSession[]$
+  consentRequestsAsPatient ConsentGrant[] @relation("PatientConsents")$
+  consentRequestsAsSpecialist ConsentGrant[] @relation("SpecialistConsents")$
+  auditLogs             AuditLog[]$
+  accessLogs            AccessLog[]$
+  errorLogs             ErrorLog[]$
+  notifications         Notification[]$
+  $
+  // AI Architecture Relations$
+  chatConversations     ChatConversation[]$
+  analysisQueue         AnalysisQueue[]$
+  chatbotCosts          ChatbotCost[]$
+  analysisCosts         AnalysisCost[]$
+  contextOptimizations  ContextOptimization[]$
+  analysisTasks         AnalysisTask[]$
+    cloudInstances        CloudInstance[]$
+    $

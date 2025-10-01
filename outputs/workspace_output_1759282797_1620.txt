@@ -1,0 +1,5 @@
+ public | file_uploads           | table | holovitals_user
+ public | payment_intents        | table | holovitals_user
+ public | subscriptions          | table | holovitals_user
+ public | token_balances         | table | holovitals_user
+ public | token_transactions     | table | holovitals_user

@@ -1,0 +1,30 @@
+model AccessLog {
+  id           String   @id @default(uuid())
+  userId       String
+  action       String
+  resourceType String
+  resourceId   String?
+  allowed      Boolean
+  reason       String?
+  ipAddress    String?
+  userAgent    String?
+  timestamp    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([timestamp])
+  @@index([allowed])
+  @@index([resourceType])
+  @@map("access_logs")
+}
+
+// ============================================================================
+// ERROR HANDLING & LOGGING
+// ============================================================================
+
+model ErrorLog {
+  id          String   @id @default(uuid())
+  severity    String   // LOW, MEDIUM, HIGH, CRITICAL
+  message     String   @db.Text
+  code        String?

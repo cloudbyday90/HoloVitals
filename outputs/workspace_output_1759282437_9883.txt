@@ -1,0 +1,8 @@
+Duplicate models found:
+  Line 891: AccessLog
+  Line 942: Notification
+Removing duplicate AccessLog from line 891 to 911
+Removing duplicate Notification from line 942 to 960
+
+Removed 40 lines
+Schema cleaned successfully

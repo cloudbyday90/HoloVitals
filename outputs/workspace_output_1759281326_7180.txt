@@ -1,0 +1,7 @@
+  contextOptimizations  ContextOptimization[]
+  analysisTasks         AnalysisTask[]
+    cloudInstances        CloudInstance[]
+  
+  @@map("users")
+}
+

@@ -1,0 +1,11 @@
+  consentRequestsAsPatient ConsentGrant[] @relation("PatientConsents")
+  consentRequestsAsSpecialist ConsentGrant[] @relation("SpecialistConsents")
+  auditLogs             AuditLog[]
+  accessLogs            AccessLog[]
+  errorLogs             ErrorLog[]
+  notifications         Notification[]
+  
+  // AI Architecture Relations
+  chatConversations     ChatConversation[]
+  analysisQueue         AnalysisQueue[]
+  chatbotCosts          ChatbotCost[]

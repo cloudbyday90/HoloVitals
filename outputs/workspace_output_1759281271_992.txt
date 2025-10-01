@@ -1,0 +1,13 @@
+  chatConversations     ChatConversation[]$
+  analysisQueue         AnalysisQueue[]$
+  chatbotCosts          ChatbotCost[]$
+  analysisCosts         AnalysisCost[]$
+  contextOptimizations  ContextOptimization[]$
+  analysisTasks         AnalysisTask[]$
+    cloudInstances        CloudInstance[]$
+  $
+  @@map("users")$
+}$
+$
+model Patient {$
+  id            String    @id @default(uuid())$

@@ -1,0 +1,21 @@
+  notifications         Notification[]
+  
+  // AI Architecture Relations
+  chatConversations     ChatConversation[]
+  analysisQueue         AnalysisQueue[]
+  chatbotCosts          ChatbotCost[]
+  analysisCosts         AnalysisCost[]
+  contextOptimizations  ContextOptimization[]
+  analysisTasks         AnalysisTask[]
+    cloudInstances        CloudInstance[]
+  
+  @@map("users")
+}
+
+model Patient {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  firstName     String?   @map("first_name")
+  lastName      String?   @map("last_name")
+  dateOfBirth   DateTime? @map("date_of_birth")
+  createdAt     DateTime  @default(now()) @map("created_at")

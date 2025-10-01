@@ -1,0 +1,3 @@
+Starting PostgreSQL 15 database server: main.
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "holovitals", schema "public" at "localhost:5432"

@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': '<function_calls>\n<execute-command>\ngrep -n "model User" medical-analysis-platform/prisma/schema.prisma | head -5\n</execute-command>\n</function_calls>'}

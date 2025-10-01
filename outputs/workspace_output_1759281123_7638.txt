@@ -1,0 +1,2 @@
+./medical-analysis-platform/node_modules/.prisma/client/schema.prisma
+./medical-analysis-platform/prisma/schema.prisma

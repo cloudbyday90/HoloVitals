@@ -1,0 +1,100 @@
+// HoloVitals Complete Database Schema
+// Includes: Base platform + AI Architecture + All Repository Systems
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+// ============================================================================
+// USER MANAGEMENT & AUTHENTICATION
+// ============================================================================
+
+model User {
+  id                    String    @id @default(uuid())
+  email                 String    @unique
+  passwordHash          String    @map("password_hash")
+  role                  String    @default("PATIENT") // OWNER, ADMIN, DOCTOR, PATIENT, SUPPORT, ANALYST
+  mfaEnabled            Boolean   @default(false) @map("mfa_enabled")
+  mfaSecret             String?   @map("mfa_secret")
+  mfaBackupCodes        String?   @map("mfa_backup_codes")
+  failedLoginAttempts   Int       @default(0) @map("failed_login_attempts")
+  lastFailedLogin       DateTime? @map("last_failed_login")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  
+  patients              Patient[]
+  documents             Document[]
+  analysisSessions      AnalysisSession[]
+  sessions              UserSession[]
+  consentRequestsAsPatient ConsentGrant[] @relation("PatientConsents")
+  consentRequestsAsSpecialist ConsentGrant[] @relation("SpecialistConsents")
+  auditLogs             AuditLog[]
+  accessLogs            AccessLog[]
+  errorLogs             ErrorLog[]
+  notifications         Notification[]
+  
+  // AI Architecture Relations
+  chatConversations     ChatConversation[]
+  analysisQueue         AnalysisQueue[]
+  chatbotCosts          ChatbotCost[]
+  analysisCosts         AnalysisCost[]
+  contextOptimizations  ContextOptimization[]
+  analysisTasks         AnalysisTask[]
+    cloudInstances        CloudInstance[]
+  
+  @@map("users")
+}
+
+model Patient {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  firstName     String?   @map("first_name")
+  lastName      String?   @map("last_name")
+  dateOfBirth   DateTime? @map("date_of_birth")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents     Document[]
+  analysisSessions AnalysisSession[]
+  
+  @@map("patients")
+}
+
+// ============================================================================
+// DOCUMENT MANAGEMENT
+// ============================================================================
+
+model Document {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  patientId     String?   @map("patient_id")
+  filePath      String    @map("file_path")
+  fileName      String    @map("file_name")
+  fileSize      Int?      @map("file_size")
+  mimeType      String?   @map("mime_type")
+  documentType  String?   @map("document_type")
+  uploadDate    DateTime  @default(now()) @map("upload_date")
+  documentDate  DateTime? @map("document_date")
+  status        String    @default("pending")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patient       Patient?  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  ocrResults    OcrResult[]
+  extractedData ExtractedData[]
+  sourceLinks   DocumentLink[] @relation("SourceDocument")
+  targetLinks   DocumentLink[] @relation("TargetDocument")
+  embeddings    DocumentEmbedding[]
+  
+  @@map("documents")
+}
+
+model OcrResult {
+  id              String    @id @default(uuid())

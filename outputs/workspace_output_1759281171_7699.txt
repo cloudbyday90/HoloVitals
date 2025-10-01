@@ -1,0 +1,50 @@
+
+// ============================================================================
+// ERROR HANDLING & LOGGING
+// ============================================================================
+
+model ErrorLog {
+  id          String   @id @default(uuid())
+  severity    String   // LOW, MEDIUM, HIGH, CRITICAL
+  message     String   @db.Text
+  code        String?
+  statusCode  Int?
+  stack       String?  @db.Text
+  details     String?  @db.Text // JSON string
+  userId      String?
+  requestId   String?
+  endpoint    String?
+  method      String?
+  userAgent   String?
+  ipAddress   String?
+  timestamp   DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([timestamp])
+  @@index([severity])
+  @@index([code])
+  @@index([endpoint])
+  @@map("error_logs")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  type      String   // CRITICAL_ERROR, INFO, WARNING, etc.
+  title     String
+  message   String   @db.Text
+  severity  String   // LOW, MEDIUM, HIGH, CRITICAL
+  metadata  String?  @db.Text // JSON string
+  read      Boolean  @default(false)
+  userId    String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([read])
+  @@map("notifications")
+}
+

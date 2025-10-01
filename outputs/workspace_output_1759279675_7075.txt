@@ -1,0 +1,16 @@
+[main e063afc] feat: Implement error monitoring dashboard with real-time analytics
+ 16 files changed, 3461 insertions(+), 17 deletions(-)
+ create mode 100644 ERROR_HANDLING_PUSH_COMPLETE.md
+ create mode 100644 PROJECT_STATUS_SUMMARY.md
+ create mode 100644 medical-analysis-platform/ERROR_MONITORING_COMPLETE.md
+ create mode 100644 medical-analysis-platform/app/api/admin/errors/alerts/route.ts
+ create mode 100644 medical-analysis-platform/app/api/admin/errors/export/route.ts
+ create mode 100644 medical-analysis-platform/app/api/admin/errors/route.ts
+ create mode 100644 medical-analysis-platform/app/api/admin/errors/stats/route.ts
+ create mode 100644 medical-analysis-platform/app/dashboard/admin/errors/page.tsx
+ create mode 100644 medical-analysis-platform/components/ErrorMonitoringWidget.tsx
+ create mode 100644 medical-analysis-platform/docs/ERROR_MONITORING_DASHBOARD.md
+ create mode 100644 medical-analysis-platform/lib/services/ErrorAlertService.ts
+ create mode 100644 outputs/workspace_output_1759279006_3315.txt
+ create mode 100644 outputs/workspace_output_1759279066_2880.txt
+ create mode 100644 outputs/workspace_output_1759279661_7299.txt

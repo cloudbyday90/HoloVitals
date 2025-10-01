@@ -1,0 +1,1 @@
+{'role': 'user', 'content': "The cost and financials, as well as any other administrative information, should only be accessible by the owner (me) and whoever else I deem should have access.\n\nThe general public shouldn't have access to operarting costs, financials, or any other Proprietary information."}
