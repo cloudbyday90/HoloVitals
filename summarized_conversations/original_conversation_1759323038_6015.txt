@@ -1,0 +1,1 @@
+{'role': 'user', 'content': 'Please verify the current git status and files, then push all unsubmitted commits  and changes'}

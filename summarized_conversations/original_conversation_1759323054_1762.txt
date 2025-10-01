@@ -1,0 +1,1 @@
+{'role': 'user', 'content': '/fast-deep-research Is it possible to access the EHR systems in Canada and in the UK (NHS)?'}

@@ -1,671 +1,792 @@
-// HIPAA Compliance Repository Schema
-// This file contains the database schema for HIPAA compliance tracking,
-// auditing, and violation management
+// HIPAA Compliance and Audit Logging Schema
+// This schema defines the database structure for HIPAA compliance features,
+// audit logging, and security enhancements
 
 // ============================================================================
-// HIPAA RULES & REGULATIONS
+// AUDIT LOGGING MODELS
 // ============================================================================
 
-enum HIPAARuleCategory {
-  PRIVACY_RULE           // 45 CFR Part 160 and Part 164, Subparts A and E
-  SECURITY_RULE          // 45 CFR Part 160 and Part 164, Subparts A and C
-  BREACH_NOTIFICATION    // 45 CFR Part 164, Subpart D
-  ENFORCEMENT_RULE       // 45 CFR Part 160, Subparts C, D, and E
-  OMNIBUS_RULE          // 2013 modifications
-}
-
-enum HIPAARuleSeverity {
-  CRITICAL              // Immediate violation, severe penalties
-  HIGH                  // Significant violation, high penalties
-  MEDIUM                // Moderate violation, medium penalties
-  LOW                   // Minor violation, low penalties
-}
-
-model HIPAARule {
-  id                String              @id @default(cuid())
-  
-  // Rule Identification
-  ruleId            String              @unique // e.g., HIPAA-PR-001
-  category          HIPAARuleCategory
-  subcategory       String              // e.g., MINIMUM_NECESSARY
-  
-  // Rule Details
-  title             String
-  description       String              @db.Text
-  requirements      String[]            // List of specific requirements
-  
-  // Applicability
-  applicableTo      String[]            // data_access, data_sharing, etc.
-  severity          HIPAARuleSeverity
-  
-  // Legal References
-  cfrReferences     String[]            // CFR citations
-  ocrGuidance       String[]            // OCR guidance document IDs
-  
-  // Penalties
-  tier1MinPenalty   Int                 // Minimum penalty tier 1
-  tier1MaxPenalty   Int                 // Maximum penalty tier 1
-  tier2MinPenalty   Int
-  tier2MaxPenalty   Int
-  tier3MinPenalty   Int
-  tier3MaxPenalty   Int
-  tier4MinPenalty   Int
-  tier4MaxPenalty   Int
-  
-  // Examples and Guidance
-  examples          Json?               // Array of examples
-  bestPractices     String[]
-  commonViolations  String[]
-  
-  // Metadata
-  effectiveDate     DateTime
-  lastUpdated       DateTime            @updatedAt
-  active            Boolean             @default(true)
-  
-  // Relationships
-  violations        ComplianceViolation[]
-  checks            ComplianceCheck[]
-  
-  @@index([category, severity])
-  @@index([active])
-}
-
-model HIPAAKnowledgeBase {
-  id                String              @id @default(cuid())
-  
-  // Article Information
-  title             String
-  category          HIPAARuleCategory
-  subcategory       String
-  
-  // Content
-  summary           String              @db.Text
-  detailedContent   String              @db.Text
-  
-  // Guidance
-  implementation    String              @db.Text
-  examples          Json                // Array of examples
-  caseStudies       Json?               // Real-world cases
-  
-  // References
-  relatedRules      String[]            // HIPAA rule IDs
-  ocrGuidance       String[]
-  legalCitations    String[]
-  externalLinks     String[]
-  
-  // Usage
-  timesReferenced   Int                 @default(0)
-  helpful           Int                 @default(0)
-  notHelpful        Int                 @default(0)
-  
-  // Metadata
-  createdBy         String
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  lastAccessed      DateTime?
-  
-  @@index([category, subcategory])
-  @@index([timesReferenced])
-}
-
-// ============================================================================
-// COMPLIANCE VERIFICATION
-// ============================================================================
-
-enum ComplianceCheckType {
-  CODE_ANALYSIS         // Static code analysis
-  DATA_FLOW            // Data flow analysis
-  ACCESS_CONTROL       // Access control verification
-  ENCRYPTION           // Encryption verification
-  AUDIT_LOG            // Audit logging verification
-  CONSENT              // Consent verification
-  AUTHENTICATION       // Authentication verification
-  PHI_HANDLING         // PHI handling verification
-  BREACH_DETECTION     // Breach detection
-  RETENTION_POLICY     // Data retention verification
-}
-
-enum ComplianceCheckStatus {
-  PENDING              // Check not yet run
-  RUNNING              // Check in progress
-  PASSED               // Check passed
-  FAILED               // Check failed
-  WARNING              // Check passed with warnings
-  BLOCKED              // Action blocked due to violation
-  REVIEW_REQUIRED      // Manual review required
-}
-
-model ComplianceCheck {
-  id                String              @id @default(cuid())
-  
-  // Check Information
-  checkType         ComplianceCheckType
-  status            ComplianceCheckStatus @default(PENDING)
-  
-  // Target
-  targetType        String              // code, feature, deployment, access, etc.
-  targetId          String              // ID of target being checked
-  targetDetails     Json?               // Additional target information
-  
-  // Rules Checked
-  rulesChecked      String[]            // HIPAA rule IDs
-  
-  // Results
-  passed            Boolean             @default(false)
-  score             Float?              // Compliance score 0-100
-  findings          Json?               // Array of findings
-  violations        String[]            // Violation IDs
-  warnings          String[]            // Warning messages
-  
-  // Execution
-  startedAt         DateTime            @default(now())
-  completedAt       DateTime?
-  duration          Int?                // Seconds
-  
-  // Context
-  triggeredBy       String              // User or SYSTEM
-  repository        String              // Which repository triggered
-  action            String              // What action was being performed
-  
-  // Metadata
-  automated         Boolean             @default(true)
-  
-  // Relationships
-  checkViolations   ComplianceViolation[]
-  
-  @@index([checkType, status])
-  @@index([targetType, targetId])
-  @@index([startedAt])
-}
-
-enum ViolationSeverity {
-  CRITICAL              // Immediate action required
-  HIGH                  // Urgent action required
-  MEDIUM                // Action required soon
-  LOW                   // Action required eventually
-}
-
-enum ViolationStatus {
-  DETECTED              // Just detected
-  ACKNOWLEDGED          // Team acknowledged
-  UNDER_REVIEW          // Being reviewed
-  REMEDIATION_PLANNED   // Fix planned
-  REMEDIATION_IN_PROGRESS // Being fixed
-  RESOLVED              // Fixed and verified
-  ACCEPTED_RISK         // Risk accepted with override
-  FALSE_POSITIVE        // Not actually a violation
-}
-
-model ComplianceViolation {
-  id                String              @id @default(cuid())
-  
-  // Violation Information
-  violationType     String              // Type of violation
-  severity          ViolationSeverity
-  status            ViolationStatus     @default(DETECTED)
-  
-  // Rule Violated
-  ruleId            String
-  rule              HIPAARule           @relation(fields: [ruleId], references: [id])
-  ruleCategory      HIPAARuleCategory
-  
-  // Details
-  title             String
-  description       String              @db.Text
-  impact            String              @db.Text
-  affectedData      String?             // Type of data affected
-  affectedUsers     Int?                // Number of users affected
-  
-  // Location
-  location          String              // Where violation occurred
-  component         String              // Component/service
-  codeReference     String?             // File:line if code violation
-  
-  // Detection
-  detectedAt        DateTime            @default(now())
-  detectedBy        String              // User or SYSTEM
-  detectionMethod   String              // How it was detected
-  checkId           String?
-  check             ComplianceCheck?    @relation(fields: [checkId], references: [id])
-  
-  // Risk Assessment
-  riskScore         Float               // 0-100
-  breachRisk        Boolean             @default(false)
-  dataExposureRisk  Boolean             @default(false)
-  penaltyRisk       String?             // Estimated penalty range
-  
-  // Remediation
-  remediationPlan   String?             @db.Text
-  requiredChanges   Json?               // Array of required changes
-  estimatedEffort   Int?                // Hours
-  assignedTo        String?
-  dueDate           DateTime?
-  
-  // Resolution
-  resolvedAt        DateTime?
-  resolvedBy        String?
-  resolutionMethod  String?
-  resolutionNotes   String?             @db.Text
-  
-  // Override (if accepted risk)
-  overrideId        String?
-  
-  // Metadata
-  tags              String[]
-  
-  // Relationships
-  auditFindings     AuditFinding[]
-  
-  @@index([severity, status])
-  @@index([ruleId])
-  @@index([detectedAt])
-  @@index([status])
-}
-
-// ============================================================================
-// AUTOMATED AUDITING
-// ============================================================================
-
-enum AuditType {
-  RANDOM_SAMPLING       // Random log sampling
-  PHI_ACCESS           // PHI access audit
-  CONSENT_COMPLIANCE   // Consent verification
-  AUTHENTICATION       // Authentication audit
-  AUTHORIZATION        // Authorization audit
-  DATA_RETENTION       // Retention policy audit
-  ENCRYPTION           // Encryption audit
-  BREACH_DETECTION     // Breach detection audit
-  SCHEDULED            // Scheduled comprehensive audit
-}
-
-enum AuditStatus {
-  SCHEDULED            // Audit scheduled
-  IN_PROGRESS          // Audit running
-  COMPLETED            // Audit completed
-  FAILED               // Audit failed
-}
-
-model ComplianceAudit {
-  id                String              @id @default(cuid())
-  
-  // Audit Information
-  auditType         AuditType
-  status            AuditStatus         @default(SCHEDULED)
-  
-  // Scope
-  startDate         DateTime
-  endDate           DateTime
-  scope             Json                // What's being audited
-  
-  // Sampling (for random audits)
-  samplingRate      Float?              // Percentage
-  sampleSize        Int?                // Number of records
-  
-  // Execution
-  scheduledAt       DateTime            @default(now())
-  startedAt         DateTime?
-  completedAt       DateTime?
-  duration          Int?                // Seconds
-  
-  // Results
-  totalRecords      Int                 @default(0)
-  recordsAudited    Int                 @default(0)
-  findingsCount     Int                 @default(0)
-  violationsCount   Int                 @default(0)
-  complianceScore   Float?              // 0-100
-  
-  // Summary
-  summary           String?             @db.Text
-  recommendations   String[]
-  
-  // Metadata
-  triggeredBy       String              // User or SYSTEM
-  automated         Boolean             @default(true)
-  
-  // Relationships
-  findings          AuditFinding[]
-  
-  @@index([auditType, status])
-  @@index([scheduledAt])
-}
-
-enum FindingSeverity {
-  CRITICAL              // Critical finding
-  HIGH                  // High severity
-  MEDIUM                // Medium severity
-  LOW                   // Low severity
-  INFORMATIONAL         // FYI only
-}
-
-model AuditFinding {
-  id                String              @id @default(cuid())
-  auditId           String
-  audit             ComplianceAudit     @relation(fields: [auditId], references: [id], onDelete: Cascade)
-  
-  // Finding Information
-  findingType       String
-  severity          FindingSeverity
-  
-  // Details
-  title             String
-  description       String              @db.Text
-  evidence          Json?               // Supporting evidence
-  
-  // Rule Reference
-  relatedRules      String[]            // HIPAA rule IDs
-  
-  // Impact
-  impact            String              @db.Text
-  affectedRecords   Int?
-  affectedUsers     Int?
-  
-  // Recommendation
-  recommendation    String              @db.Text
-  requiredAction    String?             @db.Text
-  priority          Int                 @default(1)
-  
-  // Status
-  acknowledged      Boolean             @default(false)
-  acknowledgedBy    String?
-  acknowledgedAt    DateTime?
-  
-  // Resolution
-  resolved          Boolean             @default(false)
-  resolvedBy        String?
-  resolvedAt        DateTime?
-  resolutionNotes   String?             @db.Text
-  
-  // Violation (if created)
-  violationId       String?
-  violation         ComplianceViolation? @relation(fields: [violationId], references: [id])
-  
-  // Timestamps
-  createdAt         DateTime            @default(now())
-  
-  @@index([auditId])
-  @@index([severity])
-  @@index([resolved])
-}
-
-model PHIAccessLog {
-  id                String              @id @default(cuid())
-  
-  // Access Information
-  userId            String
-  userName          String
-  userRole          String
-  
-  // Resource Accessed
-  patientId         String
-  resourceType      String              // medical_record, diagnosis, medication, etc.
-  resourceId        String
-  action            String              // READ, WRITE, UPDATE, DELETE
-  
-  // Context
-  purpose           String              // Treatment, payment, operations, etc.
-  justification     String?             @db.Text
-  
-  // Authorization
-  consentId         String?             // Consent grant ID if applicable
-  authorized        Boolean
-  authorizationMethod String            // How authorization was verified
-  
-  // Access Details
-  accessedAt        DateTime            @default(now())
-  ipAddress         String
-  location          String?
-  deviceInfo        String?
-  sessionId         String?
-  
-  // Data Accessed
-  fieldsAccessed    String[]            // Specific fields accessed
-  minimumNecessary  Boolean             // Was minimum necessary applied?
-  
-  // Audit Status
-  audited           Boolean             @default(false)
-  auditedAt         DateTime?
-  auditResult       String?             // COMPLIANT, NON_COMPLIANT, SUSPICIOUS
-  
-  // Anomaly Detection
-  anomalyScore      Float?              // 0-100, higher = more suspicious
-  anomalyFlags      String[]            // unusual_time, unusual_volume, etc.
-  
-  @@index([userId, accessedAt])
-  @@index([patientId, accessedAt])
-  @@index([audited])
-  @@index([anomalyScore])
-}
-
-model AccessPattern {
-  id                String              @id @default(cuid())
+model AuditLog {
+  id            String   @id @default(cuid())
+  timestamp     DateTime @default(now())
+  
+  // Event Information
+  eventId       String   @unique @default(cuid())
+  eventType     AuditEventType
+  eventCategory AuditEventCategory
   
   // User Information
-  userId            String
-  userName          String
+  userId        String?
+  userRole      String?
+  userName      String?
+  userEmail     String?
   
-  // Pattern Details
-  patternType       String              // NORMAL, SUSPICIOUS, ANOMALOUS
-  timeWindow        String              // Time period analyzed
+  // Session Information
+  sessionId     String?
+  ipAddress     String?
+  userAgent     String?
+  deviceId      String?
+  location      String?
   
-  // Metrics
-  accessCount       Int
-  uniquePatients    Int
-  averageAccessTime Float               // Average time of day
-  accessFrequency   Float               // Accesses per day
+  // Action Information
+  action        String
+  actionDetails Json?
   
-  // Anomalies
-  anomalies         Json                // Array of detected anomalies
-  riskScore         Float               // 0-100
+  // Resource Information
+  resourceType  String?
+  resourceId    String?
+  resourceName  String?
   
-  // Flags
-  unusualTime       Boolean             @default(false)
-  unusualVolume     Boolean             @default(false)
-  unusualResources  Boolean             @default(false)
-  geographicAnomaly Boolean             @default(false)
+  // Outcome Information
+  outcome       AuditOutcome
+  outcomeReason String?
+  errorMessage  String?
   
-  // Review
-  requiresReview    Boolean             @default(false)
-  reviewed          Boolean             @default(false)
-  reviewedBy        String?
-  reviewedAt        DateTime?
-  reviewNotes       String?             @db.Text
+  // PHI Access Information
+  phiAccessed   Boolean  @default(false)
+  patientId     String?
+  accessReason  String?
+  dataAccessed  Json?    // Array of data fields accessed
   
-  // Timestamps
-  analyzedAt        DateTime            @default(now())
-  periodStart       DateTime
-  periodEnd         DateTime
+  // Request Information
+  requestId     String?
+  requestMethod String?
+  requestPath   String?
+  requestBody   Json?
+  responseCode  Int?
   
-  @@index([userId, analyzedAt])
-  @@index([requiresReview, reviewed])
-  @@index([riskScore])
-}
-
-// ============================================================================
-// COMPLIANCE GATE SYSTEM
-// ============================================================================
-
-enum GateStatus {
-  PENDING              // Gate check pending
-  CHECKING             // Compliance check in progress
-  PASSED               // Passed compliance check
-  BLOCKED              // Blocked due to violation
-  REVIEW_REQUIRED      // Manual review required
-  APPROVED             // Manually approved
-  REJECTED             // Manually rejected
-  OVERRIDE_APPROVED    // Approved with override
-}
-
-model ComplianceGate {
-  id                String              @id @default(cuid())
-  
-  // Gate Information
-  gateId            String              @unique
-  status            GateStatus          @default(PENDING)
-  
-  // Triggering Action
-  repository        String              // Which repository triggered
-  action            String              // What action is being performed
-  actionDetails     Json                // Details of the action
-  
-  // Compliance Check
-  rulesChecked      String[]            // HIPAA rules to check
-  checkResults      Json?               // Results of checks
-  violations        String[]            // Violation IDs if any
-  riskScore         Float?              // Overall risk score
-  
-  // Blocking
-  blocked           Boolean             @default(false)
-  blockedAt         DateTime?
-  blockReason       String?             @db.Text
-  
-  // Review
-  reviewRequired    Boolean             @default(false)
-  reviewRequestedAt DateTime?
-  reviewedBy        String?
-  reviewedAt        DateTime?
-  reviewDecision    String?             // APPROVE, REJECT, REQUIRE_CHANGES
-  reviewNotes       String?             @db.Text
-  
-  // Resolution
-  resolved          Boolean             @default(false)
-  resolvedAt        DateTime?
-  resolution        String?             @db.Text
-  
-  // Override
-  overrideId        String?
+  // Security Information
+  riskLevel     RiskLevel @default(LOW)
+  securityFlags Json?    // Array of security concerns
   
   // Metadata
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
+  metadata      Json?
+  tags          String[]
   
-  @@index([repository, action])
-  @@index([status])
-  @@index([blocked])
-  @@index([reviewRequired])
+  // Retention
+  retentionDate DateTime // Date when log can be deleted
+  archived      Boolean  @default(false)
+  
+  // Indexes for efficient querying
+  @@index([timestamp])
+  @@index([userId])
+  @@index([eventType])
+  @@index([eventCategory])
+  @@index([patientId])
+  @@index([sessionId])
+  @@index([outcome])
+  @@index([riskLevel])
+  @@index([retentionDate])
+  @@map("audit_logs")
 }
 
-enum OverrideStatus {
-  PENDING              // Override requested
-  UNDER_REVIEW         // Being reviewed
-  APPROVED             // Override approved
-  REJECTED             // Override rejected
-  EXPIRED              // Override expired
-  REVOKED              // Override revoked
+enum AuditEventType {
+  // Authentication Events
+  LOGIN_SUCCESS
+  LOGIN_FAILURE
+  LOGOUT
+  PASSWORD_CHANGE
+  PASSWORD_RESET
+  MFA_ENABLED
+  MFA_DISABLED
+  MFA_SUCCESS
+  MFA_FAILURE
+  SESSION_CREATED
+  SESSION_EXPIRED
+  SESSION_TERMINATED
+  
+  // Authorization Events
+  ACCESS_GRANTED
+  ACCESS_DENIED
+  PERMISSION_CHANGED
+  ROLE_ASSIGNED
+  ROLE_REMOVED
+  EMERGENCY_ACCESS
+  
+  // Data Access Events
+  PHI_VIEWED
+  PHI_CREATED
+  PHI_UPDATED
+  PHI_DELETED
+  PHI_EXPORTED
+  PHI_PRINTED
+  PHI_SEARCHED
+  RECORD_ACCESSED
+  
+  // Administrative Events
+  USER_CREATED
+  USER_UPDATED
+  USER_DELETED
+  USER_ACTIVATED
+  USER_DEACTIVATED
+  CONFIG_CHANGED
+  SECURITY_POLICY_CHANGED
+  SYSTEM_UPDATED
+  
+  // Security Events
+  FAILED_ACCESS_ATTEMPT
+  SUSPICIOUS_ACTIVITY
+  SECURITY_VIOLATION
+  BREACH_ATTEMPT
+  VULNERABILITY_DETECTED
+  MALWARE_DETECTED
+  
+  // System Events
+  SYSTEM_STARTUP
+  SYSTEM_SHUTDOWN
+  BACKUP_CREATED
+  BACKUP_RESTORED
+  DATA_MIGRATION
+  
+  // Compliance Events
+  CONSENT_GIVEN
+  CONSENT_REVOKED
+  DATA_REQUEST
+  DATA_DISCLOSURE
+  BREACH_NOTIFICATION
 }
 
-model ComplianceOverride {
-  id                String              @id @default(cuid())
+enum AuditEventCategory {
+  AUTHENTICATION
+  AUTHORIZATION
+  DATA_ACCESS
+  DATA_MODIFICATION
+  ADMINISTRATIVE
+  SECURITY
+  SYSTEM
+  COMPLIANCE
+}
+
+enum AuditOutcome {
+  SUCCESS
+  FAILURE
+  PARTIAL_SUCCESS
+  DENIED
+  ERROR
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// ============================================================================
+// SESSION MANAGEMENT MODELS
+// ============================================================================
+
+model UserSession {
+  id              String   @id @default(cuid())
+  sessionToken    String   @unique
+  userId          String
   
-  // Override Information
-  overrideType      String              // Type of override
-  status            OverrideStatus      @default(PENDING)
+  // Session Information
+  createdAt       DateTime @default(now())
+  expiresAt       DateTime
+  lastActivityAt  DateTime @default(now())
   
-  // Violation
-  violationId       String?             // Violation being overridden
-  gateId            String?             // Gate being overridden
+  // Device Information
+  ipAddress       String
+  userAgent       String
+  deviceId        String?
+  deviceType      String?
+  browser         String?
+  os              String?
+  location        String?
   
-  // Request
-  requestedBy       String
-  requestedByName   String
-  requestedAt       DateTime            @default(now())
+  // Security Information
+  mfaVerified     Boolean  @default(false)
+  riskScore       Int      @default(0)
+  securityFlags   Json?
   
-  // Justification
-  justification     String              @db.Text
-  businessNeed      String              @db.Text
-  riskAssessment    String              @db.Text
-  mitigationPlan    String              @db.Text
+  // Session State
+  active          Boolean  @default(true)
+  terminatedAt    DateTime?
+  terminationReason String?
   
-  // Approval Requirements
-  approvalLevel     Int                 // 1=Lead, 2=Compliance, 3=Legal, 4=CTO
-  requiredApprovers String[]            // Roles required
+  // Activity Tracking
+  requestCount    Int      @default(0)
+  lastRequestPath String?
   
-  // Approvals
-  approvals         Json                // Array of approvals
-  allApproved       Boolean             @default(false)
+  @@index([userId])
+  @@index([sessionToken])
+  @@index([expiresAt])
+  @@index([active])
+  @@map("user_sessions")
+}
+
+// ============================================================================
+// ACCESS CONTROL MODELS
+// ============================================================================
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  displayName String
+  description String?
+  
+  // Role Properties
+  isSystem    Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  priority    Int      @default(0)
+  
+  // Permissions
+  permissions RolePermission[]
+  
+  // Relationships
+  userRoles   UserRole[]
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String?
+  
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  displayName String
+  description String?
+  
+  // Permission Properties
+  resource    String   // e.g., "patient", "lab_result", "user"
+  action      String   // e.g., "read", "write", "delete"
+  scope       PermissionScope @default(OWN)
   
   // Conditions
-  conditions        String[]            // Conditions for override
-  expiresAt         DateTime?           // When override expires
+  conditions  Json?    // Additional conditions for permission
   
-  // Monitoring
-  monitoringRequired Boolean            @default(true)
-  reviewFrequency   String?             // How often to review
+  // Relationships
+  rolePermissions RolePermission[]
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([resource, action, scope])
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  
+  // Additional Constraints
+  constraints  Json?
+  
+  createdAt    DateTime   @default(now())
+  
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String
+  roleId    String
+  
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  
+  // Assignment Information
+  assignedAt DateTime @default(now())
+  assignedBy String?
+  expiresAt  DateTime?
+  
+  // Scope Limitations
+  scopeType  String?  // e.g., "organization", "department", "patient_group"
+  scopeId    String?
   
   // Status
-  approvedAt        DateTime?
-  approvedBy        String?
-  rejectedAt        DateTime?
-  rejectedBy        String?
-  rejectionReason   String?             @db.Text
+  active     Boolean  @default(true)
   
-  // Revocation
-  revokedAt         DateTime?
-  revokedBy         String?
-  revocationReason  String?             @db.Text
+  @@unique([userId, roleId, scopeType, scopeId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+enum PermissionScope {
+  OWN       // User's own data only
+  ASSIGNED  // Assigned patients/resources
+  DEPARTMENT // Department-level access
+  ORGANIZATION // Organization-level access
+  SYSTEM    // System-wide access
+}
+
+// ============================================================================
+// ACCESS REQUEST MODELS
+// ============================================================================
+
+model AccessRequest {
+  id              String   @id @default(cuid())
+  
+  // Requester Information
+  requesterId     String
+  requesterName   String
+  requesterRole   String
+  
+  // Request Details
+  resourceType    String
+  resourceId      String
+  accessType      String   // e.g., "read", "write", "emergency"
+  reason          String
+  urgency         AccessUrgency @default(NORMAL)
+  
+  // Emergency Access
+  isEmergency     Boolean  @default(false)
+  emergencyReason String?
+  
+  // Approval Workflow
+  status          AccessRequestStatus @default(PENDING)
+  approvedBy      String?
+  approvedAt      DateTime?
+  rejectedBy      String?
+  rejectedAt      DateTime?
+  rejectionReason String?
+  
+  // Access Period
+  requestedAt     DateTime @default(now())
+  accessStartTime DateTime?
+  accessEndTime   DateTime?
+  
+  // Audit Trail
+  reviewNotes     String?
+  auditLogId      String?
+  
+  @@index([requesterId])
+  @@index([status])
+  @@index([resourceType, resourceId])
+  @@map("access_requests")
+}
+
+enum AccessUrgency {
+  LOW
+  NORMAL
+  HIGH
+  EMERGENCY
+}
+
+enum AccessRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+  REVOKED
+}
+
+// ============================================================================
+// SECURITY MONITORING MODELS
+// ============================================================================
+
+model SecurityAlert {
+  id          String   @id @default(cuid())
+  
+  // Alert Information
+  alertType   SecurityAlertType
+  severity    AlertSeverity
+  title       String
+  description String
+  
+  // Source Information
+  source      String   // e.g., "intrusion_detection", "anomaly_detection"
+  detectedAt  DateTime @default(now())
+  
+  // Affected Resources
+  userId      String?
+  resourceType String?
+  resourceId  String?
+  ipAddress   String?
+  
+  // Alert Details
+  indicators  Json     // Indicators of compromise
+  evidence    Json?    // Supporting evidence
+  
+  // Response
+  status      AlertStatus @default(NEW)
+  assignedTo  String?
+  assignedAt  DateTime?
+  resolvedAt  DateTime?
+  resolution  String?
+  
+  // Actions Taken
+  actionsTaken Json?
+  
+  // Related Items
+  relatedAlerts String[] // IDs of related alerts
+  auditLogIds   String[] // Related audit log entries
+  
+  @@index([alertType])
+  @@index([severity])
+  @@index([status])
+  @@index([detectedAt])
+  @@index([userId])
+  @@map("security_alerts")
+}
+
+enum SecurityAlertType {
+  FAILED_LOGIN_ATTEMPTS
+  SUSPICIOUS_ACCESS_PATTERN
+  UNAUTHORIZED_ACCESS_ATTEMPT
+  DATA_EXFILTRATION
+  PRIVILEGE_ESCALATION
+  MALWARE_DETECTED
+  VULNERABILITY_EXPLOIT
+  POLICY_VIOLATION
+  ANOMALOUS_BEHAVIOR
+  BRUTE_FORCE_ATTACK
+  SQL_INJECTION_ATTEMPT
+  XSS_ATTEMPT
+  CSRF_ATTEMPT
+  DDOS_ATTACK
+}
+
+enum AlertSeverity {
+  INFO
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AlertStatus {
+  NEW
+  ACKNOWLEDGED
+  INVESTIGATING
+  RESOLVED
+  FALSE_POSITIVE
+  IGNORED
+}
+
+// ============================================================================
+// BREACH NOTIFICATION MODELS
+// ============================================================================
+
+model BreachIncident {
+  id                String   @id @default(cuid())
+  
+  // Incident Information
+  incidentNumber    String   @unique
+  discoveredAt      DateTime
+  reportedAt        DateTime @default(now())
+  
+  // Breach Details
+  breachType        BreachType
+  description       String
+  causeOfBreach     String
+  
+  // Affected Data
+  affectedRecords   Int
+  affectedIndividuals Int
+  dataTypes         Json     // Types of PHI affected
+  
+  // Risk Assessment
+  riskLevel         RiskLevel
+  riskAssessment    String
+  
+  // Affected Parties
+  affectedPatientIds String[]
+  affectedUserIds    String[]
+  
+  // Notification Status
+  notificationStatus NotificationStatus @default(PENDING)
+  individualsNotifiedAt DateTime?
+  hhsNotifiedAt      DateTime?
+  mediaNotifiedAt    DateTime?
+  
+  // Investigation
+  investigationStatus InvestigationStatus @default(ONGOING)
+  investigationNotes  String?
+  rootCause          String?
+  
+  // Remediation
+  remediationActions Json?
+  remediationStatus  String?
+  remediationCompletedAt DateTime?
+  
+  // Documentation
+  documents          Json?    // Links to related documents
+  
+  // Metadata
+  createdBy          String
+  updatedAt          DateTime @updatedAt
+  
+  @@index([discoveredAt])
+  @@index([notificationStatus])
+  @@index([riskLevel])
+  @@map("breach_incidents")
+}
+
+enum BreachType {
+  UNAUTHORIZED_ACCESS
+  UNAUTHORIZED_DISCLOSURE
+  THEFT
+  LOSS
+  IMPROPER_DISPOSAL
+  HACKING
+  MALWARE
+  PHISHING
+  INSIDER_THREAT
+  SYSTEM_ERROR
+  OTHER
+}
+
+enum NotificationStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  NOT_REQUIRED
+}
+
+enum InvestigationStatus {
+  PENDING
+  ONGOING
+  COMPLETED
+  CLOSED
+}
+
+// ============================================================================
+// ENCRYPTION KEY MANAGEMENT
+// ============================================================================
+
+model EncryptionKey {
+  id          String   @id @default(cuid())
+  
+  // Key Information
+  keyId       String   @unique
+  keyType     KeyType
+  algorithm   String
+  keySize     Int
+  
+  // Key Material (encrypted)
+  encryptedKey String
+  keyVersion   Int      @default(1)
+  
+  // Key Status
+  status      KeyStatus @default(ACTIVE)
+  createdAt   DateTime @default(now())
+  activatedAt DateTime?
+  deactivatedAt DateTime?
+  destroyedAt DateTime?
+  
+  // Rotation
+  rotationSchedule String?
+  lastRotatedAt    DateTime?
+  nextRotationAt   DateTime?
+  
+  // Usage
+  purpose     String   // e.g., "database", "file_storage", "field_level"
+  usageCount  Int      @default(0)
+  
+  // Access Control
+  allowedRoles String[]
+  
+  @@index([keyId])
+  @@index([status])
+  @@map("encryption_keys")
+}
+
+enum KeyType {
+  MASTER_KEY
+  DATA_ENCRYPTION_KEY
+  KEY_ENCRYPTION_KEY
+}
+
+enum KeyStatus {
+  PENDING
+  ACTIVE
+  DEACTIVATED
+  COMPROMISED
+  DESTROYED
+}
+
+// ============================================================================
+// CONSENT MANAGEMENT
+// ============================================================================
+
+model PatientConsent {
+  id          String   @id @default(cuid())
+  
+  // Patient Information
+  patientId   String
+  
+  // Consent Details
+  consentType ConsentType
+  purpose     String
+  description String?
+  
+  // Consent Status
+  status      ConsentStatus @default(ACTIVE)
+  givenAt     DateTime @default(now())
+  givenBy     String   // Patient or authorized representative
+  
+  // Expiration
+  expiresAt   DateTime?
+  revokedAt   DateTime?
+  revokedBy   String?
+  revocationReason String?
+  
+  // Scope
+  scope       Json?    // What data/actions are covered
+  restrictions Json?   // Any restrictions on use
+  
+  // Documentation
+  documentUrl String?
+  signatureUrl String?
   
   // Audit
-  auditTrail        Json                // Complete audit trail
+  auditLogId  String?
   
+  @@index([patientId])
+  @@index([consentType])
   @@index([status])
-  @@index([requestedAt])
-  @@index([expiresAt])
+  @@map("patient_consents")
+}
+
+enum ConsentType {
+  TREATMENT
+  PAYMENT
+  OPERATIONS
+  RESEARCH
+  MARKETING
+  DISCLOSURE
+  ELECTRONIC_COMMUNICATION
+  DATA_SHARING
+}
+
+enum ConsentStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  REVOKED
+  SUPERSEDED
 }
 
 // ============================================================================
-// COMPLIANCE REPORTING
+// DATA RETENTION POLICIES
 // ============================================================================
 
-enum ReportType {
-  DAILY_SUMMARY        // Daily compliance summary
-  WEEKLY_AUDIT         // Weekly audit report
-  MONTHLY_DASHBOARD    // Monthly compliance dashboard
-  QUARTERLY_REVIEW     // Quarterly compliance review
-  ANNUAL_ASSESSMENT    // Annual compliance assessment
-  BREACH_NOTIFICATION  // Breach notification report
-  OCR_FILING           // OCR filing report
-  AUDIT_RESPONSE       // Response to external audit
-  CUSTOM               // Custom report
+model DataRetentionPolicy {
+  id          String   @id @default(cuid())
+  
+  // Policy Information
+  name        String   @unique
+  description String
+  
+  // Scope
+  dataType    String   // e.g., "patient_record", "audit_log", "lab_result"
+  category    String?
+  
+  // Retention Rules
+  retentionPeriodDays Int
+  archiveAfterDays    Int?
+  deleteAfterDays     Int?
+  
+  // Legal Requirements
+  legalBasis  String?
+  jurisdiction String?
+  
+  // Status
+  active      Boolean  @default(true)
+  effectiveFrom DateTime @default(now())
+  effectiveTo   DateTime?
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  
+  @@map("data_retention_policies")
 }
+
+// ============================================================================
+// SECURITY CONFIGURATION
+// ============================================================================
+
+model SecurityConfiguration {
+  id          String   @id @default(cuid())
+  
+  // Configuration Key
+  key         String   @unique
+  category    String
+  
+  // Configuration Value
+  value       Json
+  description String?
+  
+  // Validation
+  valueType   String   // e.g., "string", "number", "boolean", "json"
+  validation  Json?    // Validation rules
+  
+  // Status
+  active      Boolean  @default(true)
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?
+  
+  @@map("security_configurations")
+}
+
+// ============================================================================
+// COMPLIANCE REPORTS
+// ============================================================================
 
 model ComplianceReport {
-  id                String              @id @default(cuid())
+  id          String   @id @default(cuid())
   
   // Report Information
-  reportType        ReportType
-  title             String
-  description       String?             @db.Text
+  reportType  ComplianceReportType
+  reportPeriodStart DateTime
+  reportPeriodEnd   DateTime
   
-  // Period
-  periodStart       DateTime
-  periodEnd         DateTime
+  // Report Data
+  summary     Json
+  findings    Json
+  recommendations Json?
   
-  // Content
-  summary           String              @db.Text
-  findings          Json                // Array of findings
-  statistics        Json                // Compliance statistics
-  trends            Json?               // Trend analysis
-  recommendations   String[]
-  
-  // Metrics
-  complianceScore   Float               // Overall compliance score
-  violationsCount   Int
-  auditsPerformed   Int
-  issuesResolved    Int
+  // Compliance Status
+  overallStatus ComplianceStatus
+  score         Float?
   
   // Generation
-  generatedAt       DateTime            @default(now())
-  generatedBy       String
-  automated         Boolean             @default(true)
+  generatedAt DateTime @default(now())
+  generatedBy String
   
-  // Distribution
-  recipients        String[]            // Who received the report
-  sentAt            DateTime?
+  // Review
+  reviewedAt  DateTime?
+  reviewedBy  String?
+  reviewNotes String?
   
-  // Files
-  reportUrl         String?             // URL to full report
-  attachments       String[]            // Additional files
+  // Documentation
+  reportUrl   String?
   
   @@index([reportType])
-  @@index([periodStart, periodEnd])
-  @@index([generatedAt])
+  @@index([reportPeriodStart, reportPeriodEnd])
+  @@map("compliance_reports")
+}
+
+enum ComplianceReportType {
+  HIPAA_SECURITY
+  HIPAA_PRIVACY
+  ACCESS_REVIEW
+  AUDIT_LOG_REVIEW
+  SECURITY_ASSESSMENT
+  RISK_ASSESSMENT
+  INCIDENT_SUMMARY
+  TRAINING_COMPLIANCE
+}
+
+enum ComplianceStatus {
+  COMPLIANT
+  PARTIALLY_COMPLIANT
+  NON_COMPLIANT
+  UNDER_REVIEW
 }

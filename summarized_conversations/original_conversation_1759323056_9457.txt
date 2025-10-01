@@ -1,0 +1,1 @@
+{'role': 'user', 'content': "/fast-deep-research Let's do the same analysis with the USA"}
