@@ -53,6 +53,9 @@ model User {
     tokenBalance          TokenBalance?
     fileUploads           FileUpload[]
     paymentIntents        PaymentIntent[]
+    
+    // EHR Integration Relations
+    ehrConnections        EHRConnection[]
   
   @@map("users")
 }
@@ -1137,4 +1140,228 @@ model SystemNotification {
   @@index([createdAt])
   @@index([read])
   @@map("system_notifications")
+}
+
+// ============================================================================
+// EHR INTEGRATION & FHIR DATA
+// ============================================================================
+
+enum EHRProvider {
+  EPIC
+  CERNER
+  ALLSCRIPTS
+  ATHENAHEALTH
+  ECLINICALWORKS
+  NEXTGEN
+  MEDITECH
+  PRACTICE_FUSION
+  GREENWAY
+  OTHER
+}
+
+enum ConnectionStatus {
+  PENDING           // Awaiting user authorization
+  ACTIVE            // Connected and syncing
+  EXPIRED           // Token expired, needs reauth
+  REVOKED           // User revoked access
+  ERROR             // Connection error
+  DISCONNECTED      // User disconnected
+}
+
+enum SyncStatus {
+  IDLE              // Not syncing
+  QUEUED            // Queued for sync
+  SYNCING           // Currently syncing
+  COMPLETED         // Sync completed successfully
+  FAILED            // Sync failed
+  CANCELLED         // Sync cancelled by user
+}
+
+enum FHIRResourceType {
+  PATIENT
+  DOCUMENT_REFERENCE
+  OBSERVATION
+  CONDITION
+  MEDICATION_REQUEST
+  ALLERGY_INTOLERANCE
+  IMMUNIZATION
+  PROCEDURE
+  DIAGNOSTIC_REPORT
+  CARE_PLAN
+  ENCOUNTER
+  PRACTITIONER
+  ORGANIZATION
+  OTHER
+}
+
+model EHRConnection {
+  id                    String            @id @default(uuid())
+  userId                String            @map("user_id")
+  provider              EHRProvider
+  providerName          String            @map("provider_name") // e.g., "Kaiser Permanente"
+  fhirBaseUrl           String            @map("fhir_base_url")
+  status                ConnectionStatus  @default(PENDING)
+  
+  // OAuth tokens (encrypted)
+  accessToken           String?           @map("access_token") @db.Text
+  refreshToken          String?           @map("refresh_token") @db.Text
+  tokenExpiresAt        DateTime?         @map("token_expires_at")
+  
+  // Patient context
+  patientId             String?           @map("patient_id") // FHIR Patient ID
+  patientName           String?           @map("patient_name")
+  
+  // Sync settings
+  autoSync              Boolean           @default(true) @map("auto_sync")
+  syncFrequency         Int               @default(24) @map("sync_frequency") // hours
+  lastSyncAt            DateTime?         @map("last_sync_at")
+  nextSyncAt            DateTime?         @map("next_sync_at")
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: additional provider-specific data
+  errorMessage          String?           @db.Text @map("error_message")
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  user                  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fhirResources         FHIRResource[]
+  syncHistory           SyncHistory[]
+  
+  @@index([userId])
+  @@index([status])
+  @@index([provider])
+  @@index([nextSyncAt])
+  @@map("ehr_connections")
+}
+
+model FHIRResource {
+  id                    String            @id @default(uuid())
+  connectionId          String            @map("connection_id")
+  resourceType          FHIRResourceType  @map("resource_type")
+  fhirId                String            @map("fhir_id") // Resource ID from FHIR server
+  fhirVersion           String            @default("R4") @map("fhir_version")
+  
+  // Raw FHIR data
+  rawData               String            @db.Text @map("raw_data") // JSON string of FHIR resource
+  
+  // Extracted metadata for quick access
+  title                 String?
+  description           String?           @db.Text
+  date                  DateTime?
+  category              String?
+  status                String?
+  
+  // Document-specific fields
+  contentType           String?           @map("content_type") // e.g., "application/pdf"
+  contentUrl            String?           @map("content_url") @db.Text
+  contentSize           Int?              @map("content_size") // bytes
+  documentDownloaded    Boolean           @default(false) @map("document_downloaded")
+  localFilePath         String?           @map("local_file_path")
+  
+  // Processing status
+  processed             Boolean           @default(false)
+  processedAt           DateTime?         @map("processed_at")
+  tokensUsed            Int?              @map("tokens_used")
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: additional resource-specific data
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  connection            EHRConnection     @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  
+  @@unique([connectionId, fhirId, resourceType])
+  @@index([connectionId])
+  @@index([resourceType])
+  @@index([date])
+  @@index([processed])
+  @@map("fhir_resources")
+}
+
+model SyncHistory {
+  id                    String            @id @default(uuid())
+  connectionId          String            @map("connection_id")
+  status                SyncStatus        @default(QUEUED)
+  syncType              String            @default("incremental") @map("sync_type") // incremental, full
+  
+  // Sync metrics
+  startedAt             DateTime?         @map("started_at")
+  completedAt           DateTime?         @map("completed_at")
+  duration              Int?              // seconds
+  
+  // Resources synced
+  resourcesQueried      Int               @default(0) @map("resources_queried")
+  resourcesCreated      Int               @default(0) @map("resources_created")
+  resourcesUpdated      Int               @default(0) @map("resources_updated")
+  resourcesSkipped      Int               @default(0) @map("resources_skipped")
+  resourcesFailed       Int               @default(0) @map("resources_failed")
+  
+  // Documents downloaded
+  documentsDownloaded   Int               @default(0) @map("documents_downloaded")
+  totalBytesDownloaded  BigInt            @default(0) @map("total_bytes_downloaded")
+  
+  // Cost tracking
+  tokensEstimated       Int?              @map("tokens_estimated")
+  tokensUsed            Int?              @map("tokens_used")
+  costEstimated         Float?            @map("cost_estimated")
+  costActual            Float?            @map("cost_actual")
+  
+  // Error tracking
+  errorMessage          String?           @db.Text @map("error_message")
+  errorDetails          String?           @db.Text @map("error_details") // JSON
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: sync details, resource types synced, etc.
+  createdAt             DateTime          @default(now()) @map("created_at")
+  
+  connection            EHRConnection     @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  
+  @@index([connectionId])
+  @@index([status])
+  @@index([startedAt])
+  @@index([createdAt])
+  @@map("sync_history")
+}
+
+model ProviderConfiguration {
+  id                    String            @id @default(uuid())
+  provider              EHRProvider
+  providerName          String            @map("provider_name")
+  
+  // FHIR endpoints
+  fhirBaseUrl           String            @map("fhir_base_url")
+  authorizationUrl      String            @map("authorization_url")
+  tokenUrl              String            @map("token_url")
+  
+  // OAuth configuration
+  clientId              String?           @map("client_id")
+  clientSecret          String?           @map("client_secret")
+  redirectUri           String?           @map("redirect_uri")
+  scopes                String            // Space-separated scopes
+  
+  // Capabilities
+  supportsDocumentReference Boolean       @default(true) @map("supports_document_reference")
+  supportsObservation   Boolean           @default(true) @map("supports_observation")
+  supportsCondition     Boolean           @default(true) @map("supports_condition")
+  supportsMedication    Boolean           @default(true) @map("supports_medication")
+  supportsAllergy       Boolean           @default(true) @map("supports_allergy")
+  supportsImmunization  Boolean           @default(true) @map("supports_immunization")
+  supportsProcedure     Boolean           @default(true) @map("supports_procedure")
+  
+  // Rate limiting
+  rateLimit             Int?              @map("rate_limit") // requests per minute
+  
+  // Status
+  enabled               Boolean           @default(true)
+  isSandbox             Boolean           @default(false) @map("is_sandbox")
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: additional provider-specific config
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  @@unique([provider, providerName])
+  @@index([provider])
+  @@index([enabled])
+  @@map("provider_configurations")
 }

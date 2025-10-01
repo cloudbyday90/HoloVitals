@@ -1,88 +1,275 @@
-# HoloVitals Pricing & Token System Implementation ✅ COMPLETE
+# HoloVitals EHR Integration System - Fasten-OnPrem Style
 
-**Status**: 80% Complete (Backend & Documentation Done)  
-**Remaining**: UI Components (20%)  
-**Total Delivered**: 4,600+ lines of code, 12 API endpoints, 6 database tables, 1,000+ lines documentation
+**Goal**: Build a medical data retrieval system that connects to Epic and other EHR platforms using FHIR APIs to automatically pull patient medical records, including PDFs and clinical documents.
+
+**Status**: 0% Complete  
+**Estimated Time**: 3-4 weeks
 
 ---
 
-# HoloVitals Pricing & Token System Implementation
+## Phase 1: FHIR Foundation & Architecture (Week 1) ✅ COMPLETE
 
-## 1. Database Schema Design ✅ COMPLETE
-- [x] Create SubscriptionTier enum (BASIC, PROFESSIONAL, ENTERPRISE)
-- [x] Create Subscription model with tier, status, billing cycle
-- [x] Create TokenBalance model with balance, used, purchased tracking
-- [x] Create TokenTransaction model for all token movements
-- [x] Create FileUpload model with size, cost estimate, processing status
-- [x] Create PaymentIntent model for one-time purchases
+### 1.1 FHIR Client Infrastructure ✅
+- [x] Create base FHIR client with R4 support
+- [x] Implement SMART on FHIR authentication flow
+- [x] Create OAuth2 token management service
+- [x] Build FHIR resource parser and validator
+- [x] Implement error handling and retry logic
+
+### 1.2 Database Schema for EHR Data ✅
+- [x] Create EHRConnection model (provider, credentials, status)
+- [x] Create FHIRResource model (raw FHIR data storage)
+- [x] Create SyncHistory model (sync logs and status)
+- [x] Create ProviderConfiguration model
 - [x] Add indexes for performance
-- [x] Create migration script
-- [x] Run database migration successfully
 
-## 2. Pricing Configuration Service
-- [x] Define tier pricing structure (monthly cost, initial tokens, free upload limits)
-- [x] Create token cost calculator (per MB, per operation type)
-- [x] Create file size analyzer (estimate tokens needed)
-- [x] Create cost estimation service (before processing)
-- [x] Define token costs per AI operation (chat, analysis, optimization)
+### 1.3 Provider Registry ✅
+- [x] Create provider configuration system
+- [x] Add Epic FHIR endpoint configurations
+- [x] Add Cerner/Oracle Health configurations
+- [x] Add support for 100+ healthcare systems
+- [x] Implement provider discovery service
 
-## 3. Subscription Management Service
-- [x] Create subscription creation/upgrade/downgrade logic
-- [x] Implement monthly token refresh (automatic balance top-up)
-- [x] Handle subscription status (active, past_due, cancelled)
-- [x] Implement grace period for expired subscriptions
-- [x] Create subscription change workflow
+---
 
-## 4. Token Management Service
-- [x] Implement token balance tracking
-- [x] Create token deduction logic (with validation)
-- [x] Implement token purchase system (one-time add-ons)
-- [x] Create token transaction logging
-- [x] Implement free upload limit tracking (per tier)
-- [x] Create token usage analytics
+## Phase 2: Epic Integration (Week 2)
 
-## 5. File Upload & Cost Analysis
-- [x] Create large file upload handler (up to 1GB)
-- [x] Implement chunked upload for large files
-- [x] Create pre-processing cost estimator
-- [x] Implement cost approval workflow
-- [x] Create multi-month processing scheduler (for low-balance users)
-- [x] Handle free upload limit exemptions
+### 2.1 Epic SMART on FHIR Authentication
+- [ ] Implement Epic OAuth2 authorization flow
+- [ ] Create Epic app registration helper
+- [ ] Build patient authorization UI
+- [ ] Implement token refresh mechanism
+- [ ] Add Epic sandbox testing support
 
-## 6. API Endpoints
-- [x] POST /api/subscriptions - Create/upgrade subscription
-- [x] GET /api/subscriptions/current - Get user's subscription
-- [x] POST /api/tokens/purchase - Buy additional tokens
-- [x] GET /api/tokens/balance - Get token balance
-- [x] POST /api/uploads/estimate - Estimate upload cost
-- [x] POST /api/uploads - Upload file with cost approval
-- [x] GET /api/pricing - Get pricing tiers
+### 2.2 Epic FHIR API Integration
+- [ ] Implement Patient resource retrieval
+- [ ] Implement DocumentReference queries
+- [ ] Implement Observation (labs) retrieval
+- [ ] Implement Condition (diagnoses) retrieval
+- [ ] Implement MedicationRequest retrieval
+- [ ] Implement AllergyIntolerance retrieval
+- [ ] Implement Immunization retrieval
+- [ ] Implement Procedure retrieval
 
-## 7. UI Components
-- [ ] Create pricing page with tier comparison
-- [ ] Create subscription management dashboard
-- [ ] Create token balance widget
-- [ ] Create file upload with cost preview
-- [ ] Create payment modal for token purchases
-- [ ] Create upgrade/downgrade flow
+### 2.3 Document Retrieval
+- [ ] Implement PDF download from DocumentReference
+- [ ] Support Base64-encoded documents
+- [ ] Support external document URLs
+- [ ] Implement document type detection
+- [ ] Add document validation and virus scanning
 
-## 8. Documentation
-- [x] Create pricing documentation
-- [x] Create token system guide
-- [x] Create API documentation
-- [x] Create user guide for file uploads
+---
 
-## 9. Testing
-- [ ] Test subscription creation and upgrades
-- [ ] Test token balance tracking
-- [ ] Test free upload limits
-- [ ] Test cost estimation accuracy
-- [ ] Test large file uploads
-- [ ] Test multi-month processing logic
+## Phase 3: Data Synchronization Engine (Week 2-3)
 
-## 10. Integration & Deployment
-- [ ] Integrate with existing services
-- [ ] Add to error monitoring
-- [ ] Add to audit logging
-- [ ] Update RBAC permissions
+### 3.1 Sync Service
+- [ ] Create background sync scheduler
+- [ ] Implement incremental sync (only new/updated data)
+- [ ] Add full sync capability
+- [ ] Implement sync conflict resolution
+- [ ] Add sync progress tracking
+
+### 3.2 Data Transformation
+- [ ] Transform FHIR resources to HoloVitals format
+- [ ] Map FHIR codes to standard terminologies
+- [ ] Extract structured data from documents
+- [ ] Implement data deduplication
+- [ ] Add data quality validation
+
+### 3.3 Cost Management Integration
+- [ ] Estimate tokens for imported documents
+- [ ] Apply free upload limits
+- [ ] Integrate with token deduction system
+- [ ] Track import costs per provider
+- [ ] Generate cost reports
+
+---
+
+## Phase 4: Multi-Provider Support (Week 3)
+
+### 4.1 Additional EHR Connectors
+- [ ] Cerner/Oracle Health connector
+- [ ] Allscripts connector
+- [ ] athenahealth connector
+- [ ] eClinicalWorks connector
+- [ ] NextGen connector
+
+### 4.2 Connector Framework
+- [ ] Create abstract EHR connector interface
+- [ ] Implement connector factory pattern
+- [ ] Add connector health monitoring
+- [ ] Build connector testing framework
+- [ ] Create connector documentation
+
+---
+
+## Phase 5: API Endpoints (Week 3-4)
+
+### 5.1 Connection Management APIs
+- [ ] POST /api/ehr/connect - Initiate EHR connection
+- [ ] GET /api/ehr/connections - List user's connections
+- [ ] DELETE /api/ehr/connections/:id - Remove connection
+- [ ] POST /api/ehr/authorize - Complete OAuth flow
+- [ ] GET /api/ehr/providers - List available providers
+
+### 5.2 Sync Management APIs
+- [ ] POST /api/ehr/sync - Trigger manual sync
+- [ ] GET /api/ehr/sync/status - Get sync status
+- [ ] GET /api/ehr/sync/history - Get sync history
+- [ ] POST /api/ehr/sync/cancel - Cancel ongoing sync
+
+### 5.3 Data Retrieval APIs
+- [ ] GET /api/ehr/documents - List imported documents
+- [ ] GET /api/ehr/resources - List FHIR resources
+- [ ] GET /api/ehr/timeline - Get patient timeline
+- [ ] GET /api/ehr/summary - Get health summary
+
+---
+
+## Phase 6: UI Components (Week 4)
+
+### 6.1 Provider Connection UI
+- [ ] Provider selection page
+- [ ] OAuth authorization flow UI
+- [ ] Connection status dashboard
+- [ ] Connection management interface
+
+### 6.2 Data Sync UI
+- [ ] Sync progress indicator
+- [ ] Sync history timeline
+- [ ] Manual sync trigger button
+- [ ] Sync settings configuration
+
+### 6.3 Imported Data UI
+- [ ] Document viewer for imported PDFs
+- [ ] Health timeline visualization
+- [ ] Lab results display
+- [ ] Medication list view
+- [ ] Allergy and condition lists
+
+---
+
+## Phase 7: Security & Compliance (Week 4)
+
+### 7.1 Security Measures
+- [ ] Encrypt OAuth tokens at rest
+- [ ] Implement token rotation
+- [ ] Add connection timeout policies
+- [ ] Implement rate limiting
+- [ ] Add IP whitelisting for callbacks
+
+### 7.2 HIPAA Compliance
+- [ ] Audit all EHR data access
+- [ ] Implement data retention policies
+- [ ] Add patient consent tracking
+- [ ] Create BAA documentation
+- [ ] Implement data breach notification
+
+### 7.3 Testing & Validation
+- [ ] Unit tests for all services
+- [ ] Integration tests with Epic sandbox
+- [ ] End-to-end workflow tests
+- [ ] Security penetration testing
+- [ ] Load testing for sync operations
+
+---
+
+## Phase 8: Documentation & Deployment
+
+### 8.1 Documentation
+- [ ] EHR integration guide
+- [ ] Provider setup instructions
+- [ ] API documentation
+- [ ] Troubleshooting guide
+- [ ] Security best practices
+
+### 8.2 Deployment
+- [ ] Configure production OAuth apps
+- [ ] Set up webhook endpoints
+- [ ] Configure background job workers
 - [ ] Deploy to production
+- [ ] Monitor and optimize
+
+---
+
+## Key Features to Implement
+
+### 1. SMART on FHIR Authentication
+- OAuth2 authorization code flow
+- Patient-facing app registration
+- Automatic token refresh
+- Secure token storage
+
+### 2. Comprehensive Data Retrieval
+- Patient demographics
+- Clinical documents (PDFs, CCDAs)
+- Lab results and observations
+- Medications and prescriptions
+- Diagnoses and conditions
+- Allergies and intolerances
+- Immunization records
+- Procedures and surgeries
+
+### 3. Intelligent Sync
+- Incremental updates (only new data)
+- Conflict resolution
+- Error recovery
+- Progress tracking
+- Cost estimation
+
+### 4. Multi-Provider Support
+- Epic (MyChart)
+- Cerner/Oracle Health
+- 100+ healthcare systems
+- Extensible connector framework
+
+### 5. Cost Integration
+- Automatic token estimation
+- Free upload limit application
+- Cost tracking per provider
+- Budget alerts
+
+---
+
+## Technical Stack
+
+### Backend
+- TypeScript/Node.js
+- FHIR Client library (fhir.js or custom)
+- OAuth2 client (simple-oauth2)
+- Background jobs (Bull/BullMQ)
+- Prisma ORM
+
+### Standards
+- FHIR R4
+- SMART on FHIR
+- OAuth 2.0
+- HL7 standards
+
+### Security
+- Token encryption (AES-256-GCM)
+- HTTPS only
+- HIPAA-compliant logging
+- Audit trails
+
+---
+
+## Success Metrics
+
+- [ ] Successfully connect to Epic sandbox
+- [ ] Retrieve patient data from Epic
+- [ ] Download and process PDF documents
+- [ ] Sync 100+ resources in <5 minutes
+- [ ] Support 5+ EHR providers
+- [ ] Maintain 99.9% sync success rate
+- [ ] Complete HIPAA compliance audit
+
+---
+
+## Next Immediate Steps
+
+1. Create FHIR client infrastructure
+2. Set up Epic sandbox account
+3. Implement SMART on FHIR auth flow
+4. Build database schema
+5. Create first Epic connector

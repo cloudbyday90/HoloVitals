@@ -1,0 +1,11 @@
+    
+    // Subscription & Pricing Relations
+    subscription          Subscription?
+    tokenBalance          TokenBalance?
+    fileUploads           FileUpload[]
+    paymentIntents        PaymentIntent[]
+  
+  @@map("users")
+}
+
+model Patient {

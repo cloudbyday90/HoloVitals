@@ -1,0 +1,4 @@
+ public | ehr_connections         | table | holovitals_user
+ public | fhir_resources          | table | holovitals_user
+ public | provider_configurations | table | holovitals_user
+ public | sync_history            | table | holovitals_user
