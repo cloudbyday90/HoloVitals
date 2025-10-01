@@ -1,0 +1,21 @@
+[main 244b368] Phase 2c: Cerner-Specific Features Implementation
+ 20 files changed, 4085 insertions(+), 2 deletions(-)
+ create mode 100644 ALLSCRIPTS_IMPLEMENTATION_SUMMARY.md
+ create mode 100644 PROJECT_STATUS_UPDATE.md
+ create mode 100644 medical-analysis-platform/app/api/ehr/cerner/bulk-export/[id]/route.ts
+ create mode 100644 medical-analysis-platform/app/api/ehr/cerner/bulk-export/route.ts
+ create mode 100644 medical-analysis-platform/app/api/ehr/cerner/capabilities/route.ts
+ create mode 100644 medical-analysis-platform/app/api/ehr/cerner/enhanced-sync/route.ts
+ create mode 100644 medical-analysis-platform/docs/CERNER_INTEGRATION.md
+ create mode 100644 medical-analysis-platform/docs/PHASE_2C_CERNER_COMPLETE.md
+ create mode 100644 medical-analysis-platform/lib/services/CernerEnhancedService.ts
+ create mode 100644 outputs/workspace_output_1759316024_9669.txt
+ create mode 100644 outputs/workspace_output_1759316034_1382.txt
+ create mode 100644 outputs/workspace_output_1759316043_1912.txt
+ create mode 100644 outputs/workspace_output_1759316053_8259.txt
+ create mode 100644 outputs/workspace_output_1759316059_160.txt
+ create mode 100644 outputs/workspace_output_1759316125_4216.txt
+ create mode 100644 outputs/workspace_output_1759316130_742.txt
+ create mode 100644 outputs/workspace_output_1759316317_7408.txt
+ create mode 100644 outputs/workspace_output_1759316324_6717.txt
+ create mode 100644 outputs/workspace_output_1759316774_2230.txt

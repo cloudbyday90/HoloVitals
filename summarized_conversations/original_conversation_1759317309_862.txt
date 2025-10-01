@@ -1,0 +1,1 @@
+{'role': 'assistant', 'content': 'Now let me update the FHIRResourceType enum to include the new Epic-specific types:\n\n<function_calls>\n<execute-command>\ngrep -n "enum FHIRResourceType" medical-analysis-platform/prisma/schema.prisma\n</execute-command>\n</function_calls>'}

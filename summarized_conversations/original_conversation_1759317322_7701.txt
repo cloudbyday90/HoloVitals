@@ -1,0 +1,1 @@
+{'role': 'user', 'content': '<tool_result> <create-file> ToolResult(success=True, output="File \'PHASE_2_EPIC_SUMMARY.md\' created successfully.") </create-file> </tool_result>'}

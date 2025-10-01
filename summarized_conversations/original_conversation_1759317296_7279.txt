@@ -1,0 +1,1 @@
+{'role': 'user', 'content': '<tool_result> <execute-command> ToolResult(success=True, output=\'{\\n  "output": "   ./medical-analysis-platform/node_modules/.prisma/client/schema.prisma\\\\n   ./medical-analysis-platform/prisma/schema.prisma\\\\n",\\n  "exit_code": 0,\\n  "cwd": "/workspace"\\n}\') </execute-command> </tool_result>'}

@@ -1,0 +1,345 @@
+// Medical Standardization Repository Schema
+// Add this to your main schema.prisma file
+
+// LOINC Code Categories
+enum LOINCCategory {
+  LABORATORY
+  CLINICAL
+  SURVEY
+  CLAIMS
+  DOCUMENT
+  RADIOLOGY
+}
+
+// Component Types
+enum ComponentType {
+  CHEMISTRY
+  HEMATOLOGY
+  MICROBIOLOGY
+  IMMUNOLOGY
+  TOXICOLOGY
+  GENETICS
+  PATHOLOGY
+  VITAL_SIGNS
+  OTHER
+}
+
+// Unit Systems
+enum UnitSystem {
+  UCUM  // Unified Code for Units of Measure
+  SI    // International System of Units
+  CONVENTIONAL
+}
+
+// Reference Range Types
+enum ReferenceRangeType {
+  NORMAL
+  CRITICAL_LOW
+  CRITICAL_HIGH
+  THERAPEUTIC
+  TOXIC
+}
+
+// LOINC Code Model
+model LOINCCode {
+  id              String          @id @default(cuid())
+  loincNumber     String          @unique // e.g., "2345-7"
+  
+  // LOINC Components
+  component       String          // e.g., "Glucose"
+  property        String          // e.g., "MCnc" (Mass Concentration)
+  timeAspect      String          // e.g., "Pt" (Point in time)
+  system          String          // e.g., "Ser/Plas" (Serum or Plasma)
+  scale           String          // e.g., "Qn" (Quantitative)
+  method          String?         // e.g., "Enzymatic"
+  
+  // Classification
+  category        LOINCCategory
+  componentType   ComponentType
+  
+  // Display Names
+  commonName      String          // Most common name
+  shortName       String          // Abbreviated name
+  longName        String          // Full descriptive name
+  relatedNames    String[]        // Alternative names
+  
+  // Status
+  status          String          @default("ACTIVE") // ACTIVE, DEPRECATED, TRIAL
+  version         String          @default("2.76")
+  effectiveDate   DateTime        @default(now())
+  
+  // Relationships
+  units           LOINCUnit[]
+  referenceRanges ReferenceRange[]
+  mappings        CodeMapping[]
+  labResults      LabResultStandardization[]
+  
+  // Metadata
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  @@index([loincNumber])
+  @@index([component])
+  @@index([category])
+  @@index([componentType])
+  @@index([status])
+  @@index([commonName])
+}
+
+// LOINC Unit Model
+model LOINCUnit {
+  id                String      @id @default(cuid())
+  loincCodeId       String
+  loincCode         LOINCCode   @relation(fields: [loincCodeId], references: [id], onDelete: Cascade)
+  
+  // Unit Information
+  unit              String      // e.g., "mg/dL"
+  ucumCode          String      // UCUM code e.g., "mg/dL"
+  unitSystem        UnitSystem
+  
+  // Conversion
+  conversionFactor  Float?      // Factor to convert to primary unit
+  isPrimary         Boolean     @default(false)
+  
+  // Metadata
+  createdAt         DateTime    @default(now())
+  
+  @@index([loincCodeId])
+  @@index([unit])
+  @@index([isPrimary])
+}
+
+// Reference Range Model
+model ReferenceRange {
+  id              String              @id @default(cuid())
+  loincCodeId     String
+  loincCode       LOINCCode           @relation(fields: [loincCodeId], references: [id], onDelete: Cascade)
+  
+  // Range Type
+  type            ReferenceRangeType  @default(NORMAL)
+  
+  // Range Values
+  lowValue        Float?
+  highValue       Float?
+  unit            String
+  
+  // Demographics
+  ageMin          Int?                // Minimum age in years
+  ageMax          Int?                // Maximum age in years
+  gender          String?             // MALE, FEMALE, OTHER, ALL
+  
+  // Conditions
+  condition       String?             // e.g., "Pregnant", "Fasting"
+  population      String?             // e.g., "Adult", "Pediatric"
+  
+  // Source
+  source          String              @default("Mayo Clinic")
+  effectiveDate   DateTime            @default(now())
+  
+  // Relationships
+  labResults      LabResultStandardization[]
+  
+  // Metadata
+  createdAt       DateTime            @default(now())
+  
+  @@index([loincCodeId])
+  @@index([type])
+  @@index([gender])
+  @@index([ageMin, ageMax])
+}
+
+// Code Mapping Model (for mapping between coding systems)
+model CodeMapping {
+  id              String      @id @default(cuid())
+  
+  // Source (LOINC)
+  loincCode       String
+  loinc           LOINCCode   @relation(fields: [loincCode], references: [loincNumber], onDelete: Cascade)
+  
+  // Target System
+  targetSystem    String      // e.g., "SNOMED-CT", "CPT", "ICD-10"
+  targetCode      String
+  targetName      String?
+  
+  // Relationship
+  relationship    String      // EQUIVALENT, BROADER, NARROWER, RELATED
+  confidence      Float       @default(1.0) // 0-1
+  
+  // Source
+  source          String      @default("Manual")
+  
+  // Metadata
+  createdAt       DateTime    @default(now())
+  
+  @@unique([loincCode, targetSystem, targetCode])
+  @@index([loincCode])
+  @@index([targetSystem])
+  @@index([targetCode])
+  @@index([confidence])
+}
+
+// Lab Result Standardization Model
+model LabResultStandardization {
+  id                  String          @id @default(cuid())
+  
+  // Original Data (from EHR provider)
+  originalCode        String          // Provider-specific code
+  originalCodeSystem  String          // e.g., "EPIC", "CERNER"
+  originalName        String
+  originalValue       String          // Store as string to handle all types
+  originalUnit        String?
+  
+  // Standardized Data (LOINC)
+  loincCodeId         String
+  loincCode           LOINCCode       @relation(fields: [loincCodeId], references: [id])
+  standardizedValue   Float?          // Numeric value if quantitative
+  standardizedUnit    String?
+  
+  // Interpretation
+  interpretation      String?         // NORMAL, LOW, HIGH, CRITICAL_LOW, CRITICAL_HIGH
+  flags               String[]        // Additional flags
+  referenceRangeId    String?
+  referenceRange      ReferenceRange? @relation(fields: [referenceRangeId], references: [id])
+  
+  // Context
+  patientId           String
+  patient             User            @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  fhirResourceId      String?
+  fhirResource        FHIRResource?   @relation(fields: [fhirResourceId], references: [id])
+  
+  // Audit
+  standardizedAt      DateTime        @default(now())
+  standardizedBy      String          @default("SYSTEM")
+  
+  // Metadata
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  
+  @@index([originalCode, originalCodeSystem])
+  @@index([loincCodeId])
+  @@index([patientId])
+  @@index([interpretation])
+  @@index([standardizedAt])
+}
+
+// SNOMED CT Code Model (for diagnoses, procedures, etc.)
+model SNOMEDCode {
+  id              String      @id @default(cuid())
+  snomedId        String      @unique // e.g., "73211009"
+  
+  // Display
+  preferredTerm   String      // Preferred display name
+  fullySpecified  String      // Fully specified name
+  synonyms        String[]    // Alternative names
+  
+  // Classification
+  semanticTag     String      // e.g., "disorder", "procedure"
+  hierarchy       String[]    // Parent concepts
+  
+  // Status
+  status          String      @default("ACTIVE")
+  effectiveDate   DateTime    @default(now())
+  
+  // Metadata
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([snomedId])
+  @@index([preferredTerm])
+  @@index([semanticTag])
+  @@index([status])
+}
+
+// RxNorm Code Model (for medications)
+model RxNormCode {
+  id              String      @id @default(cuid())
+  rxcui           String      @unique // RxNorm Concept Unique Identifier
+  
+  // Display
+  name            String      // Drug name
+  synonym         String?     // Alternative name
+  
+  // Classification
+  termType        String      // e.g., "SCD" (Semantic Clinical Drug)
+  strength        String?     // e.g., "500 mg"
+  doseForm        String?     // e.g., "Tablet"
+  
+  // Relationships
+  ingredients     String[]    // Active ingredients
+  brandNames      String[]    // Brand names
+  
+  // Status
+  status          String      @default("ACTIVE")
+  
+  // Metadata
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([rxcui])
+  @@index([name])
+  @@index([termType])
+  @@index([status])
+}
+
+// ICD-10 Code Model (for diagnoses)
+model ICD10Code {
+  id              String      @id @default(cuid())
+  code            String      @unique // e.g., "E11.9"
+  
+  // Display
+  description     String      // Full description
+  shortDescription String?    // Abbreviated description
+  
+  // Classification
+  category        String      // e.g., "Endocrine"
+  subcategory     String?
+  
+  // Billing
+  billable        Boolean     @default(true)
+  
+  // Status
+  status          String      @default("ACTIVE")
+  effectiveDate   DateTime    @default(now())
+  
+  // Metadata
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([code])
+  @@index([description])
+  @@index([category])
+  @@index([billable])
+  @@index([status])
+}
+
+// CPT Code Model (for procedures)
+model CPTCode {
+  id              String      @id @default(cuid())
+  code            String      @unique // e.g., "99213"
+  
+  // Display
+  description     String      // Full description
+  shortDescription String?    // Abbreviated description
+  
+  // Classification
+  category        String      // e.g., "Evaluation and Management"
+  subcategory     String?
+  
+  // Billing
+  rvuWork         Float?      // Relative Value Unit - Work
+  rvuPractice     Float?      // RVU - Practice Expense
+  rvuMalpractice  Float?      // RVU - Malpractice
+  
+  // Status
+  status          String      @default("ACTIVE")
+  effectiveDate   DateTime    @default(now())
+  
+  // Metadata
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([code])
+  @@index([description])
+  @@index([category])
+  @@index([status])
+}

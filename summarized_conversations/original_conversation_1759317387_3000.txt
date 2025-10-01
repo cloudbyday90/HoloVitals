@@ -1,0 +1,1 @@
+{'role': 'user', 'content': "Next, we need to make sure we standardize lab results across the platform. I'm thinking we use the Mayo clinic Loinc codes. We can create a new repository called Medical IStandardization Repository. The other repositories can reference this new repository."}

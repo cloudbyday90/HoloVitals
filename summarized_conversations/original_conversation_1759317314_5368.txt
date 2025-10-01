@@ -1,0 +1,1 @@
+{'role': 'user', 'content': 'Next, implement Cerner-specific features '}

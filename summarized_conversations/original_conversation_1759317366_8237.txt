@@ -1,0 +1,1 @@
+{'role': 'user', 'content': '<tool_result> <str-replace> ToolResult(success=False, output="String \'## Phase 2b: Allscripts-Specific Features ✅ COMPLETE\\n\\n### 2.1 Epic-Specific Resource Types [x]\' not found in file") </str-replace> </tool_result>'}
