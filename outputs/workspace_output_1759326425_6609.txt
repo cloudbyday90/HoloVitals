@@ -1,0 +1,1 @@
+1455 ./medical-analysis-platform/prisma/schema.prisma

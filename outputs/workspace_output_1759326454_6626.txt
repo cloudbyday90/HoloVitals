@@ -1,0 +1,9 @@
+model User2FA {
+model SecureFile {
+model FileAccessGrant {
+model PatientAccessRequest {
+model PatientAmendmentRequest {
+model PatientRestrictionRequest {
+model PatientCommunicationRequest {
+model AuditLogArchive {
+model AccessReview {

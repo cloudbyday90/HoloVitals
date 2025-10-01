@@ -1,0 +1,34 @@
+On branch feature/complete-hipaa-features
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   HIPAA_FEATURES_COMPLETE.md
+	new file:   app/api/auth/2fa/backup-codes/route.ts
+	new file:   app/api/auth/2fa/disable/route.ts
+	new file:   app/api/auth/2fa/enable/route.ts
+	new file:   app/api/auth/2fa/setup/route.ts
+	new file:   app/api/auth/2fa/status/route.ts
+	new file:   app/api/auth/2fa/verify/route.ts
+	new file:   app/api/files/download/[fileId]/route.ts
+	new file:   app/api/files/search/route.ts
+	new file:   app/api/files/upload/route.ts
+	new file:   app/api/patient-rights/access/route.ts
+	new file:   app/api/patient-rights/amendment/route.ts
+	new file:   app/api/patient-rights/disclosures/route.ts
+	new file:   app/api/patient-rights/restriction/route.ts
+	new file:   lib/middleware/twoFactorMiddleware.ts
+	new file:   lib/services/PatientRightsService.ts
+	new file:   lib/services/SecureFileStorageService.ts
+	new file:   lib/services/TwoFactorAuthService.ts
+	new file:   outputs/workspace_output_1759324190_8222.txt
+	new file:   outputs/workspace_output_1759324203_8424.txt
+	new file:   outputs/workspace_output_1759324213_9342.txt
+	new file:   outputs/workspace_output_1759324235_6035.txt
+	new file:   outputs/workspace_output_1759324937_9225.txt
+	new file:   outputs/workspace_output_1759324943_8295.txt
+	new file:   prisma/schema-hipaa-additional.prisma
+	modified:   todo.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	outputs/workspace_output_1759324950_1121.txt
+

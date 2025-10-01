@@ -1,0 +1,10 @@
+model User {
+model BreachNotification {
+model LegalAgreement {
+model PatientConsent {
+model DataPortabilityRequest {
+model DataRectificationRequest {
+model EncryptionKeyRotation {
+model Subprocessor {
+model ComplianceChecklist {
+model TrainingRecord {

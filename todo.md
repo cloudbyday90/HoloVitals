@@ -1,27 +1,44 @@
-# API Endpoints and Frontend UI Implementation
+# EHR Connection Wizard Implementation
 
-## Phase 1: API Endpoints (Current)
-- [x] Create EHR connection endpoint (POST /api/ehr/connect)
-- [x] Create patient search endpoint (GET /api/ehr/patients/search)
-- [x] Create patient sync endpoint (POST /api/ehr/patients/:id/sync)
-- [x] Create encounters endpoint (GET /api/ehr/patients/:id/encounters)
-- [x] Create medications endpoint (GET /api/ehr/patients/:id/medications)
-- [x] Create lab results endpoint (GET /api/ehr/patients/:id/labs)
-- [x] Create allergies endpoint (GET /api/ehr/patients/:id/allergies)
-- [x] Create connection status endpoint (GET /api/ehr/connection/status)
-- [x] Create disconnect endpoint (DELETE /api/ehr/disconnect)
-- [x] Add API middleware (auth, rate limiting, error handling)
-- [x] Create API documentation
+## Phase 2: Frontend UI - Connection Wizard
 
-## Phase 2: Frontend UI Components
-- [ ] Create EHR connection wizard component
-- [ ] Create patient search interface
-- [ ] Create data sync dashboard
-- [ ] Create clinical data viewer
-- [ ] Create sync history timeline
-- [ ] Create connection status widget
+### Step 1: Project Setup
+- [x] Create component directory structure
+- [x] Set up custom hooks
+- [x] Create types and interfaces
 
-## Phase 3: Testing
-- [ ] Write unit tests for API endpoints
-- [ ] Write integration tests
-- [ ] Write E2E tests
+### Step 2: Provider Selection
+- [x] Create ProviderSelector component
+- [x] Add provider cards with logos
+- [x] Add provider information
+- [x] Handle provider selection
+
+### Step 3: Credentials Form
+- [x] Create CredentialsForm component
+- [x] Add form fields (dynamic based on provider)
+- [x] Add form validation (Zod)
+- [x] Handle form submission
+
+### Step 4: Connection Testing
+- [x] Create ConnectionTest component
+- [x] Add loading state
+- [x] Test connection to EHR
+- [x] Handle success/error states
+
+### Step 5: Success/Error Screens
+- [x] Create SuccessScreen component
+- [x] Create ErrorScreen component
+- [x] Add retry functionality
+- [x] Add navigation to next steps
+
+### Step 6: Main Wizard Component
+- [x] Create ConnectionWizard wrapper
+- [x] Add step navigation
+- [x] Add progress indicator
+- [x] Handle wizard state management
+
+### Step 7: Integration & Testing
+- [x] Integrate with API endpoints
+- [x] Add error handling
+- [x] Test all user flows
+- [x] Add loading states
