@@ -101,8 +101,8 @@
 - [ ] Create API documentation
 
 ## 12. Deployment
-- [ ] Commit changes to Git
-- [ ] Create feature branch
-- [ ] Push to GitHub
-- [ ] Create pull request
-- [ ] Create deployment summary
+- [x] Commit changes to Git
+- [x] Create feature branch
+- [x] Push to GitHub
+- [x] Create pull request (#4)
+- [x] Create deployment summary
