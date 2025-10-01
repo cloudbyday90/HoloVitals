@@ -16,12 +16,20 @@ export default function StatusBar() {
     totalCost: 0,
     activeTasks: 0,
     activeInstances: 0,
-    lastUpdate: new Date().toLocaleTimeString(),
+    lastUpdate: '',
   });
 
   const [isOnline, setIsOnline] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Set mounted flag and initial time
+    setMounted(true);
+    setStatus((prev) => ({
+      ...prev,
+      lastUpdate: new Date().toLocaleTimeString(),
+    }));
+
     // Simulate real-time updates
     const interval = setInterval(() => {
       setStatus((prev) => ({
@@ -83,10 +91,12 @@ export default function StatusBar() {
           </div>
 
           {/* Last Update */}
-          <div className="flex items-center gap-2 text-gray-500 text-xs hidden lg:flex">
-            <Clock className="w-3 h-3" />
-            <span>Updated {status.lastUpdate}</span>
-          </div>
+          {mounted && (
+            <div className="flex items-center gap-2 text-gray-500 text-xs hidden lg:flex">
+              <Clock className="w-3 h-3" />
+              <span>Updated {status.lastUpdate}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
