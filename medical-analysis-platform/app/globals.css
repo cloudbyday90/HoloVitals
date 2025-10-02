@@ -27,19 +27,34 @@ body {
 
 /* Text visibility rules - targeted, no layout interference */
 h1, h2, h3, h4, h5, h6 {
-  @apply text-gray-900 dark:text-gray-100;
+  color: #111827 !important;
 }
 
 /* Card text should be visible */
 [class*="CardTitle"] {
-  @apply text-gray-900 dark:text-gray-100;
+  color: #111827 !important;
 }
 
 [class*="CardDescription"] {
-  @apply text-gray-600 dark:text-gray-400;
+  color: #4b5563 !important;
 }
 
 /* Ensure muted text is still readable */
 .text-muted-foreground {
-  @apply text-gray-600 dark:text-gray-400;
+  color: #4b5563 !important;
+}
+
+/* Force paragraph text to be visible */
+p {
+  color: #374151 !important;
+}
+
+/* Force span text to be visible */
+span {
+  color: #374151 !important;
+}
+
+/* But preserve layout classes */
+.grid, .flex, [class*="grid"], [class*="flex"] {
+  color: inherit !important;
 }
