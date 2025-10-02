@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { X, Home, FileText, MessageSquare, ListTodo, Server, DollarSign, Settings, Zap } from 'lucide-react';
+import { X, Home, FileText, MessageSquare, Settings, Heart, Sparkles, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MobileNavProps {
@@ -10,13 +10,14 @@ interface MobileNavProps {
   onClose: () => void;
 }
 
+// Consumer-focused navigation - NO admin items
 const navigation = [
   { name: 'Overview', href: '/dashboard', icon: Home },
   { name: 'Documents', href: '/dashboard/documents', icon: FileText },
   { name: 'AI Chat', href: '/dashboard/chat', icon: MessageSquare },
-  { name: 'Queue', href: '/dashboard/queue', icon: ListTodo },
-  { name: 'Instances', href: '/dashboard/instances', icon: Server },
-  { name: 'Costs', href: '/dashboard/costs', icon: DollarSign },
+  { name: 'AI Insights', href: '/ai-insights', icon: Sparkles },
+  { name: 'My Health Data', href: '/clinical', icon: Activity },
+  { name: 'Health Score', href: '/health-score', icon: Heart },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 
@@ -38,10 +39,10 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
         {/* Header */}
         <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
           <Link href="/dashboard" className="flex items-center gap-2" onClick={onClose}>
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <Heart className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="font-bold text-xl text-gray-900">
               HoloVitals
             </span>
           </Link>
