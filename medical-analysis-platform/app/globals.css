@@ -38,3 +38,69 @@ p, span, div {
 .text-muted-foreground {
   color: #374151 !important; /* gray-700 */
 }
+
+/* Enhanced Text Visibility Rules */
+.text-muted-foreground {
+  @apply text-gray-600 dark:text-gray-400;
+}
+
+/* Ensure stat numbers are always visible */
+.stat-value {
+  @apply text-3xl font-bold text-gray-900 dark:text-gray-100;
+}
+
+/* Ensure card content is visible */
+.card-stat {
+  @apply text-2xl font-semibold text-gray-900 dark:text-gray-100;
+}
+
+/* Activity items should be visible */
+.activity-text {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+.activity-time {
+  @apply text-gray-600 dark:text-gray-400;
+}
+
+/* Status indicators */
+.status-text {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+/* Large numbers on colored backgrounds */
+.stat-on-color {
+  @apply text-gray-900 dark:text-gray-100 font-bold;
+}
+
+/* Default text colors for better visibility */
+p:not([class*="text-"]) {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+span:not([class*="text-"]) {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+div:not([class*="text-"]) {
+  @apply text-gray-900 dark:text-gray-100;
+}
+
+/* Override for specific cases */
+.text-white {
+  @apply text-white !important;
+}
+
+.text-black {
+  @apply text-black !important;
+}
+
+/* Ensure headings are always dark and visible */
+h1, h2, h3, h4, h5, h6 {
+  @apply text-gray-900 dark:text-gray-100;
+}
+
+/* Card descriptions should be visible but slightly muted */
+[class*="CardDescription"] {
+  @apply text-gray-600 dark:text-gray-400;
+}

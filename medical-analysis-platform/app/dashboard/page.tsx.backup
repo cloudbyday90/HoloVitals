@@ -41,7 +41,7 @@ export default function DashboardPage() {
       {/* Welcome Section */}
       <div>
         <h1 className="text-3xl font-bold mb-2 text-gray-900">Welcome back!</h1>
-        <p className="text-gray-700 dark:text-gray-300">Here's what's happening with your medical analysis platform today.</p>
+        <p className="text-gray-800">Here's what's happening with your medical analysis platform today.</p>
       </div>
 
       {/* Stats Grid */}
@@ -55,7 +55,7 @@ export default function DashboardPage() {
             <FileText className="w-4 h-4 text-gray-700" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.documents}</div>
+            <div className="text-2xl font-bold">{stats.documents}</div>
             <p className="text-xs text-gray-700 mt-1">
               <span className="text-green-600">+2</span> from last week
             </p>
@@ -71,7 +71,7 @@ export default function DashboardPage() {
             <MessageSquare className="w-4 h-4 text-gray-700" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.conversations}</div>
+            <div className="text-2xl font-bold">{stats.conversations}</div>
             <p className="text-xs text-gray-700 mt-1">
               <span className="text-green-600">+3</span> from last week
             </p>
@@ -87,7 +87,7 @@ export default function DashboardPage() {
             <Activity className="w-4 h-4 text-gray-700" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.activeTasks}</div>
+            <div className="text-2xl font-bold">{stats.activeTasks}</div>
             <p className="text-xs text-gray-700 mt-1">
               {stats.activeInstances} instance running
             </p>
@@ -103,7 +103,7 @@ export default function DashboardPage() {
             <DollarSign className="w-4 h-4 text-gray-700" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">${stats.todayCost}</div>
+            <div className="text-2xl font-bold">${stats.todayCost}</div>
             <p className="text-xs text-gray-700 mt-1">
               ${stats.monthlyCost} this month
             </p>
@@ -123,15 +123,15 @@ export default function DashboardPage() {
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">Tokens Saved</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              <p className="text-sm text-gray-800 mb-1">Tokens Saved</p>
+              <p className="text-3xl font-bold text-green-600">
                 {stats.tokensSaved.toLocaleString()}
               </p>
               <p className="text-xs text-gray-700 mt-1">40% reduction</p>
             </div>
             <div>
-              <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">Cost Saved</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              <p className="text-sm text-gray-800 mb-1">Cost Saved</p>
+              <p className="text-3xl font-bold text-green-600">
                 ${stats.costSaved}
               </p>
               <p className="text-xs text-gray-700 mt-1">This month</p>
@@ -200,7 +200,7 @@ export default function DashboardPage() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                    <p className="text-sm font-medium truncate">
                       {activity.title}
                     </p>
                     <p className="text-xs text-gray-700">{activity.time}</p>
@@ -222,19 +222,19 @@ export default function DashboardPage() {
           <div className="grid md:grid-cols-4 gap-4">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Chatbot Service</span>
+              <span className="text-sm">Chatbot Service</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Context Optimizer</span>
+              <span className="text-sm">Context Optimizer</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Analysis Queue</span>
+              <span className="text-sm">Analysis Queue</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Instance Provisioner</span>
+              <span className="text-sm">Instance Provisioner</span>
             </div>
           </div>
         </CardContent>
