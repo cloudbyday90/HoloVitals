@@ -49,6 +49,32 @@
   }
 }
 
+/* Dark mode styles */
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --card: #1a1a1a;
+  --card-foreground: #ededed;
+  --popover: #1a1a1a;
+  --popover-foreground: #ededed;
+  --primary: #ededed;
+  --primary-foreground: #0a0a0a;
+  --secondary: #262626;
+  --secondary-foreground: #ededed;
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+  --accent: #262626;
+  --accent-foreground: #ededed;
+  --border: #404040;
+  --input: #404040;
+  --ring: #ededed;
+}
+
+.dark body {
+  background-color: #0a0a0a;
+  color: #ededed;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
