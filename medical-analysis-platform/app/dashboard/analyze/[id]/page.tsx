@@ -147,7 +147,7 @@ What would you like to know more about?`;
                     <div key={index} className="border-b pb-3 last:border-b-0">
                       <div className="flex justify-between items-start mb-1">
                         <span className="font-medium">{item.name}</span>
-                        {item.isAbnormal &amp;&amp; (
+                        {item.isAbnormal && (
                           <span className="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded">
                             Abnormal
                           </span>
