@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { 
   FileText, 
-  Users,
+  MessageSquare, 
   TrendingUp, 
   Activity,
   ArrowUpRight,
@@ -12,34 +12,33 @@ import {
   CheckCircle2,
   AlertCircle,
   Heart,
-  Calendar,
-  Pill,
-  TestTube
+  Brain,
+  Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardPage() {
   // Mock data - will be replaced with real API calls
   const stats = {
-    totalPatients: 1247,
-    activePatients: 89,
-    upcomingAppointments: 12,
-    pendingLabResults: 5,
-    criticalAlerts: 2,
+    documents: 12,
+    aiConversations: 8,
+    healthInsights: 15,
     healthScore: 87,
+    tokensSaved: 45000,
+    costSaved: 18.50,
   };
 
   const recentActivity = [
-    { id: 1, type: 'patient', title: 'New patient registered: John Doe', time: '2 hours ago', status: 'completed' },
-    { id: 2, type: 'lab', title: 'Lab results received for Jane Smith', time: '3 hours ago', status: 'completed' },
-    { id: 3, type: 'appointment', title: 'Appointment scheduled with Dr. Johnson', time: '5 hours ago', status: 'completed' },
-    { id: 4, type: 'alert', title: 'Critical lab value flagged', time: '6 hours ago', status: 'alert' },
+    { id: 1, type: 'document', title: 'Blood Test Results.pdf uploaded', time: '2 hours ago', status: 'completed' },
+    { id: 2, type: 'chat', title: 'Asked about cholesterol levels', time: '3 hours ago', status: 'completed' },
+    { id: 3, type: 'insight', title: 'New health insight generated', time: '5 hours ago', status: 'completed' },
+    { id: 4, type: 'document', title: 'MRI Report.pdf analyzed', time: '6 hours ago', status: 'completed' },
   ];
 
-  const upcomingAppointments = [
-    { id: 1, patient: 'Sarah Johnson', time: '10:00 AM', type: 'Follow-up' },
-    { id: 2, patient: 'Michael Chen', time: '11:30 AM', type: 'Annual Physical' },
-    { id: 3, patient: 'Emily Davis', time: '2:00 PM', type: 'Lab Review' },
+  const healthInsights = [
+    { id: 1, title: 'Your cholesterol levels are improving', type: 'positive', date: 'Today' },
+    { id: 2, title: 'Consider scheduling your annual checkup', type: 'reminder', date: 'Yesterday' },
+    { id: 3, title: 'Blood pressure readings are stable', type: 'positive', date: '2 days ago' },
   ];
 
   return (
@@ -47,55 +46,55 @@ export default function DashboardPage() {
       {/* Welcome Section */}
       <div>
         <h1 className="text-3xl font-bold mb-2 text-gray-900">Welcome back!</h1>
-        <p className="text-gray-700">Here's what's happening with your patients today.</p>
+        <p className="text-gray-700">Here's your personal health overview and AI insights.</p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* Total Patients */}
+        {/* Documents */}
         <Card className="bg-white border-gray-200">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-900">
-              Total Patients
+              My Documents
             </CardTitle>
-            <Users className="w-4 h-4 text-blue-600" />
+            <FileText className="w-4 h-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">{stats.totalPatients}</div>
+            <div className="text-2xl font-bold text-gray-900">{stats.documents}</div>
             <p className="text-xs text-gray-600 mt-1">
-              <span className="text-green-600">+{stats.activePatients}</span> active this month
+              Medical records uploaded
             </p>
           </CardContent>
         </Card>
 
-        {/* Appointments */}
+        {/* AI Conversations */}
         <Card className="bg-white border-gray-200">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-900">
-              Appointments
+              AI Conversations
             </CardTitle>
-            <Calendar className="w-4 h-4 text-purple-600" />
+            <MessageSquare className="w-4 h-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">{stats.upcomingAppointments}</div>
+            <div className="text-2xl font-bold text-gray-900">{stats.aiConversations}</div>
             <p className="text-xs text-gray-600 mt-1">
-              Scheduled for today
+              Questions answered
             </p>
           </CardContent>
         </Card>
 
-        {/* Lab Results */}
+        {/* Health Insights */}
         <Card className="bg-white border-gray-200">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-900">
-              Lab Results
+              Health Insights
             </CardTitle>
-            <TestTube className="w-4 h-4 text-green-600" />
+            <Brain className="w-4 h-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">{stats.pendingLabResults}</div>
+            <div className="text-2xl font-bold text-gray-900">{stats.healthInsights}</div>
             <p className="text-xs text-gray-600 mt-1">
-              Pending review
+              AI-generated insights
             </p>
           </CardContent>
         </Card>
@@ -104,7 +103,7 @@ export default function DashboardPage() {
         <Card className="bg-white border-gray-200">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-900">
-              Avg Health Score
+              Health Score
             </CardTitle>
             <Heart className="w-4 h-4 text-red-600" />
           </CardHeader>
@@ -117,108 +116,103 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Critical Alerts */}
-      {stats.criticalAlerts > 0 && (
-        <Card className="bg-gradient-to-br from-red-50 to-orange-50 border-red-200">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-gray-900">
-              <AlertCircle className="w-5 h-5 text-red-600" />
-              Critical Alerts
-            </CardTitle>
-            <CardDescription className="text-gray-700">Requires immediate attention</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-red-200">
-                <div>
-                  <p className="font-medium text-gray-900">High blood pressure reading</p>
-                  <p className="text-sm text-gray-600">Patient: Robert Martinez - 180/110 mmHg</p>
-                </div>
-                <Button size="sm" variant="destructive">
-                  Review
-                </Button>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-red-200">
-                <div>
-                  <p className="font-medium text-gray-900">Abnormal lab results</p>
-                  <p className="text-sm text-gray-600">Patient: Lisa Anderson - Elevated glucose</p>
-                </div>
-                <Button size="sm" variant="destructive">
-                  Review
-                </Button>
-              </div>
+      {/* Cost Savings Card */}
+      <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-gray-900">
+            <TrendingUp className="w-5 h-5 text-green-600" />
+            Your Savings
+          </CardTitle>
+          <CardDescription className="text-gray-700">Smart AI optimization is saving you money!</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-700 mb-1">AI Tokens Saved</p>
+              <p className="text-3xl font-bold text-gray-900">
+                {stats.tokensSaved.toLocaleString()}
+              </p>
+              <p className="text-xs text-gray-600 mt-1">40% reduction in costs</p>
             </div>
-          </CardContent>
-        </Card>
-      )}
+            <div>
+              <p className="text-sm text-gray-700 mb-1">Money Saved</p>
+              <p className="text-3xl font-bold text-gray-900">
+                ${stats.costSaved}
+              </p>
+              <p className="text-xs text-gray-600 mt-1">This month</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Quick Actions & Upcoming Appointments */}
+      {/* Quick Actions & AI Insights */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Quick Actions */}
         <Card className="bg-white border-gray-200">
           <CardHeader>
             <CardTitle className="text-gray-900">Quick Actions</CardTitle>
-            <CardDescription className="text-gray-600">Common tasks and shortcuts</CardDescription>
+            <CardDescription className="text-gray-600">What would you like to do?</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <Link href="/patients">
+            <Link href="/dashboard/documents">
               <Button variant="outline" className="w-full justify-start bg-white hover:bg-gray-50 text-gray-900 border-gray-300">
-                <Users className="w-4 h-4 mr-2 text-blue-600" />
-                Search Patients
+                <FileText className="w-4 h-4 mr-2 text-blue-600" />
+                Upload Medical Document
                 <ArrowUpRight className="w-4 h-4 ml-auto text-gray-500" />
               </Button>
             </Link>
-            <Link href="/clinical">
+            <Link href="/dashboard/chat">
               <Button variant="outline" className="w-full justify-start bg-white hover:bg-gray-50 text-gray-900 border-gray-300">
-                <FileText className="w-4 h-4 mr-2 text-green-600" />
-                View Clinical Data
-                <ArrowUpRight className="w-4 h-4 ml-auto text-gray-500" />
-              </Button>
-            </Link>
-            <Link href="/clinical/labs">
-              <Button variant="outline" className="w-full justify-start bg-white hover:bg-gray-50 text-gray-900 border-gray-300">
-                <TestTube className="w-4 h-4 mr-2 text-purple-600" />
-                Review Lab Results
+                <MessageSquare className="w-4 h-4 mr-2 text-purple-600" />
+                Ask AI About My Health
                 <ArrowUpRight className="w-4 h-4 ml-auto text-gray-500" />
               </Button>
             </Link>
             <Link href="/ai-insights">
               <Button variant="outline" className="w-full justify-start bg-white hover:bg-gray-50 text-gray-900 border-gray-300">
-                <Activity className="w-4 h-4 mr-2 text-orange-600" />
-                AI Health Insights
+                <Sparkles className="w-4 h-4 mr-2 text-yellow-600" />
+                View AI Health Insights
+                <ArrowUpRight className="w-4 h-4 ml-auto text-gray-500" />
+              </Button>
+            </Link>
+            <Link href="/clinical">
+              <Button variant="outline" className="w-full justify-start bg-white hover:bg-gray-50 text-gray-900 border-gray-300">
+                <Activity className="w-4 h-4 mr-2 text-green-600" />
+                View My Health Data
                 <ArrowUpRight className="w-4 h-4 ml-auto text-gray-500" />
               </Button>
             </Link>
           </CardContent>
         </Card>
 
-        {/* Upcoming Appointments */}
+        {/* Recent AI Insights */}
         <Card className="bg-white border-gray-200">
           <CardHeader>
-            <CardTitle className="text-gray-900">Today's Appointments</CardTitle>
-            <CardDescription className="text-gray-600">Scheduled for today</CardDescription>
+            <CardTitle className="text-gray-900">Recent AI Insights</CardTitle>
+            <CardDescription className="text-gray-600">Personalized health insights for you</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {upcomingAppointments.map((appointment) => (
-                <div key={appointment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                      <Calendar className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{appointment.patient}</p>
-                      <p className="text-sm text-gray-600">{appointment.type}</p>
-                    </div>
+              {healthInsights.map((insight) => (
+                <div key={insight.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="mt-1">
+                    {insight.type === 'positive' ? (
+                      <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    ) : insight.type === 'reminder' ? (
+                      <Clock className="w-4 h-4 text-blue-600" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-yellow-600" />
+                    )}
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">{appointment.time}</p>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">{insight.title}</p>
+                    <p className="text-xs text-gray-600 mt-1">{insight.date}</p>
                   </div>
                 </div>
               ))}
             </div>
             <Button variant="outline" className="w-full mt-4 bg-white hover:bg-gray-50 text-gray-900 border-gray-300">
-              View All Appointments
+              View All Insights
             </Button>
           </CardContent>
         </Card>
@@ -228,7 +222,7 @@ export default function DashboardPage() {
       <Card className="bg-white border-gray-200">
         <CardHeader>
           <CardTitle className="text-gray-900">Recent Activity</CardTitle>
-          <CardDescription className="text-gray-600">Latest updates and actions</CardDescription>
+          <CardDescription className="text-gray-600">Your latest actions and updates</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -240,7 +234,7 @@ export default function DashboardPage() {
                   ) : activity.status === 'processing' ? (
                     <Clock className="w-4 h-4 text-blue-600 animate-pulse" />
                   ) : (
-                    <AlertCircle className="w-4 h-4 text-red-600" />
+                    <AlertCircle className="w-4 h-4 text-yellow-600" />
                   )}
                 </div>
                 <div className="flex-1">
@@ -249,36 +243,6 @@ export default function DashboardPage() {
                 </div>
               </div>
             ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Health Insights Summary */}
-      <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-gray-900">
-            <TrendingUp className="w-5 h-5 text-blue-600" />
-            Platform Health
-          </CardTitle>
-          <CardDescription className="text-gray-700">Overall system performance</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="p-4 bg-white rounded-lg border border-blue-200">
-              <p className="text-sm text-gray-700 mb-1">Data Sync Status</p>
-              <p className="text-2xl font-bold text-gray-900">100%</p>
-              <p className="text-xs text-green-600 mt-1">All systems operational</p>
-            </div>
-            <div className="p-4 bg-white rounded-lg border border-blue-200">
-              <p className="text-sm text-gray-700 mb-1">EHR Connections</p>
-              <p className="text-2xl font-bold text-gray-900">7/7</p>
-              <p className="text-xs text-green-600 mt-1">All providers connected</p>
-            </div>
-            <div className="p-4 bg-white rounded-lg border border-blue-200">
-              <p className="text-sm text-gray-700 mb-1">AI Analysis</p>
-              <p className="text-2xl font-bold text-gray-900">Active</p>
-              <p className="text-xs text-green-600 mt-1">Processing insights</p>
-            </div>
           </div>
         </CardContent>
       </Card>
