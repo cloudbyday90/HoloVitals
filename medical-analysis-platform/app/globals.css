@@ -170,7 +170,10 @@ input[type="search"],
 input[type="email"],
 input[type="password"],
 input[type="number"],
-textarea {
+textarea,
+input.flex,
+input[class*="rounded"],
+input[class*="border"] {
   background-color: #ffffff !important;
   border-color: #e5e7eb !important;
   color: #111827 !important;
@@ -179,6 +182,17 @@ textarea {
 input::placeholder,
 textarea::placeholder {
   color: #6b7280 !important;
+}
+
+/* Force all inputs to have white background */
+input {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+input:focus {
+  background-color: #ffffff !important;
+  color: #111827 !important;
 }
 
 /* Select trigger styling */
