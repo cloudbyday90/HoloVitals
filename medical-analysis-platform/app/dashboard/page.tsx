@@ -49,7 +49,7 @@ export default function DashboardPage() {
         {/* Documents */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-800">
+            <CardTitle className="text-sm font-medium text-gray-900 dark:text-gray-100">
               Documents
             </CardTitle>
             <FileText className="w-4 h-4 text-gray-700" />
@@ -65,7 +65,7 @@ export default function DashboardPage() {
         {/* Conversations */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-800">
+            <CardTitle className="text-sm font-medium text-gray-900 dark:text-gray-100">
               AI Conversations
             </CardTitle>
             <MessageSquare className="w-4 h-4 text-gray-700" />
@@ -81,7 +81,7 @@ export default function DashboardPage() {
         {/* Active Tasks */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-800">
+            <CardTitle className="text-sm font-medium text-gray-900 dark:text-gray-100">
               Active Tasks
             </CardTitle>
             <Activity className="w-4 h-4 text-gray-700" />
@@ -97,7 +97,7 @@ export default function DashboardPage() {
         {/* Today's Cost */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-800">
+            <CardTitle className="text-sm font-medium text-gray-900 dark:text-gray-100">
               Today's Cost
             </CardTitle>
             <DollarSign className="w-4 h-4 text-gray-700" />

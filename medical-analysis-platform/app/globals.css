@@ -25,7 +25,21 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Minimal text visibility rules - only for headings */
+/* Text visibility rules - targeted, no layout interference */
 h1, h2, h3, h4, h5, h6 {
   @apply text-gray-900 dark:text-gray-100;
+}
+
+/* Card text should be visible */
+[class*="CardTitle"] {
+  @apply text-gray-900 dark:text-gray-100;
+}
+
+[class*="CardDescription"] {
+  @apply text-gray-600 dark:text-gray-400;
+}
+
+/* Ensure muted text is still readable */
+.text-muted-foreground {
+  @apply text-gray-600 dark:text-gray-400;
 }
