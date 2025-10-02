@@ -1,6 +1,6 @@
 'use client';
 
-import { Menu, Bell, User, Search } from 'lucide-react';
+import { Menu, Bell, User, Search, Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -45,6 +45,41 @@ export default function Header({ onMenuClick, sidebarOpen }: HeaderProps) {
 
         {/* Right Section */}
         <div className="flex items-center gap-2">
+            {/* Launch Console Button */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                  <Rocket className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Launch Console</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <a href="/admin" className="cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-red-500 rounded-full" />
+                      <div>
+                        <p className="font-medium">Admin Console</p>
+                        <p className="text-xs text-gray-600">Full system access</p>
+                      </div>
+                    </div>
+                  </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="/dev" className="cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                      <div>
+                        <p className="font-medium">Dev Console</p>
+                        <p className="text-xs text-gray-600">Development tools</p>
+                      </div>
+                    </div>
+                  </a>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
           {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
