@@ -4,6 +4,19 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+   
+   // Utility function to format dates consistently (avoids hydration mismatch)
+   const formatDate = (date: Date): string => {
+     const year = date.getFullYear();
+     const month = String(date.getMonth() + 1).padStart(2, '0');
+     const day = String(date.getDate()).padStart(2, '0');
+     return `${month}/${day}/${year}`;
+   };
+   
+   // Utility function to format numbers consistently
+   const formatNumber = (num: number): string => {
+     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+   };
 import {
   FileText,
   Upload,
@@ -202,7 +215,7 @@ export default function DocumentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
-              {stats.totalTokensSaved.toLocaleString()}
+              {formatNumber(stats.totalTokensSaved)}
             </div>
           </CardContent>
         </Card>
@@ -337,7 +350,7 @@ export default function DocumentsPage() {
                         </span>
                         <span className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
-                          {doc.uploadDate.toLocaleDateString()}
+                          {formatDate(doc.uploadDate)}
                         </span>
                         <span>{doc.size.toFixed(2)} MB</span>
                       </div>
@@ -356,7 +369,7 @@ export default function DocumentsPage() {
                         </span>
                         {doc.tokensSaved && (
                           <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
-                            {doc.tokensSaved.toLocaleString()} tokens saved
+                            {formatNumber(doc.tokensSaved)} tokens saved
                           </span>
                         )}
                       </div>
