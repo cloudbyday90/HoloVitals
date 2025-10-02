@@ -11,7 +11,8 @@ import {
   Sparkles,
   Activity,
   Heart,
-  User
+  User,
+  RefreshCw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,6 +29,7 @@ const navigation = [
   { name: 'AI Insights', href: '/ai-insights', icon: Sparkles },
   { name: 'My Health Data', href: '/clinical', icon: Activity },
   { name: 'Health Score', href: '/health-score', icon: Heart },
+  { name: 'EHR Sync', href: '/sync', icon: RefreshCw },
 ];
 
 export function Sidebar({ isOpen, onToggle }: SidebarProps) {
