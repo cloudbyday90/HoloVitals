@@ -40,7 +40,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/* Welcome Section */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">Welcome back!</h1>
+        <h1 className="text-3xl font-bold mb-2 text-gray-900">Welcome back!</h1>
         <p className="text-gray-800">Here's what's happening with your medical analysis platform today.</p>
       </div>
 
@@ -114,7 +114,7 @@ export default function DashboardPage() {
       {/* Cost Savings Card */}
       <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-gray-900">
             <TrendingUp className="w-5 h-5 text-green-600" />
             Cost Savings
           </CardTitle>
@@ -145,7 +145,7 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle className="text-gray-900">Quick Actions</CardTitle>
             <CardDescription>Common tasks and shortcuts</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -183,7 +183,7 @@ export default function DashboardPage() {
         {/* Recent Activity */}
         <Card>
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle className="text-gray-900">Recent Activity</CardTitle>
             <CardDescription>Your latest actions and updates</CardDescription>
           </CardHeader>
           <CardContent>
@@ -215,7 +215,7 @@ export default function DashboardPage() {
       {/* System Status */}
       <Card>
         <CardHeader>
-          <CardTitle>System Status</CardTitle>
+          <CardTitle className="text-gray-900">System Status</CardTitle>
           <CardDescription>All systems operational</CardDescription>
         </CardHeader>
         <CardContent>
