@@ -221,3 +221,26 @@ button[role="combobox"],
   background-color: #f3f4f6 !important;
   color: #111827 !important;
 }
+
+/* Fix Button components - ensure no black backgrounds */
+button[class*="outline"] {
+  background-color: #ffffff !important;
+  border-color: #d1d5db !important;
+  color: #111827 !important;
+}
+
+button[class*="outline"]:hover {
+  background-color: #f9fafb !important;
+  color: #111827 !important;
+}
+
+/* Ghost buttons should have transparent backgrounds */
+button[class*="ghost"] {
+  background-color: transparent !important;
+  color: #111827 !important;
+}
+
+button[class*="ghost"]:hover {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}

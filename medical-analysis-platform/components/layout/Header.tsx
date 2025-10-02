@@ -33,7 +33,7 @@ export default function Header({ onMenuClick, sidebarOpen }: HeaderProps) {
           </Button>
 
           {/* Search Bar */}
-          <div className="hidden md:flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 w-64 lg:w-96">
+          <div className="hidden md:flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 w-64 lg:w-96 border border-gray-200">
             <Search className="w-4 h-4 text-gray-700" />
             <input
               type="text"
