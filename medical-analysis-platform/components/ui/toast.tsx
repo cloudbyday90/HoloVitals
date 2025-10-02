@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * Toast Notification Component
  * For displaying error and success messages

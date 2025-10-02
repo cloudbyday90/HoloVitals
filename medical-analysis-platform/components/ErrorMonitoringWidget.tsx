@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * Error Monitoring Widget
  * Compact widget for dashboard showing error summary
