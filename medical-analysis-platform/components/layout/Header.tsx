@@ -38,7 +38,7 @@ export default function Header({ onMenuClick, sidebarOpen }: HeaderProps) {
             <input
               type="text"
               placeholder="Search documents, chats..."
-              className="bg-transparent border-none outline-none text-sm w-full"
+              className="bg-transparent border-none outline-none text-sm w-full text-gray-900"
             />
           </div>
         </div>
@@ -52,26 +52,26 @@ export default function Header({ onMenuClick, sidebarOpen }: HeaderProps) {
                   <Rocket className="w-5 h-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Launch Console</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
+              <DropdownMenuContent align="end" className="w-56 bg-white border-gray-200">
+                <DropdownMenuLabel className="text-gray-900">Launch Console</DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-gray-200" />
+                <DropdownMenuItem asChild className="focus:bg-gray-100">
                   <a href="/admin" className="cursor-pointer">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-red-500 rounded-full" />
                       <div>
-                        <p className="font-medium">Admin Console</p>
+                        <p className="font-medium text-gray-900">Admin Console</p>
                         <p className="text-xs text-gray-600">Full system access</p>
                       </div>
                     </div>
                   </a>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild className="focus:bg-gray-100">
                   <a href="/dev" className="cursor-pointer">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full" />
                       <div>
-                        <p className="font-medium">Dev Console</p>
+                        <p className="font-medium text-gray-900">Dev Console</p>
                         <p className="text-xs text-gray-600">Development tools</p>
                       </div>
                     </div>
@@ -88,9 +88,9 @@ export default function Header({ onMenuClick, sidebarOpen }: HeaderProps) {
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
-              <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-              <DropdownMenuSeparator />
+            <DropdownMenuContent align="end" className="w-80 bg-white border-gray-200">
+              <DropdownMenuLabel className="text-gray-900">Notifications</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-gray-200" />
               <div className="p-4 text-sm text-gray-700 text-center">
                 No new notifications
               </div>
@@ -106,19 +106,19 @@ export default function Header({ onMenuClick, sidebarOpen }: HeaderProps) {
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-56 bg-white border-gray-200">
+              <DropdownMenuLabel className="text-gray-900">
                 <div>
-                  <p className="font-medium">John Doe</p>
-                  <p className="text-xs text-gray-700">john@example.com</p>
+                  <p className="font-medium text-gray-900">John Doe</p>
+                  <p className="text-xs text-gray-600">john@example.com</p>
                 </div>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Billing</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuSeparator className="bg-gray-200" />
+              <DropdownMenuItem className="text-gray-900 focus:bg-gray-100">Profile</DropdownMenuItem>
+              <DropdownMenuItem className="text-gray-900 focus:bg-gray-100">Settings</DropdownMenuItem>
+              <DropdownMenuItem className="text-gray-900 focus:bg-gray-100">Billing</DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-gray-200" />
+              <DropdownMenuItem className="text-red-600 focus:bg-red-50">
                 Sign out
               </DropdownMenuItem>
             </DropdownMenuContent>
