@@ -2,7 +2,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #111827;
 }
 
 @theme inline {
@@ -25,36 +25,57 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Text visibility rules - targeted, no layout interference */
+/* FORCE TEXT VISIBILITY - Using !important to override everything */
+
+/* Headings must be dark */
 h1, h2, h3, h4, h5, h6 {
   color: #111827 !important;
 }
 
-/* Card text should be visible */
-[class*="CardTitle"] {
-  color: #111827 !important;
-}
-
-[class*="CardDescription"] {
-  color: #4b5563 !important;
-}
-
-/* Ensure muted text is still readable */
-.text-muted-foreground {
-  color: #4b5563 !important;
-}
-
-/* Force paragraph text to be visible */
+/* Paragraphs must be visible */
 p {
   color: #374151 !important;
 }
 
-/* Force span text to be visible */
+/* Spans must be visible */
 span {
   color: #374151 !important;
 }
 
-/* But preserve layout classes */
-.grid, .flex, [class*="grid"], [class*="flex"] {
+/* Card titles must be dark */
+[class*="CardTitle"] {
+  color: #111827 !important;
+}
+
+/* Card descriptions should be visible but muted */
+[class*="CardDescription"] {
+  color: #4b5563 !important;
+}
+
+/* Muted text should still be readable */
+.text-muted-foreground {
+  color: #4b5563 !important;
+}
+
+/* Stat numbers (large text) must be dark and bold */
+.text-2xl, .text-3xl, .text-4xl {
+  color: #111827 !important;
+}
+
+/* Any bold div (stat numbers) must be dark */
+div.font-bold {
+  color: #111827 !important;
+}
+
+/* Small text should be visible */
+.text-xs, .text-sm {
+  color: #374151 !important;
+}
+
+/* But preserve layout - these should not have forced colors */
+.grid, .flex, 
+[class*="grid"], [class*="flex"],
+.space-y-6, .space-y-4, .space-y-2,
+[class*="space-"] {
   color: inherit !important;
 }
