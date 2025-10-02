@@ -79,3 +79,57 @@ div.font-bold {
 [class*="space-"] {
   color: inherit !important;
 }
+
+/* Fix sidebar icons - make them darker */
+nav svg, 
+[class*="sidebar"] svg,
+a svg {
+  color: #374151 !important;
+  opacity: 1 !important;
+}
+
+/* Fix notification icon */
+[class*="notification"] svg,
+button svg {
+  color: #374151 !important;
+  opacity: 1 !important;
+}
+
+/* Fix icons in general */
+svg {
+  opacity: 1 !important;
+}
+
+/* Preserve green color for success indicators */
+.text-green-600 {
+  color: #16a34a !important;
+}
+
+/* Preserve red color for notifications */
+.text-red-600, .text-red-500 {
+  color: #dc2626 !important;
+}
+
+/* Preserve blue color for info */
+.text-blue-600 {
+  color: #2563eb !important;
+}
+
+/* Preserve yellow color for warnings */
+.text-yellow-600 {
+  color: #ca8a04 !important;
+}
+
+/* Text on colored backgrounds needs to be even darker */
+[class*="bg-gradient"] h3,
+[class*="bg-gradient"] [class*="CardTitle"],
+[class*="bg-green"] h3,
+[class*="bg-green"] [class*="CardTitle"] {
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+/* Make sure text-gray-900 is actually very dark */
+.text-gray-900 {
+  color: #111827 !important;
+}
