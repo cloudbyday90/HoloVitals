@@ -9,8 +9,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { LightweightChatbotService } from '@/lib/services/LightweightChatbotService';
 import { ChatRequest } from '@/lib/types/chatbot';
 
-// Initialize chatbot service
-const chatbotService = new LightweightChatbotService();
+// Mark route as dynamic to prevent static optimization
+export const dynamic = 'force-dynamic';
+
+// Lazy initialization of chatbot service
+let chatbotService: LightweightChatbotService | null = null;
+function getChatbotService() {
+  if (!chatbotService) {
+    chatbotService = new LightweightChatbotService();
+  }
+  return chatbotService;
+}
 
 /**
  * POST /api/chat
@@ -44,7 +53,7 @@ export async function POST(request: NextRequest) {
       const stream = new ReadableStream({
         async start(controller) {
           try {
-            for await (const chunk of chatbotService.streamChat(body)) {
+            for await (const chunk of getChatbotService().streamChat(body)) {
               const data = `data: ${JSON.stringify({ content: chunk })}\n\n`;
               controller.enqueue(encoder.encode(data));
             }
@@ -68,7 +77,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Regular response
-    const response = await chatbotService.chat(body);
+    const response = await getChatbotService().chat(body);
 
     return NextResponse.json(response, { status: 200 });
   } catch (error: any) {
@@ -92,7 +101,7 @@ export async function GET(request: NextRequest) {
 
     if (conversationId) {
       // Get specific conversation
-      const conversation = await chatbotService.getConversationHistory(conversationId);
+      const conversation = await getChatbotService().getConversationHistory(conversationId);
       
       if (!conversation) {
         return NextResponse.json(
@@ -104,7 +113,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(conversation, { status: 200 });
     } else if (userId) {
       // Get all conversations for user
-      const conversations = await chatbotService.getUserConversations(userId);
+      const conversations = await getChatbotService().getUserConversations(userId);
       return NextResponse.json(conversations, { status: 200 });
     } else {
       return NextResponse.json(
@@ -137,7 +146,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    await chatbotService.deleteConversation(conversationId);
+    await getChatbotService().deleteConversation(conversationId);
 
     return NextResponse.json(
       { message: 'Conversation deleted successfully' },
