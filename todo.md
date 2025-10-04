@@ -1,38 +1,27 @@
-# HoloVitals v1.4.7 Release - Complete
+# HoloVitals v1.4.8 Release - Complete
 
 ## Status: ✅ COMPLETE
 
-Version 1.4.7 has been successfully released with payment API routes build fix. Application now builds successfully!
+Version 1.4.8 has been successfully released with development mode support! Developers can now install HoloVitals locally without Stripe or Cloudflare Tunnel.
 
 ---
 
 ## ✅ Completed Tasks
 
-### [x] Issue Identification
-- Identified build error with payment API routes
-- Error: "Neither authOptions nor config.authenticationOptions provided"
-- Build failed on /api/payments/create-billing-portal
-- 9 payment/subscription routes needed fixing
-
-### [x] Code Fix
-- Added `export const dynamic = 'force-dynamic'` to 9 API routes
-- Routes fixed:
-  * /api/payments/create-billing-portal
-  * /api/payments/create-checkout-session
-  * /api/payments/invoices
-  * /api/payments/payment-methods
-  * /api/payments/subscription
-  * /api/subscriptions/cancel
-  * /api/subscriptions
-  * /api/tokens/purchase
-  * /api/webhooks/stripe
+### [x] Feature Implementation
+- Added development/production installation type selection
+- Development mode skips Cloudflare Tunnel setup
+- Development mode skips Stripe configuration
+- Environment-specific .env.local generation
+- Mode-specific instructions and URLs
 
 ### [x] Documentation & Release
-- Created CHANGELOG_V1.4.7.md
-- Created release-body-v1.4.7.md
-- Created scripts/install-v1.4.7.sh
+- Created CHANGELOG_V1.4.8.md
+- Created release-body-v1.4.8.md
+- Created scripts/install-v1.4.8.sh
+- Updated scripts/install-v1.4.7.sh (backport)
 - Committed and pushed changes
-- Created git tag v1.4.7
+- Created git tag v1.4.8
 - Published GitHub release
 
 ---
@@ -40,22 +29,51 @@ Version 1.4.7 has been successfully released with payment API routes build fix. 
 ## 🚀 Final Installation Command
 
 ```bash
-wget https://raw.githubusercontent.com/cloudbyday90/HoloVitals/main/scripts/install-v1.4.7.sh && chmod +x install-v1.4.7.sh && ./install-v1.4.7.sh
+wget https://raw.githubusercontent.com/cloudbyday90/HoloVitals/main/scripts/install-v1.4.8.sh && chmod +x install-v1.4.8.sh && ./install-v1.4.8.sh
 ```
 
 **Prerequisites:** GitHub Personal Access Token (https://github.com/settings/tokens)
 
 ---
 
+## 🎯 Installation Types
+
+### Development Mode
+**Perfect for:**
+- Local development and testing
+- UI/UX development
+- Payment UI visual testing
+
+**Configuration:**
+- URL: `http://localhost:3000`
+- Cloudflare Tunnel: Skipped
+- Stripe: Not required
+- Start: `npm run dev`
+
+### Production Mode
+**Perfect for:**
+- Public deployment
+- Live payment processing
+
+**Configuration:**
+- URL: `https://your-domain.com`
+- Cloudflare Tunnel: Required
+- Stripe: Required
+- Start: `npm run start`
+
+---
+
 ## 📊 Complete Version History
 
-### v1.4.7 (Current) ✅
-- Payment API routes build fix
-- 9 routes configured for dynamic rendering
+### v1.4.8 (Current) ✅
+- Development mode support
+- Conditional Stripe/Cloudflare setup
+
+### v1.4.7 ✅
+- Payment API routes fix
 
 ### v1.4.6 ✅
 - GitHub PAT authentication
-- Private repository support
 
 ### v1.4.5 ✅
 - Documents upload API fix
@@ -75,21 +93,21 @@ wget https://raw.githubusercontent.com/cloudbyday90/HoloVitals/main/scripts/inst
 
 ---
 
-## ✅ All Installation Phases Working
+## ✅ All Installation Phases
 
 1. ✅ Prerequisites Check
 2. ✅ Repository Setup (with GitHub PAT)
 3. ✅ Dependencies Installation (with smart check)
-4. ✅ Environment Configuration
+4. ✅ Environment Configuration (dev/prod specific)
 5. ✅ Prisma Client Generation (with smart check)
-6. ✅ Cloudflare Tunnel Setup (with smart check)
-7. ✅ Application Build (FIXED!)
+6. ✅ Cloudflare Tunnel Setup (production only)
+7. ✅ Application Build
 
 ---
 
 ## 🔗 Important Links
 
-- **GitHub Release:** https://github.com/cloudbyday90/HoloVitals/releases/tag/v1.4.7
+- **GitHub Release:** https://github.com/cloudbyday90/HoloVitals/releases/tag/v1.4.8
 - **Repository:** https://github.com/cloudbyday90/HoloVitals
 - **Create PAT:** https://github.com/settings/tokens
 
@@ -97,5 +115,5 @@ wget https://raw.githubusercontent.com/cloudbyday90/HoloVitals/main/scripts/inst
 
 **Status:** Release Complete ✅  
 **Installation:** Production Ready ✅  
-**Build:** Success ✅  
+**Development Mode:** Available ✅  
 **All Phases:** Complete ✅
