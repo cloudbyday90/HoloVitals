@@ -1705,3 +1705,118 @@ model SyncStatistics {
   @@index([date])
   @@map("sync_statistics")
 }
+
+// ============================================================================
+// HIPAA COMPLIANCE MONITORING SYSTEM
+// CRITICAL: Separate from general error logging
+// Every incident tracked individually, NO deduplication, 6+ year retention
+// ============================================================================
+
+model HipaaIncident {
+  id                      String    @id @default(uuid())
+  incidentNumber          String    @unique
+  timestamp               DateTime
+  severity                String    // CRITICAL, HIGH, MEDIUM, LOW
+  category                String
+  description             String    @db.Text
+  
+  // PHI Information
+  phiExposed              Boolean   @default(false)
+  phiType                 String?   @db.Text // JSON array
+  numberOfRecordsAffected Int?
+  patientIds              String?   @db.Text // JSON array
+  
+  // Context
+  userId                  String?
+  userRole                String?
+  ipAddress               String?
+  endpoint                String?   @db.Text
+  action                  String?   @db.Text
+  stackTrace              String?   @db.Text
+  
+  // Investigation
+  status                  String    @default("NEW")
+  assignedTo              String?
+  investigationNotes      String?   @db.Text
+  resolutionNotes         String?   @db.Text
+  
+  // Compliance
+  reportedToOCR           Boolean   @default(false)
+  reportedDate            DateTime?
+  breachNotificationSent  Boolean   @default(false)
+  breachNotificationDate  DateTime?
+  
+  // Audit
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  closedAt                DateTime?
+  
+  // Relations
+  auditLog                HipaaIncidentAuditLog[]
+  notifications           HipaaNotification[]
+
+  @@index([incidentNumber])
+  @@index([timestamp])
+  @@index([severity])
+  @@index([status])
+  @@index([category])
+  @@index([assignedTo])
+  @@index([phiExposed])
+  @@index([userId])
+  @@map("hipaa_incidents")
+}
+
+model HipaaIncidentAuditLog {
+  id            String    @id @default(uuid())
+  incidentId    String
+  timestamp     DateTime  @default(now())
+  action        String
+  performedBy   String?
+  previousState String?   @db.Text // JSON
+  newState      String    @db.Text // JSON
+  notes         String?   @db.Text
+  
+  incident      HipaaIncident @relation(fields: [incidentId], references: [id], onDelete: Restrict)
+
+  @@index([incidentId])
+  @@index([timestamp])
+  @@index([performedBy])
+  @@map("hipaa_incident_audit_log")
+}
+
+model HipaaComplianceTeam {
+  id                      String    @id @default(uuid())
+  userId                  String    @unique
+  role                    String    // COMPLIANCE_OFFICER, PRIVACY_OFFICER, SECURITY_OFFICER, INVESTIGATOR
+  email                   String
+  phone                   String?
+  notificationPreferences String?   @db.Text // JSON
+  active                  Boolean   @default(true)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([role])
+  @@index([active])
+  @@map("hipaa_compliance_team")
+}
+
+model HipaaNotification {
+  id                   String    @id @default(uuid())
+  incidentId           String
+  notificationType     String    // EMAIL, SMS, PHONE, CRITICAL_ALERT, ESCALATION
+  recipientId          String?
+  recipientEmail       String
+  sentAt               DateTime  @default(now())
+  delivered            Boolean   @default(false)
+  deliveryConfirmedAt  DateTime?
+  errorMessage         String?   @db.Text
+  
+  incident             HipaaIncident @relation(fields: [incidentId], references: [id], onDelete: Restrict)
+
+  @@index([incidentId])
+  @@index([sentAt])
+  @@index([recipientId])
+  @@index([delivered])
+  @@map("hipaa_notifications")
+}

@@ -196,6 +196,7 @@ export class EnhancedErrorLogger {
 
   /**
    * Log error to database and console with deduplication
+   * CRITICAL: HIPAA-related errors are routed to separate system
    */
   public async logError(
     error: Error,
@@ -208,6 +209,14 @@ export class EnhancedErrorLogger {
       ipAddress?: string;
     }
   ): Promise<void> {
+    // CRITICAL: Check if this is a HIPAA-related error FIRST
+    // HIPAA incidents are handled separately, NOT deduplicated
+    const isHIPAA = await this.checkIfHIPAARelated(error, context);
+    if (isHIPAA) {
+      await this.routeToHIPAASystem(error, context);
+      return; // Do NOT process through general error logging
+    }
+
     const severity = this.determineSeverity(error);
     const details = getErrorDetails(error);
     const timestamp = new Date();
@@ -443,6 +452,146 @@ export class EnhancedErrorLogger {
       );
     } catch (error) {
       console.error('Failed to send critical error alert:', error);
+    }
+  }
+
+  /**
+   * Check if error is HIPAA-related
+   * CRITICAL: HIPAA errors must be routed to separate system
+   */
+  private async checkIfHIPAARelated(error: Error, context?: any): Promise<boolean> {
+    const details = getErrorDetails(error);
+    
+    // Check error code
+    if (details.code && (
+      details.code === 'HIPAA_VIOLATION' ||
+      details.code.startsWith('PHI_') ||
+      details.code.includes('HIPAA') ||
+      details.code === 'UNAUTHORIZED_PHI_ACCESS' ||
+      details.code === 'PHI_DISCLOSURE_ERROR' ||
+      details.code === 'ENCRYPTION_ERROR' ||
+      details.code === 'AUDIT_LOG_FAILURE' ||
+      details.code === 'BAA_VIOLATION'
+    )) {
+      return true;
+    }
+
+    // Check error message for HIPAA keywords
+    const hipaaKeywords = [
+      'hipaa',
+      'phi',
+      'protected health information',
+      'unauthorized access to patient',
+      'patient data breach',
+      'medical record access',
+      'health information breach',
+      'encryption failure',
+      'audit log',
+      'business associate agreement',
+      'baa violation',
+    ];
+
+    const errorString = JSON.stringify({
+      message: error.message,
+      stack: error.stack,
+      endpoint: context?.endpoint,
+    }).toLowerCase();
+
+    return hipaaKeywords.some(keyword => errorString.includes(keyword));
+  }
+
+  /**
+   * Route HIPAA error to separate HIPAA compliance system
+   * CRITICAL: Do NOT deduplicate, track individually
+   */
+  private async routeToHIPAASystem(error: Error, context?: any): Promise<void> {
+    console.error('🚨 HIPAA-RELATED ERROR DETECTED - Routing to HIPAA Compliance System');
+    
+    try {
+      // Import HIPAA service dynamically to avoid circular dependency
+      const { hipaaIncidentService, HIPAAIncidentSeverity, HIPAAViolationCategory } = 
+        await import('../compliance/HIPAAIncidentService');
+      
+      const details = getErrorDetails(error);
+      
+      // Determine severity
+      let severity = HIPAAIncidentSeverity.HIGH;
+      if (details.code === 'PHI_DISCLOSURE_ERROR' || details.code === 'UNAUTHORIZED_PHI_ACCESS') {
+        severity = HIPAAIncidentSeverity.CRITICAL;
+      } else if (details.statusCode && details.statusCode < 500) {
+        severity = HIPAAIncidentSeverity.MEDIUM;
+      }
+
+      // Determine category
+      let category = HIPAAViolationCategory.UNAUTHORIZED_ACCESS;
+      if (details.code?.includes('DISCLOSURE')) {
+        category = HIPAAViolationCategory.PHI_DISCLOSURE;
+      } else if (details.code?.includes('ENCRYPTION')) {
+        category = HIPAAViolationCategory.INSUFFICIENT_ENCRYPTION;
+      } else if (details.code?.includes('AUDIT')) {
+        category = HIPAAViolationCategory.MISSING_AUDIT_LOGS;
+      } else if (details.code?.includes('BAA')) {
+        category = HIPAAViolationCategory.BAA_VIOLATION;
+      }
+
+      // Check if PHI was exposed
+      const phiExposed = details.code?.includes('PHI_') || 
+                        error.message.toLowerCase().includes('patient data') ||
+                        error.message.toLowerCase().includes('medical record');
+
+      // Create HIPAA incident
+      const incident = await hipaaIncidentService.createIncident({
+        timestamp: new Date(),
+        severity,
+        category,
+        description: error.message,
+        phiExposed,
+        userId: context?.userId,
+        ipAddress: context?.ipAddress,
+        endpoint: context?.endpoint,
+        action: context?.method,
+        stackTrace: details.stack,
+        status: 'NEW' as any,
+        reportedToOCR: false,
+        breachNotificationSent: false,
+      });
+
+      // Log reference to HIPAA incident in general error log
+      // This creates a link but does NOT duplicate the incident
+      await prisma.errorLog.create({
+        data: {
+          severity: 'CRITICAL',
+          message: `HIPAA Incident Created: ${incident.incidentNumber}`,
+          code: 'HIPAA_INCIDENT_REFERENCE',
+          statusCode: 500,
+          details: JSON.stringify({
+            hipaaIncidentNumber: incident.incidentNumber,
+            hipaaIncidentId: incident.id,
+            note: 'Full incident details in HIPAA Compliance Dashboard',
+            dashboardUrl: '/admin/hipaa-compliance',
+          }),
+          userId: context?.userId,
+          requestId: context?.requestId,
+          endpoint: context?.endpoint,
+          method: context?.method,
+          userAgent: context?.userAgent,
+          ipAddress: context?.ipAddress,
+          timestamp: new Date(),
+          errorHash: `HIPAA-${incident.incidentNumber}`,
+          occurrenceCount: 1,
+          firstSeen: new Date(),
+          lastSeen: new Date(),
+          isDuplicate: false,
+        },
+      });
+
+      console.error(`✅ HIPAA Incident Created: ${incident.incidentNumber}`);
+      console.error(`📊 View in HIPAA Compliance Dashboard: /admin/hipaa-compliance`);
+      
+    } catch (hipaaError) {
+      console.error('❌ CRITICAL: Failed to create HIPAA incident:', hipaaError);
+      // Still log to general error log as fallback
+      console.error('Original HIPAA error:', error);
     }
   }
 
