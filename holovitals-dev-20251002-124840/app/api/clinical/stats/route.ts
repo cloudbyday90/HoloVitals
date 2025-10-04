@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const patientId = searchParams.get('patientId') || session.user.id;
 
     // Get patient repository
-    const repository = await prisma.patientRepository.findFirst({
+    const repository = await prisma.customerRepository.findFirst({
       where: { userId: patientId },
     });
 
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
       }),
       
       // Active medications
-      prisma.patientMedication.count({
+      prisma.customerMedication.count({
         where: {
           repositoryId: repository.id,
           status: 'ACTIVE',
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
       }),
       
       // Active conditions
-      prisma.patientDiagnosis.count({
+      prisma.customerDiagnosis.count({
         where: {
           repositoryId: repository.id,
           status: 'ACTIVE',
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
       }),
       
       // Allergies
-      prisma.patientAllergy.count({
+      prisma.customerAllergy.count({
         where: {
           repositoryId: repository.id,
         },

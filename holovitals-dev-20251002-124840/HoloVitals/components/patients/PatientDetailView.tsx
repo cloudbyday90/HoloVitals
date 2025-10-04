@@ -95,9 +95,9 @@ export function PatientDetailView({
       setIsLoading(true);
       
       // Load patient details
-      const patientResponse = await fetch(`/api/ehr/patients/${patientId}`);
-      if (patientResponse.ok) {
-        const patientData = await patientResponse.json();
+      const customerResponse = await fetch(`/api/ehr/patients/${patientId}`);
+      if (customerResponse.ok) {
+        const patientData = await customerResponse.json();
         setPatient(patientData.data);
       }
 

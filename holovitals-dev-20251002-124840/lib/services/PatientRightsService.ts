@@ -85,7 +85,7 @@ export class PatientRightsService {
     try {
       // Create access request
       const accessRequest = await prisma.$queryRaw<any[]>`
-        INSERT INTO patient_access_requests (
+        INSERT INTO customer_access_requests (
           patient_id, request_type, specific_records, start_date, end_date,
           delivery_method, delivery_address, status, requested_at
         ) VALUES (
@@ -135,7 +135,7 @@ export class PatientRightsService {
     try {
       // Update request status
       await prisma.$executeRaw`
-        UPDATE patient_access_requests 
+        UPDATE customer_access_requests 
         SET status = 'FULFILLED', fulfilled_at = NOW(), 
             fulfilled_by = ${fulfilledBy}, notes = ${notes}
         WHERE id = ${requestId}
@@ -143,7 +143,7 @@ export class PatientRightsService {
 
       // Get request details
       const request = await prisma.$queryRaw<any[]>`
-        SELECT patient_id FROM patient_access_requests WHERE id = ${requestId}
+        SELECT patient_id FROM customer_access_requests WHERE id = ${requestId}
       `;
 
       if (request.length > 0) {
@@ -174,7 +174,7 @@ export class PatientRightsService {
    */
   async getAccessRequests(patientId: string): Promise<any[]> {
     return prisma.$queryRaw<any[]>`
-      SELECT * FROM patient_access_requests 
+      SELECT * FROM customer_access_requests 
       WHERE patient_id = ${patientId}
       ORDER BY requested_at DESC
     `;
@@ -191,7 +191,7 @@ export class PatientRightsService {
     try {
       // Create amendment request
       const amendmentRequest = await prisma.$queryRaw<any[]>`
-        INSERT INTO patient_amendment_requests (
+        INSERT INTO customer_amendment_requests (
           patient_id, record_id, record_type, current_value,
           proposed_value, reason, status, requested_at
         ) VALUES (
@@ -239,7 +239,7 @@ export class PatientRightsService {
     try {
       // Update request status
       await prisma.$executeRaw`
-        UPDATE patient_amendment_requests 
+        UPDATE customer_amendment_requests 
         SET status = 'APPROVED', reviewed_at = NOW(), 
             reviewed_by = ${approvedBy}, review_notes = ${notes}
         WHERE id = ${requestId}
@@ -248,7 +248,7 @@ export class PatientRightsService {
       // Get request details
       const request = await prisma.$queryRaw<any[]>`
         SELECT patient_id, record_id, proposed_value 
-        FROM patient_amendment_requests WHERE id = ${requestId}
+        FROM customer_amendment_requests WHERE id = ${requestId}
       `;
 
       if (request.length > 0) {
@@ -286,7 +286,7 @@ export class PatientRightsService {
     try {
       // Update request status
       await prisma.$executeRaw`
-        UPDATE patient_amendment_requests 
+        UPDATE customer_amendment_requests 
         SET status = 'DENIED', reviewed_at = NOW(), 
             reviewed_by = ${deniedBy}, review_notes = ${reason}
         WHERE id = ${requestId}
@@ -294,7 +294,7 @@ export class PatientRightsService {
 
       // Get request details
       const request = await prisma.$queryRaw<any[]>`
-        SELECT patient_id FROM patient_amendment_requests WHERE id = ${requestId}
+        SELECT patient_id FROM customer_amendment_requests WHERE id = ${requestId}
       `;
 
       if (request.length > 0) {
@@ -391,7 +391,7 @@ export class PatientRightsService {
     try {
       // Create restriction request
       const restrictionRequest = await prisma.$queryRaw<any[]>`
-        INSERT INTO patient_restriction_requests (
+        INSERT INTO customer_restriction_requests (
           patient_id, restriction_type, data_type, recipient,
           reason, status, requested_at
         ) VALUES (
@@ -438,7 +438,7 @@ export class PatientRightsService {
     try {
       // Update request status
       await prisma.$executeRaw`
-        UPDATE patient_restriction_requests 
+        UPDATE customer_restriction_requests 
         SET status = 'APPROVED', reviewed_at = NOW(), 
             reviewed_by = ${approvedBy}, review_notes = ${notes}
         WHERE id = ${requestId}
@@ -446,7 +446,7 @@ export class PatientRightsService {
 
       // Get request details
       const request = await prisma.$queryRaw<any[]>`
-        SELECT patient_id FROM patient_restriction_requests WHERE id = ${requestId}
+        SELECT patient_id FROM customer_restriction_requests WHERE id = ${requestId}
       `;
 
       if (request.length > 0) {
@@ -485,7 +485,7 @@ export class PatientRightsService {
     try {
       // Create communication request
       const commRequest = await prisma.$queryRaw<any[]>`
-        INSERT INTO patient_communication_requests (
+        INSERT INTO customer_communication_requests (
           patient_id, communication_type, alternative_contact,
           reason, status, requested_at
         ) VALUES (
@@ -532,14 +532,14 @@ export class PatientRightsService {
     try {
       // Update request status
       await prisma.$executeRaw`
-        UPDATE patient_communication_requests 
+        UPDATE customer_communication_requests 
         SET status = 'APPROVED', reviewed_at = NOW(), reviewed_by = ${approvedBy}
         WHERE id = ${requestId}
       `;
 
       // Get request details
       const request = await prisma.$queryRaw<any[]>`
-        SELECT patient_id FROM patient_communication_requests WHERE id = ${requestId}
+        SELECT patient_id FROM customer_communication_requests WHERE id = ${requestId}
       `;
 
       if (request.length > 0) {
@@ -581,25 +581,25 @@ export class PatientRightsService {
     ] = await Promise.all([
       prisma.$queryRaw<any[]>`
         SELECT status, COUNT(*) as count
-        FROM patient_access_requests
+        FROM customer_access_requests
         WHERE requested_at BETWEEN ${startDate} AND ${endDate}
         GROUP BY status
       `,
       prisma.$queryRaw<any[]>`
         SELECT status, COUNT(*) as count
-        FROM patient_amendment_requests
+        FROM customer_amendment_requests
         WHERE requested_at BETWEEN ${startDate} AND ${endDate}
         GROUP BY status
       `,
       prisma.$queryRaw<any[]>`
         SELECT status, COUNT(*) as count
-        FROM patient_restriction_requests
+        FROM customer_restriction_requests
         WHERE requested_at BETWEEN ${startDate} AND ${endDate}
         GROUP BY status
       `,
       prisma.$queryRaw<any[]>`
         SELECT status, COUNT(*) as count
-        FROM patient_communication_requests
+        FROM customer_communication_requests
         WHERE requested_at BETWEEN ${startDate} AND ${endDate}
         GROUP BY status
       `,
@@ -626,4 +626,4 @@ export class PatientRightsService {
 }
 
 // Export singleton instance
-export const patientRights = PatientRightsService.getInstance();
+export const customerRights = PatientRightsService.getInstance();

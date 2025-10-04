@@ -3,7 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { patientRights } from '@/lib/services/PatientRightsService';
+import { customerRights } from '@/lib/services/PatientRightsService';
 
 /**
  * GET /api/patient-rights/disclosures
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const disclosures = await patientRights.requestDisclosureAccounting({
+    const disclosures = await customerRights.requestDisclosureAccounting({
       patientId,
       startDate: new Date(startDate),
       endDate: new Date(endDate),

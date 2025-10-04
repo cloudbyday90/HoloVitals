@@ -18,7 +18,7 @@ model SyncJob {
   userId            String
   
   // Resource info
-  patientId         String?
+  customerId         String?
   resourceType      String?
   resourceIds       String[]        @default([])
   
@@ -241,7 +241,7 @@ model SyncStatistics {
 // PROVIDER-SPECIFIC ID TRACKING
 // ============================================
 
-// Add these fields to existing Patient model
+// Add these fields to existing Customer model
 // epicId            String?         @unique
 // cernerId          String?         @unique
 // meditechId        String?         @unique
@@ -256,11 +256,11 @@ model SyncStatistics {
 // ============================================
 
 // Additional indexes to add to existing models:
-// @@index([epicId]) on Patient
-// @@index([cernerId]) on Patient
-// @@index([meditechId]) on Patient
-// @@index([allscriptsId]) on Patient
-// @@index([nextgenId]) on Patient
-// @@index([athenaId]) on Patient
-// @@index([ecwId]) on Patient
-// @@index([lastSyncedAt]) on Patient
+// @@index([epicId]) on Customer
+// @@index([cernerId]) on Customer
+// @@index([meditechId]) on Customer
+// @@index([allscriptsId]) on Customer
+// @@index([nextgenId]) on Customer
+// @@index([athenaId]) on Customer
+// @@index([ecwId]) on Customer
+// @@index([lastSyncedAt]) on Customer

@@ -20,12 +20,12 @@ export class TrendAnalysisService {
    * Analyze trends for a specific health metric
    */
   async analyzeTrend(
-    patientId: string,
+    customerId: string,
     metric: string,
     timeframe: TimeFrame = '90-days'
   ): Promise<TrendAnalysis> {
     // Fetch historical data
-    const dataPoints = await this.fetchHistoricalData(patientId, metric, timeframe);
+    const dataPoints = await this.fetchHistoricalData(customerId, metric, timeframe);
 
     if (dataPoints.length < 3) {
       throw new Error('Insufficient data points for trend analysis');
@@ -63,12 +63,12 @@ export class TrendAnalysisService {
    * Analyze multiple metrics at once
    */
   async analyzeMultipleTrends(
-    patientId: string,
+    customerId: string,
     metrics: string[],
     timeframe: TimeFrame = '90-days'
   ): Promise<TrendAnalysis[]> {
     const analyses = await Promise.all(
-      metrics.map((metric) => this.analyzeTrend(patientId, metric, timeframe))
+      metrics.map((metric) => this.analyzeTrend(customerId, metric, timeframe))
     );
     return analyses;
   }
@@ -77,7 +77,7 @@ export class TrendAnalysisService {
    * Get trending metrics (metrics with significant changes)
    */
   async getTrendingMetrics(
-    patientId: string,
+    customerId: string,
     timeframe: TimeFrame = '90-days'
   ): Promise<TrendAnalysis[]> {
     const allMetrics = [
@@ -94,7 +94,7 @@ export class TrendAnalysisService {
       'ldl',
     ];
 
-    const analyses = await this.analyzeMultipleTrends(patientId, allMetrics, timeframe);
+    const analyses = await this.analyzeMultipleTrends(customerId, allMetrics, timeframe);
 
     // Filter for significant trends (change rate > 10% or anomalies present)
     return analyses.filter(
@@ -106,7 +106,7 @@ export class TrendAnalysisService {
    * Fetch historical data for a metric
    */
   private async fetchHistoricalData(
-    patientId: string,
+    customerId: string,
     metric: string,
     timeframe: TimeFrame
   ): Promise<TrendDataPoint[]> {
@@ -120,7 +120,7 @@ export class TrendAnalysisService {
     if (this.isVitalSign(metric)) {
       const vitals = await prisma.vitalSigns.findMany({
         where: {
-          patientId,
+          customerId,
           recordedAt: { gte: startDate },
         },
         orderBy: { recordedAt: 'asc' },
@@ -134,7 +134,7 @@ export class TrendAnalysisService {
     else if (this.isLabTest(metric)) {
       const labs = await prisma.labResult.findMany({
         where: {
-          patientId,
+          customerId,
           resultDate: { gte: startDate },
           testName: { contains: metric, mode: 'insensitive' },
         },

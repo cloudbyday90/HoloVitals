@@ -3,7 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { patientRights } from '@/lib/services/PatientRightsService';
+import { customerRights } from '@/lib/services/PatientRightsService';
 
 /**
  * POST /api/patient-rights/restriction
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const requestId = await patientRights.requestRestriction({
+    const requestId = await customerRights.requestRestriction({
       patientId,
       restrictionType,
       dataType,

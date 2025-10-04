@@ -139,8 +139,8 @@ export function useSyncDashboard(
       if (filters.dateTo) {
         params.append('dateTo', filters.dateTo);
       }
-      if (filters.patientId) {
-        params.append('patientId', filters.patientId);
+      if (filters.customerId) {
+        params.append('customerId', filters.customerId);
       }
 
       // Add pagination
@@ -206,7 +206,7 @@ export function useSyncDashboard(
         id: Date.now().toString(),
         type: 'SUCCESS',
         title: 'Sync Started',
-        message: `Sync initiated for ${request.patientIds.length} patient(s)`,
+        message: `Sync initiated for ${request.customerIds.length} customer(s)`,
         timestamp: new Date().toISOString(),
         read: false,
       };

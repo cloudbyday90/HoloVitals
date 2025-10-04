@@ -1,6 +1,6 @@
 /**
  * Consumer-Focused Subscription Plans for HoloVitals
- * Target Audience: Individual patients seeking personal health AI assistant
+ * Target Audience: Individual customers seeking personal health AI assistant
  */
 
 export interface ConsumerPlan {

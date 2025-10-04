@@ -17,19 +17,19 @@ const prisma = new PrismaClient();
 
 export class HealthRiskAssessmentService {
   /**
-   * Generate comprehensive risk assessment for a patient
+   * Generate comprehensive risk assessment for a customer
    */
-  async generateRiskAssessment(patientId: string): Promise<RiskAssessment> {
-    // Fetch patient data
-    const patientData = await this.fetchPatientData(patientId);
+  async generateRiskAssessment(customerId: string): Promise<RiskAssessment> {
+    // Fetch customer data
+    const customerData = await this.fetchPatientData(customerId);
 
     // Assess various health risks
     const risks: HealthRisk[] = [
-      await this.assessCardiovascularRisk(patientData),
-      await this.assessDiabetesRisk(patientData),
-      await this.assessCancerRisk(patientData),
-      await this.assessRespiratoryRisk(patientData),
-      await this.assessMentalHealthRisk(patientData),
+      await this.assessCardiovascularRisk(customerData),
+      await this.assessDiabetesRisk(customerData),
+      await this.assessCancerRisk(customerData),
+      await this.assessRespiratoryRisk(customerData),
+      await this.assessMentalHealthRisk(customerData),
     ].filter((risk) => risk !== null) as HealthRisk[];
 
     // Determine overall risk level
@@ -43,7 +43,7 @@ export class HealthRiskAssessmentService {
 
     return {
       id: `risk-${Date.now()}`,
-      patientId,
+      customerId,
       assessmentDate: new Date(),
       overallRisk,
       risks,
@@ -55,13 +55,13 @@ export class HealthRiskAssessmentService {
   /**
    * Assess cardiovascular disease risk
    */
-  private async assessCardiovascularRisk(patientData: any): Promise<HealthRisk | null> {
+  private async assessCardiovascularRisk(customerData: any): Promise<HealthRisk | null> {
     const riskFactors: RiskFactor[] = [];
     let totalRiskScore = 0;
 
     // Age factor
-    if (patientData.age) {
-      const ageRisk = this.calculateAgeRisk(patientData.age, 'cardiovascular');
+    if (customerData.age) {
+      const ageRisk = this.calculateAgeRisk(customerData.age, 'cardiovascular');
       if (ageRisk) {
         riskFactors.push(ageRisk);
         totalRiskScore += ageRisk.impact;
@@ -69,8 +69,8 @@ export class HealthRiskAssessmentService {
     }
 
     // Blood pressure
-    if (patientData.bloodPressure) {
-      const bpRisk = this.assessBloodPressureRisk(patientData.bloodPressure);
+    if (customerData.bloodPressure) {
+      const bpRisk = this.assessBloodPressureRisk(customerData.bloodPressure);
       if (bpRisk) {
         riskFactors.push(bpRisk);
         totalRiskScore += bpRisk.impact;
@@ -78,8 +78,8 @@ export class HealthRiskAssessmentService {
     }
 
     // Cholesterol
-    if (patientData.cholesterol) {
-      const cholesterolRisk = this.assessCholesterolRisk(patientData.cholesterol);
+    if (customerData.cholesterol) {
+      const cholesterolRisk = this.assessCholesterolRisk(customerData.cholesterol);
       if (cholesterolRisk) {
         riskFactors.push(cholesterolRisk);
         totalRiskScore += cholesterolRisk.impact;
@@ -87,7 +87,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Smoking status
-    if (patientData.smokingStatus === 'current') {
+    if (customerData.smokingStatus === 'current') {
       riskFactors.push({
         name: 'Current Smoker',
         category: 'lifestyle',
@@ -99,8 +99,8 @@ export class HealthRiskAssessmentService {
     }
 
     // BMI
-    if (patientData.bmi) {
-      const bmiRisk = this.assessBMIRisk(patientData.bmi);
+    if (customerData.bmi) {
+      const bmiRisk = this.assessBMIRisk(customerData.bmi);
       if (bmiRisk) {
         riskFactors.push(bmiRisk);
         totalRiskScore += bmiRisk.impact;
@@ -108,7 +108,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Diabetes
-    if (patientData.hasDiabetes) {
+    if (customerData.hasDiabetes) {
       riskFactors.push({
         name: 'Diabetes',
         category: 'medical-history',
@@ -120,7 +120,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Family history
-    if (patientData.familyHistory?.cardiovascular) {
+    if (customerData.familyHistory?.cardiovascular) {
       riskFactors.push({
         name: 'Family History of Heart Disease',
         category: 'family-history',
@@ -159,12 +159,12 @@ export class HealthRiskAssessmentService {
   /**
    * Assess diabetes risk
    */
-  private async assessDiabetesRisk(patientData: any): Promise<HealthRisk | null> {
+  private async assessDiabetesRisk(customerData: any): Promise<HealthRisk | null> {
     const riskFactors: RiskFactor[] = [];
     let totalRiskScore = 0;
 
     // Age factor
-    if (patientData.age && patientData.age >= 45) {
+    if (customerData.age && customerData.age >= 45) {
       riskFactors.push({
         name: 'Age ≥45',
         category: 'age',
@@ -176,15 +176,15 @@ export class HealthRiskAssessmentService {
     }
 
     // BMI
-    if (patientData.bmi && patientData.bmi >= 25) {
-      const severity = patientData.bmi >= 30 ? 'high' : 'moderate';
-      const impact = patientData.bmi >= 30 ? 25 : 15;
+    if (customerData.bmi && customerData.bmi >= 25) {
+      const severity = customerData.bmi >= 30 ? 'high' : 'moderate';
+      const impact = customerData.bmi >= 30 ? 25 : 15;
       riskFactors.push({
         name: 'Overweight/Obesity',
         category: 'lifestyle',
         severity,
         modifiable: true,
-        currentValue: `${patientData.bmi} kg/m²`,
+        currentValue: `${customerData.bmi} kg/m²`,
         targetValue: '<25 kg/m²',
         impact,
       });
@@ -192,14 +192,14 @@ export class HealthRiskAssessmentService {
     }
 
     // Fasting glucose
-    if (patientData.fastingGlucose) {
-      if (patientData.fastingGlucose >= 100 && patientData.fastingGlucose < 126) {
+    if (customerData.fastingGlucose) {
+      if (customerData.fastingGlucose >= 100 && customerData.fastingGlucose < 126) {
         riskFactors.push({
           name: 'Prediabetes (Impaired Fasting Glucose)',
           category: 'lab-results',
           severity: 'high',
           modifiable: true,
-          currentValue: `${patientData.fastingGlucose} mg/dL`,
+          currentValue: `${customerData.fastingGlucose} mg/dL`,
           targetValue: '<100 mg/dL',
           impact: 30,
         });
@@ -208,14 +208,14 @@ export class HealthRiskAssessmentService {
     }
 
     // HbA1c
-    if (patientData.hba1c) {
-      if (patientData.hba1c >= 5.7 && patientData.hba1c < 6.5) {
+    if (customerData.hba1c) {
+      if (customerData.hba1c >= 5.7 && customerData.hba1c < 6.5) {
         riskFactors.push({
           name: 'Prediabetes (Elevated HbA1c)',
           category: 'lab-results',
           severity: 'high',
           modifiable: true,
-          currentValue: `${patientData.hba1c}%`,
+          currentValue: `${customerData.hba1c}%`,
           targetValue: '<5.7%',
           impact: 30,
         });
@@ -224,7 +224,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Physical inactivity
-    if (patientData.physicalActivity === 'sedentary') {
+    if (customerData.physicalActivity === 'sedentary') {
       riskFactors.push({
         name: 'Physical Inactivity',
         category: 'lifestyle',
@@ -236,7 +236,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Family history
-    if (patientData.familyHistory?.diabetes) {
+    if (customerData.familyHistory?.diabetes) {
       riskFactors.push({
         name: 'Family History of Diabetes',
         category: 'family-history',
@@ -248,7 +248,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Hypertension
-    if (patientData.hasHypertension) {
+    if (customerData.hasHypertension) {
       riskFactors.push({
         name: 'Hypertension',
         category: 'medical-history',
@@ -286,12 +286,12 @@ export class HealthRiskAssessmentService {
   /**
    * Assess cancer risk
    */
-  private async assessCancerRisk(patientData: any): Promise<HealthRisk | null> {
+  private async assessCancerRisk(customerData: any): Promise<HealthRisk | null> {
     const riskFactors: RiskFactor[] = [];
     let totalRiskScore = 0;
 
     // Age factor
-    if (patientData.age && patientData.age >= 50) {
+    if (customerData.age && customerData.age >= 50) {
       riskFactors.push({
         name: 'Age ≥50',
         category: 'age',
@@ -303,7 +303,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Smoking
-    if (patientData.smokingStatus === 'current') {
+    if (customerData.smokingStatus === 'current') {
       riskFactors.push({
         name: 'Current Smoker',
         category: 'lifestyle',
@@ -312,7 +312,7 @@ export class HealthRiskAssessmentService {
         impact: 35,
       });
       totalRiskScore += 35;
-    } else if (patientData.smokingStatus === 'former') {
+    } else if (customerData.smokingStatus === 'former') {
       riskFactors.push({
         name: 'Former Smoker',
         category: 'lifestyle',
@@ -324,7 +324,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Family history
-    if (patientData.familyHistory?.cancer) {
+    if (customerData.familyHistory?.cancer) {
       riskFactors.push({
         name: 'Family History of Cancer',
         category: 'family-history',
@@ -336,7 +336,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Obesity
-    if (patientData.bmi && patientData.bmi >= 30) {
+    if (customerData.bmi && customerData.bmi >= 30) {
       riskFactors.push({
         name: 'Obesity',
         category: 'lifestyle',
@@ -348,7 +348,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Alcohol consumption
-    if (patientData.alcoholConsumption === 'heavy') {
+    if (customerData.alcoholConsumption === 'heavy') {
       riskFactors.push({
         name: 'Heavy Alcohol Consumption',
         category: 'lifestyle',
@@ -386,12 +386,12 @@ export class HealthRiskAssessmentService {
   /**
    * Assess respiratory disease risk
    */
-  private async assessRespiratoryRisk(patientData: any): Promise<HealthRisk | null> {
+  private async assessRespiratoryRisk(customerData: any): Promise<HealthRisk | null> {
     const riskFactors: RiskFactor[] = [];
     let totalRiskScore = 0;
 
     // Smoking
-    if (patientData.smokingStatus === 'current') {
+    if (customerData.smokingStatus === 'current') {
       riskFactors.push({
         name: 'Current Smoker',
         category: 'lifestyle',
@@ -403,7 +403,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Occupational exposure
-    if (patientData.occupationalExposure) {
+    if (customerData.occupationalExposure) {
       riskFactors.push({
         name: 'Occupational Exposure to Pollutants',
         category: 'environmental',
@@ -415,7 +415,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Asthma history
-    if (patientData.hasAsthma) {
+    if (customerData.hasAsthma) {
       riskFactors.push({
         name: 'History of Asthma',
         category: 'medical-history',
@@ -427,7 +427,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Family history
-    if (patientData.familyHistory?.respiratory) {
+    if (customerData.familyHistory?.respiratory) {
       riskFactors.push({
         name: 'Family History of Respiratory Disease',
         category: 'family-history',
@@ -465,12 +465,12 @@ export class HealthRiskAssessmentService {
   /**
    * Assess mental health risk
    */
-  private async assessMentalHealthRisk(patientData: any): Promise<HealthRisk | null> {
+  private async assessMentalHealthRisk(customerData: any): Promise<HealthRisk | null> {
     const riskFactors: RiskFactor[] = [];
     let totalRiskScore = 0;
 
     // Stress level
-    if (patientData.stressLevel === 'high') {
+    if (customerData.stressLevel === 'high') {
       riskFactors.push({
         name: 'High Stress Level',
         category: 'lifestyle',
@@ -482,7 +482,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Sleep quality
-    if (patientData.sleepQuality === 'poor') {
+    if (customerData.sleepQuality === 'poor') {
       riskFactors.push({
         name: 'Poor Sleep Quality',
         category: 'lifestyle',
@@ -494,7 +494,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Social isolation
-    if (patientData.socialIsolation) {
+    if (customerData.socialIsolation) {
       riskFactors.push({
         name: 'Social Isolation',
         category: 'lifestyle',
@@ -506,7 +506,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Family history
-    if (patientData.familyHistory?.mentalHealth) {
+    if (customerData.familyHistory?.mentalHealth) {
       riskFactors.push({
         name: 'Family History of Mental Health Conditions',
         category: 'family-history',
@@ -518,7 +518,7 @@ export class HealthRiskAssessmentService {
     }
 
     // Chronic pain
-    if (patientData.hasChronicPain) {
+    if (customerData.hasChronicPain) {
       riskFactors.push({
         name: 'Chronic Pain',
         category: 'medical-history',
@@ -557,10 +557,10 @@ export class HealthRiskAssessmentService {
    * Helper methods
    */
 
-  private async fetchPatientData(patientId: string): Promise<any> {
-    // Fetch comprehensive patient data from database
-    const patient = await prisma.patient.findUnique({
-      where: { id: patientId },
+  private async fetchPatientData(customerId: string): Promise<any> {
+    // Fetch comprehensive customer data from database
+    const customer = await prisma.customer.findUnique({
+      where: { id: customerId },
       include: {
         vitalSigns: {
           orderBy: { recordedAt: 'desc' },
@@ -578,34 +578,34 @@ export class HealthRiskAssessmentService {
       },
     });
 
-    if (!patient) {
-      throw new Error('Patient not found');
+    if (!customer) {
+      throw new Error('Customer not found');
     }
 
     // Extract and process relevant data
-    const latestVitals = patient.vitalSigns[0];
-    const labResults = patient.labResults;
+    const latestVitals = customer.vitalSigns[0];
+    const labResults = customer.labResults;
 
     return {
-      age: this.calculateAge(patient.dateOfBirth),
-      gender: patient.gender,
+      age: this.calculateAge(customer.dateOfBirth),
+      gender: customer.gender,
       bloodPressure: latestVitals?.bloodPressure,
       bmi: latestVitals?.bmi,
       cholesterol: this.getLatestLabValue(labResults, 'cholesterol'),
       fastingGlucose: this.getLatestLabValue(labResults, 'glucose'),
       hba1c: this.getLatestLabValue(labResults, 'hba1c'),
-      smokingStatus: patient.smokingStatus,
-      alcoholConsumption: patient.alcoholConsumption,
-      physicalActivity: patient.physicalActivity,
-      stressLevel: patient.stressLevel,
-      sleepQuality: patient.sleepQuality,
-      socialIsolation: patient.socialIsolation,
-      hasDiabetes: patient.conditions.some((c) => c.code?.includes('E11')),
-      hasHypertension: patient.conditions.some((c) => c.code?.includes('I10')),
-      hasAsthma: patient.conditions.some((c) => c.code?.includes('J45')),
-      hasChronicPain: patient.conditions.some((c) => c.description?.toLowerCase().includes('pain')),
-      occupationalExposure: patient.occupationalExposure,
-      familyHistory: patient.familyHistory,
+      smokingStatus: customer.smokingStatus,
+      alcoholConsumption: customer.alcoholConsumption,
+      physicalActivity: customer.physicalActivity,
+      stressLevel: customer.stressLevel,
+      sleepQuality: customer.sleepQuality,
+      socialIsolation: customer.socialIsolation,
+      hasDiabetes: customer.conditions.some((c) => c.code?.includes('E11')),
+      hasHypertension: customer.conditions.some((c) => c.code?.includes('I10')),
+      hasAsthma: customer.conditions.some((c) => c.code?.includes('J45')),
+      hasChronicPain: customer.conditions.some((c) => c.description?.toLowerCase().includes('pain')),
+      occupationalExposure: customer.occupationalExposure,
+      familyHistory: customer.familyHistory,
     };
   }
 

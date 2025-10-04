@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 
 /**
  * GET /api/clinical/conditions
- * Fetch conditions/diagnoses for the authenticated patient
+ * Fetch conditions/diagnoses for the authenticated customer
  */
 export async function GET(request: NextRequest) {
   try {
@@ -18,13 +18,13 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const patientId = searchParams.get('patientId') || session.user.id;
+    const customerId = searchParams.get('customerId') || session.user.id;
     const status = searchParams.get('status');
 
     // Build where clause
     const where: any = {
       repository: {
-        userId: patientId,
+        userId: customerId,
       },
     };
 
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch conditions
-    const conditions = await prisma.patientDiagnosis.findMany({
+    const conditions = await prisma.customerDiagnosis.findMany({
       where,
       include: {
         repository: {
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     // Transform to API format
     const transformedConditions = conditions.map((condition) => ({
       id: condition.id,
-      patientId,
+      customerId,
       condition: condition.condition,
       icd10Code: condition.icd10Code,
       category: 'diagnosis',

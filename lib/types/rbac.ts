@@ -10,8 +10,8 @@
 export enum UserRole {
   OWNER = 'OWNER',           // Platform owner - full access
   ADMIN = 'ADMIN',           // System administrator - most access
-  DOCTOR = 'DOCTOR',         // Medical professional - patient data access
-  PATIENT = 'PATIENT',       // End user - own data only
+  DOCTOR = 'DOCTOR',         // Medical professional - customer data access
+  CUSTOMER = 'CUSTOMER',       // End user - own data only
   SUPPORT = 'SUPPORT',       // Customer support - limited access
   ANALYST = 'ANALYST',       // Data analyst - anonymized data only
 }
@@ -48,7 +48,7 @@ export enum Permission {
   MANAGE_QUEUE = 'MANAGE_QUEUE',
   CANCEL_ANY_TASK = 'CANCEL_ANY_TASK',
   
-  // Patient Data Permissions
+  // Customer Data Permissions
   VIEW_OWN_DATA = 'VIEW_OWN_DATA',
   VIEW_PATIENT_DATA = 'VIEW_PATIENT_DATA',
   MANAGE_OWN_DATA = 'MANAGE_OWN_DATA',
@@ -106,7 +106,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     Permission.MANAGE_QUEUE,
     Permission.CANCEL_ANY_TASK,
     
-    // Patient Data
+    // Customer Data
     Permission.VIEW_OWN_DATA,
     Permission.VIEW_PATIENT_DATA,
     Permission.MANAGE_OWN_DATA,
@@ -153,7 +153,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     Permission.MANAGE_QUEUE,
     Permission.CANCEL_ANY_TASK,
     
-    // Patient Data
+    // Customer Data
     Permission.VIEW_PATIENT_DATA,
     Permission.MANAGE_PATIENT_DATA,
     
@@ -169,9 +169,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     Permission.VIEW_DETAILED_ANALYTICS,
   ],
   
-  // DOCTOR - Patient care focused
+  // DOCTOR - Customer care focused
   [UserRole.DOCTOR]: [
-    // Patient Data
+    // Customer Data
     Permission.VIEW_OWN_DATA,
     Permission.VIEW_PATIENT_DATA,
     Permission.MANAGE_OWN_DATA,
@@ -189,8 +189,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     Permission.PROVISION_INSTANCES,
   ],
   
-  // PATIENT - Own data only
-  [UserRole.PATIENT]: [
+  // CUSTOMER - Own data only
+  [UserRole.CUSTOMER]: [
     // Own Data Only
     Permission.VIEW_OWN_DATA,
     Permission.MANAGE_OWN_DATA,
@@ -210,7 +210,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     // Limited User Access
     Permission.VIEW_ALL_USERS,
     
-    // Limited Patient Data (with consent)
+    // Limited Customer Data (with consent)
     Permission.VIEW_PATIENT_DATA,
     
     // Documents (view only)
@@ -237,7 +237,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
 
 export enum ResourceType {
   USER = 'USER',
-  PATIENT = 'PATIENT',
+  CUSTOMER = 'CUSTOMER',
   DOCUMENT = 'DOCUMENT',
   CONVERSATION = 'CONVERSATION',
   TASK = 'TASK',
@@ -304,7 +304,7 @@ export const ROLE_HIERARCHY: RoleHierarchy = {
   [UserRole.DOCTOR]: 60,
   [UserRole.SUPPORT]: 40,
   [UserRole.ANALYST]: 30,
-  [UserRole.PATIENT]: 20,
+  [UserRole.CUSTOMER]: 20,
 };
 
 // ============================================================================

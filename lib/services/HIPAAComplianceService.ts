@@ -37,7 +37,7 @@ export interface AuditLogEntry {
   outcomeReason?: string;
   errorMessage?: string;
   phiAccessed?: boolean;
-  patientId?: string;
+  customerId?: string;
   accessReason?: string;
   dataAccessed?: string[];
   requestId?: string;
@@ -57,7 +57,7 @@ export interface AccessControlCheck {
   resourceId: string;
   action: string;
   context?: {
-    patientId?: string;
+    customerId?: string;
     departmentId?: string;
     organizationId?: string;
     emergency?: boolean;
@@ -88,7 +88,7 @@ export interface BreachNotification {
   dataTypes: string[];
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   riskAssessment: string;
-  affectedPatientIds: string[];
+  affectedCustomerIds: string[];
   affectedUserIds: string[];
 }
 
@@ -160,7 +160,7 @@ export class HIPAAComplianceService {
           outcomeReason: entry.outcomeReason,
           errorMessage: entry.errorMessage,
           phiAccessed: entry.phiAccessed || false,
-          patientId: entry.patientId,
+          customerId: entry.customerId,
           accessReason: entry.accessReason,
           dataAccessed: entry.dataAccessed,
           requestId: entry.requestId,
@@ -189,7 +189,7 @@ export class HIPAAComplianceService {
   async logPHIAccess(params: {
     userId: string;
     userRole: string;
-    patientId: string;
+    customerId: string;
     dataAccessed: string[];
     accessReason: string;
     sessionId?: string;
@@ -204,14 +204,14 @@ export class HIPAAComplianceService {
       action: 'VIEW_PHI',
       outcome: 'SUCCESS',
       phiAccessed: true,
-      patientId: params.patientId,
+      customerId: params.customerId,
       accessReason: params.accessReason,
       dataAccessed: params.dataAccessed,
       sessionId: params.sessionId,
       ipAddress: params.ipAddress,
       userAgent: params.userAgent,
       resourceType: 'PATIENT_RECORD',
-      resourceId: params.patientId,
+      resourceId: params.customerId,
       riskLevel: 'MEDIUM',
     });
   }
@@ -278,7 +278,7 @@ export class HIPAAComplianceService {
    */
   async queryAuditLogs(filters: {
     userId?: string;
-    patientId?: string;
+    customerId?: string;
     eventType?: string;
     eventCategory?: string;
     startDate?: Date;
@@ -291,7 +291,7 @@ export class HIPAAComplianceService {
     const where: any = {};
 
     if (filters.userId) where.userId = filters.userId;
-    if (filters.patientId) where.patientId = filters.patientId;
+    if (filters.customerId) where.customerId = filters.customerId;
     if (filters.eventType) where.eventType = filters.eventType;
     if (filters.eventCategory) where.eventCategory = filters.eventCategory;
     if (filters.outcome) where.outcome = filters.outcome;
@@ -453,7 +453,7 @@ export class HIPAAComplianceService {
     resourceType: string;
     resourceId: string;
     reason: string;
-    patientId?: string;
+    customerId?: string;
   }): Promise<string> {
     const accessRequest = await prisma.accessRequest.create({
       data: {
@@ -486,7 +486,7 @@ export class HIPAAComplianceService {
       resourceType: params.resourceType,
       resourceId: params.resourceId,
       outcome: 'SUCCESS',
-      patientId: params.patientId,
+      customerId: params.customerId,
       accessReason: params.reason,
       riskLevel: 'HIGH',
       metadata: {
@@ -567,7 +567,7 @@ export class HIPAAComplianceService {
    */
   async detectBreach(params: {
     userId?: string;
-    patientId?: string;
+    customerId?: string;
     eventType: string;
     indicators: any;
   }): Promise<boolean> {
@@ -585,7 +585,7 @@ export class HIPAAComplianceService {
           source: 'breach_detection',
           userId: params.userId,
           resourceType: 'PATIENT_RECORD',
-          resourceId: params.patientId,
+          resourceId: params.customerId,
           indicators: params.indicators,
           status: 'NEW',
         },
@@ -613,7 +613,7 @@ export class HIPAAComplianceService {
         dataTypes: notification.dataTypes,
         riskLevel: notification.riskLevel as any,
         riskAssessment: notification.riskAssessment,
-        affectedPatientIds: notification.affectedPatientIds,
+        affectedCustomerIds: notification.affectedCustomerIds,
         affectedUserIds: notification.affectedUserIds,
         notificationStatus: 'PENDING',
         investigationStatus: 'ONGOING',

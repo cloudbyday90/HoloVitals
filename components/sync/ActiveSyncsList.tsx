@@ -139,7 +139,7 @@ export function ActiveSyncsList({
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">
-                        {sync.patientName || `Patient ${sync.patientId.slice(0, 8)}`}
+                        {sync.customerName || `Customer ${sync.customerId.slice(0, 8)}`}
                       </span>
                       <Badge variant="outline" className="text-xs">
                         {sync.ehrProvider}

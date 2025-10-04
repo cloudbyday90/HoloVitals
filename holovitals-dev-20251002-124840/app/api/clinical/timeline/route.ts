@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '100');
 
     // Fetch patient repository
-    const repository = await prisma.patientRepository.findFirst({
+    const repository = await prisma.customerRepository.findFirst({
       where: { userId: patientId },
     });
 
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch medications
     if (!eventTypes || eventTypes.includes(TimelineEventType.MEDICATION)) {
-      const medications = await prisma.patientMedication.findMany({
+      const medications = await prisma.customerMedication.findMany({
         where: {
           repositoryId: repository.id,
           ...(startDate && { startDate: { gte: new Date(startDate) } }),
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch diagnoses
     if (!eventTypes || eventTypes.includes(TimelineEventType.DIAGNOSIS)) {
-      const diagnoses = await prisma.patientDiagnosis.findMany({
+      const diagnoses = await prisma.customerDiagnosis.findMany({
         where: {
           repositoryId: repository.id,
           ...(startDate && { diagnosedDate: { gte: new Date(startDate) } }),
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch procedures
     if (!eventTypes || eventTypes.includes(TimelineEventType.PROCEDURE)) {
-      const procedures = await prisma.patientProcedure.findMany({
+      const procedures = await prisma.customerProcedure.findMany({
         where: {
           repositoryId: repository.id,
           ...(startDate && { date: { gte: new Date(startDate) } }),
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch immunizations
     if (!eventTypes || eventTypes.includes(TimelineEventType.IMMUNIZATION)) {
-      const immunizations = await prisma.patientImmunization.findMany({
+      const immunizations = await prisma.customerImmunization.findMany({
         where: {
           repositoryId: repository.id,
           ...(startDate && { date: { gte: new Date(startDate) } }),
@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch allergies
     if (!eventTypes || eventTypes.includes(TimelineEventType.ALLERGY)) {
-      const allergies = await prisma.patientAllergy.findMany({
+      const allergies = await prisma.customerAllergy.findMany({
         where: {
           repositoryId: repository.id,
           ...(startDate && endDate && {

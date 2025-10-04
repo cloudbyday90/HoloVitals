@@ -19,35 +19,35 @@ const prisma = new PrismaClient();
 
 export class PersonalizedRecommendationsService {
   /**
-   * Generate personalized recommendations for a patient
+   * Generate personalized recommendations for a customer
    */
-  async generateRecommendations(patientId: string): Promise<PersonalizedRecommendations> {
-    // Fetch patient data
-    const patientData = await this.fetchPatientData(patientId);
+  async generateRecommendations(customerId: string): Promise<PersonalizedRecommendations> {
+    // Fetch customer data
+    const customerData = await this.fetchPatientData(customerId);
 
     // Generate recommendations by category
     const categories: RecommendationCategory[] = [
-      await this.generateLifestyleRecommendations(patientData),
-      await this.generateNutritionRecommendations(patientData),
-      await this.generateExerciseRecommendations(patientData),
-      await this.generateSleepRecommendations(patientData),
-      await this.generateStressManagementRecommendations(patientData),
-      await this.generatePreventiveCareRecommendations(patientData),
-      await this.generateMedicationAdherenceRecommendations(patientData),
-      await this.generateMonitoringRecommendations(patientData),
+      await this.generateLifestyleRecommendations(customerData),
+      await this.generateNutritionRecommendations(customerData),
+      await this.generateExerciseRecommendations(customerData),
+      await this.generateSleepRecommendations(customerData),
+      await this.generateStressManagementRecommendations(customerData),
+      await this.generatePreventiveCareRecommendations(customerData),
+      await this.generateMedicationAdherenceRecommendations(customerData),
+      await this.generateMonitoringRecommendations(customerData),
     ].filter((cat) => cat.recommendations.length > 0);
 
     // Extract priority actions
     const priorityActions = this.extractPriorityActions(categories);
 
     // Generate long-term goals
-    const longTermGoals = this.generateLongTermGoals(patientData, categories);
+    const longTermGoals = this.generateLongTermGoals(customerData, categories);
 
     // Curate resources
     const resources = this.curateResources(categories);
 
     return {
-      patientId,
+      customerId,
       generatedDate: new Date(),
       categories,
       priorityActions,
@@ -95,12 +95,12 @@ export class PersonalizedRecommendationsService {
    * Generate lifestyle recommendations
    */
   private async generateLifestyleRecommendations(
-    patientData: any
+    customerData: any
   ): Promise<RecommendationCategory> {
     const recommendations: Recommendation[] = [];
 
     // Smoking cessation
-    if (patientData.smokingStatus === 'current') {
+    if (customerData.smokingStatus === 'current') {
       recommendations.push({
         id: 'lifestyle-smoking-1',
         title: 'Quit Smoking',
@@ -128,7 +128,7 @@ export class PersonalizedRecommendationsService {
     }
 
     // Alcohol moderation
-    if (patientData.alcoholConsumption === 'heavy') {
+    if (customerData.alcoholConsumption === 'heavy') {
       recommendations.push({
         id: 'lifestyle-alcohol-1',
         title: 'Reduce Alcohol Consumption',
@@ -155,14 +155,14 @@ export class PersonalizedRecommendationsService {
     }
 
     // Weight management
-    if (patientData.bmi >= 25) {
-      const targetWeightLoss = patientData.bmi >= 30 ? '10%' : '5-7%';
+    if (customerData.bmi >= 25) {
+      const targetWeightLoss = customerData.bmi >= 30 ? '10%' : '5-7%';
       recommendations.push({
         id: 'lifestyle-weight-1',
         title: 'Achieve Healthy Weight',
-        description: `Your BMI is ${patientData.bmi.toFixed(1)}, which is above the healthy range. Losing ${targetWeightLoss} of body weight can significantly improve health.`,
+        description: `Your BMI is ${customerData.bmi.toFixed(1)}, which is above the healthy range. Losing ${targetWeightLoss} of body weight can significantly improve health.`,
         category: 'lifestyle',
-        priority: patientData.bmi >= 30 ? 'high' : 'medium',
+        priority: customerData.bmi >= 30 ? 'high' : 'medium',
         actionable: true,
         steps: [
           'Set realistic weight loss goal (1-2 lbs per week)',
@@ -194,12 +194,12 @@ export class PersonalizedRecommendationsService {
    * Generate nutrition recommendations
    */
   private async generateNutritionRecommendations(
-    patientData: any
+    customerData: any
   ): Promise<RecommendationCategory> {
     const recommendations: Recommendation[] = [];
 
     // Heart-healthy diet
-    if (patientData.cholesterol > 200 || patientData.hasCardiovascularRisk) {
+    if (customerData.cholesterol > 200 || customerData.hasCardiovascularRisk) {
       recommendations.push({
         id: 'nutrition-heart-1',
         title: 'Adopt Heart-Healthy Diet',
@@ -228,7 +228,7 @@ export class PersonalizedRecommendationsService {
     }
 
     // Diabetes-friendly diet
-    if (patientData.hasDiabetes || patientData.hasPrediabetes) {
+    if (customerData.hasDiabetes || customerData.hasPrediabetes) {
       recommendations.push({
         id: 'nutrition-diabetes-1',
         title: 'Follow Diabetes-Friendly Diet',
@@ -294,12 +294,12 @@ export class PersonalizedRecommendationsService {
    * Generate exercise recommendations
    */
   private async generateExerciseRecommendations(
-    patientData: any
+    customerData: any
   ): Promise<RecommendationCategory> {
     const recommendations: Recommendation[] = [];
 
     // Aerobic exercise
-    if (patientData.physicalActivity === 'sedentary' || patientData.physicalActivity === 'light') {
+    if (customerData.physicalActivity === 'sedentary' || customerData.physicalActivity === 'light') {
       recommendations.push({
         id: 'exercise-aerobic-1',
         title: 'Start Regular Aerobic Exercise',
@@ -354,7 +354,7 @@ export class PersonalizedRecommendationsService {
     });
 
     // Flexibility and balance
-    if (patientData.age >= 65) {
+    if (customerData.age >= 65) {
       recommendations.push({
         id: 'exercise-balance-1',
         title: 'Improve Balance and Flexibility',
@@ -392,11 +392,11 @@ export class PersonalizedRecommendationsService {
    * Generate sleep recommendations
    */
   private async generateSleepRecommendations(
-    patientData: any
+    customerData: any
   ): Promise<RecommendationCategory> {
     const recommendations: Recommendation[] = [];
 
-    if (patientData.sleepQuality === 'poor' || patientData.sleepHours < 7) {
+    if (customerData.sleepQuality === 'poor' || customerData.sleepHours < 7) {
       recommendations.push({
         id: 'sleep-hygiene-1',
         title: 'Improve Sleep Quality',
@@ -436,11 +436,11 @@ export class PersonalizedRecommendationsService {
    * Generate stress management recommendations
    */
   private async generateStressManagementRecommendations(
-    patientData: any
+    customerData: any
   ): Promise<RecommendationCategory> {
     const recommendations: Recommendation[] = [];
 
-    if (patientData.stressLevel === 'high') {
+    if (customerData.stressLevel === 'high') {
       recommendations.push({
         id: 'stress-management-1',
         title: 'Reduce Stress Levels',
@@ -479,11 +479,11 @@ export class PersonalizedRecommendationsService {
    * Generate preventive care recommendations
    */
   private async generatePreventiveCareRecommendations(
-    patientData: any
+    customerData: any
   ): Promise<RecommendationCategory> {
     const recommendations: Recommendation[] = [];
-    const age = patientData.age;
-    const gender = patientData.gender;
+    const age = customerData.age;
+    const gender = customerData.gender;
 
     // Colorectal cancer screening
     if (age >= 45 && age <= 75) {
@@ -575,11 +575,11 @@ export class PersonalizedRecommendationsService {
    * Generate medication adherence recommendations
    */
   private async generateMedicationAdherenceRecommendations(
-    patientData: any
+    customerData: any
   ): Promise<RecommendationCategory> {
     const recommendations: Recommendation[] = [];
 
-    if (patientData.medications && patientData.medications.length > 0) {
+    if (customerData.medications && customerData.medications.length > 0) {
       recommendations.push({
         id: 'medication-adherence-1',
         title: 'Take Medications as Prescribed',
@@ -618,12 +618,12 @@ export class PersonalizedRecommendationsService {
    * Generate monitoring recommendations
    */
   private async generateMonitoringRecommendations(
-    patientData: any
+    customerData: any
   ): Promise<RecommendationCategory> {
     const recommendations: Recommendation[] = [];
 
     // Blood pressure monitoring
-    if (patientData.hasHypertension || patientData.bloodPressure > 130) {
+    if (customerData.hasHypertension || customerData.bloodPressure > 130) {
       recommendations.push({
         id: 'monitoring-bp-1',
         title: 'Monitor Blood Pressure at Home',
@@ -651,7 +651,7 @@ export class PersonalizedRecommendationsService {
     }
 
     // Blood glucose monitoring
-    if (patientData.hasDiabetes) {
+    if (customerData.hasDiabetes) {
       recommendations.push({
         id: 'monitoring-glucose-1',
         title: 'Monitor Blood Glucose Regularly',
@@ -689,9 +689,9 @@ export class PersonalizedRecommendationsService {
    * Helper methods
    */
 
-  private async fetchPatientData(patientId: string): Promise<any> {
-    const patient = await prisma.patient.findUnique({
-      where: { id: patientId },
+  private async fetchPatientData(customerId: string): Promise<any> {
+    const customer = await prisma.customer.findUnique({
+      where: { id: customerId },
       include: {
         vitalSigns: {
           orderBy: { recordedAt: 'desc' },
@@ -710,30 +710,30 @@ export class PersonalizedRecommendationsService {
       },
     });
 
-    if (!patient) {
-      throw new Error('Patient not found');
+    if (!customer) {
+      throw new Error('Customer not found');
     }
 
-    const latestVitals = patient.vitalSigns[0];
-    const age = this.calculateAge(patient.dateOfBirth);
+    const latestVitals = customer.vitalSigns[0];
+    const age = this.calculateAge(customer.dateOfBirth);
 
     return {
       age,
-      gender: patient.gender,
+      gender: customer.gender,
       bmi: latestVitals?.bmi,
       bloodPressure: latestVitals?.bloodPressureSystolic,
-      cholesterol: this.getLatestLabValue(patient.labResults, 'cholesterol'),
-      hasDiabetes: patient.conditions.some((c) => c.code?.includes('E11')),
-      hasPrediabetes: this.getLatestLabValue(patient.labResults, 'hba1c') >= 5.7,
-      hasHypertension: patient.conditions.some((c) => c.code?.includes('I10')),
-      hasCardiovascularRisk: patient.conditions.some((c) => c.code?.includes('I')),
-      smokingStatus: patient.smokingStatus,
-      alcoholConsumption: patient.alcoholConsumption,
-      physicalActivity: patient.physicalActivity,
-      sleepQuality: patient.sleepQuality,
-      sleepHours: patient.sleepHours,
-      stressLevel: patient.stressLevel,
-      medications: patient.medications,
+      cholesterol: this.getLatestLabValue(customer.labResults, 'cholesterol'),
+      hasDiabetes: customer.conditions.some((c) => c.code?.includes('E11')),
+      hasPrediabetes: this.getLatestLabValue(customer.labResults, 'hba1c') >= 5.7,
+      hasHypertension: customer.conditions.some((c) => c.code?.includes('I10')),
+      hasCardiovascularRisk: customer.conditions.some((c) => c.code?.includes('I')),
+      smokingStatus: customer.smokingStatus,
+      alcoholConsumption: customer.alcoholConsumption,
+      physicalActivity: customer.physicalActivity,
+      sleepQuality: customer.sleepQuality,
+      sleepHours: customer.sleepHours,
+      stressLevel: customer.stressLevel,
+      medications: customer.medications,
     };
   }
 
@@ -769,15 +769,15 @@ export class PersonalizedRecommendationsService {
   }
 
   private generateLongTermGoals(
-    patientData: any,
+    customerData: any,
     categories: RecommendationCategory[]
   ): Goal[] {
     const goals: Goal[] = [];
 
     // Weight loss goal
-    if (patientData.bmi >= 25) {
+    if (customerData.bmi >= 25) {
       const targetBMI = 24.9;
-      const currentWeight = patientData.bmi * 0.45; // Simplified calculation
+      const currentWeight = customerData.bmi * 0.45; // Simplified calculation
       const targetWeight = targetBMI * 0.45;
       const weightLoss = currentWeight - targetWeight;
 
@@ -809,7 +809,7 @@ export class PersonalizedRecommendationsService {
     }
 
     // Exercise goal
-    if (patientData.physicalActivity === 'sedentary') {
+    if (customerData.physicalActivity === 'sedentary') {
       goals.push({
         id: 'goal-exercise-1',
         title: 'Establish Regular Exercise Routine',
@@ -838,7 +838,7 @@ export class PersonalizedRecommendationsService {
     }
 
     // Diabetes prevention goal
-    if (patientData.hasPrediabetes) {
+    if (customerData.hasPrediabetes) {
       goals.push({
         id: 'goal-diabetes-1',
         title: 'Prevent Type 2 Diabetes',

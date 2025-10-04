@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 
 /**
  * GET /api/clinical/stats
- * Fetch dashboard statistics for the authenticated patient
+ * Fetch dashboard statistics for the authenticated customer
  */
 export async function GET(request: NextRequest) {
   try {
@@ -18,11 +18,11 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const patientId = searchParams.get('patientId') || session.user.id;
+    const customerId = searchParams.get('customerId') || session.user.id;
 
-    // Get patient repository
-    const repository = await prisma.patientRepository.findFirst({
-      where: { userId: patientId },
+    // Get customer repository
+    const repository = await prisma.customerRepository.findFirst({
+      where: { userId: customerId },
     });
 
     if (!repository) {
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
       prisma.labResultStandardization.count({
         where: {
           repository: {
-            userId: patientId,
+            userId: customerId,
           },
         },
       }),
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
       prisma.labResultStandardization.count({
         where: {
           repository: {
-            userId: patientId,
+            userId: customerId,
           },
           performedDate: {
             gte: thirtyDaysAgo,
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
       prisma.labResultStandardization.count({
         where: {
           repository: {
-            userId: patientId,
+            userId: customerId,
           },
           interpretation: {
             in: ['HIGH', 'LOW', 'CRITICAL_HIGH', 'CRITICAL_LOW', 'ABNORMAL'],
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
       }),
       
       // Active medications
-      prisma.patientMedication.count({
+      prisma.customerMedication.count({
         where: {
           repositoryId: repository.id,
           status: 'ACTIVE',
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
       }),
       
       // Active conditions
-      prisma.patientDiagnosis.count({
+      prisma.customerDiagnosis.count({
         where: {
           repositoryId: repository.id,
           status: 'ACTIVE',
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
       }),
       
       // Allergies
-      prisma.patientAllergy.count({
+      prisma.customerAllergy.count({
         where: {
           repositoryId: repository.id,
         },
@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
       prisma.fHIRResource.count({
         where: {
           connection: {
-            userId: patientId,
+            userId: customerId,
           },
           resourceType: 'DOCUMENT_REFERENCE',
           date: {

@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     
-    const patientId = searchParams.get('patientId') || session.user.id;
+    const customerId = searchParams.get('customerId') || session.user.id;
     const loincCode = searchParams.get('loincCode');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     // Build where clause
     const where: any = {
       repository: {
-        userId: patientId,
+        userId: customerId,
       },
       loincCode: {
         loincNumber: loincCode,

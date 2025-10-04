@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 export default function AccessDeniedPage() {
   const searchParams = useSearchParams();
   const requiredRole = searchParams.get('required') || 'ADMIN';
-  const currentRole = searchParams.get('current') || 'PATIENT';
+  const currentRole = searchParams.get('current') || 'CUSTOMER';
   const attemptedPath = searchParams.get('path') || '/dashboard';
 
   return (
@@ -93,7 +93,7 @@ export default function AccessDeniedPage() {
             </Button>
           </Link>
 
-          {currentRole === 'PATIENT' && requiredRole === 'OWNER' && (
+          {currentRole === 'CUSTOMER' && requiredRole === 'OWNER' && (
             <div className="text-center">
               <p className="text-sm text-gray-600">
                 Need access to administrative features?{' '}

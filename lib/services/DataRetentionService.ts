@@ -431,9 +431,9 @@ export class DataRetentionService {
         jurisdiction: 'US',
       },
       {
-        name: 'Patient Record Retention',
-        description: 'Patient medical record retention (10 years)',
-        dataType: 'patient_record',
+        name: 'Customer Record Retention',
+        description: 'Customer medical record retention (10 years)',
+        dataType: 'customer_record',
         category: 'medical',
         retentionPeriodDays: 3650, // 10 years
         archiveAfterDays: 1825, // 5 years

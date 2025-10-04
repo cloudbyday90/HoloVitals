@@ -5,7 +5,7 @@ import { LabInterpretation, LabStatus } from '@/lib/types/clinical-data';
 
 /**
  * GET /api/clinical/labs
- * Fetch lab results for the authenticated patient
+ * Fetch lab results for the authenticated customer
  */
 export async function GET(request: NextRequest) {
   try {
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     
     // Parse query parameters
-    const patientId = searchParams.get('patientId') || session.user.id;
+    const customerId = searchParams.get('customerId') || session.user.id;
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
     const testTypes = searchParams.get('testTypes')?.split(',');
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     // Build where clause
     const where: any = {
       repository: {
-        userId: patientId,
+        userId: customerId,
       },
     };
 
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
     // Transform to API format
     const transformedResults = labResults.map((result) => ({
       id: result.id,
-      patientId,
+      customerId,
       testName: result.loincCode.longName,
       loincCode: result.loincCode.loincNumber,
       value: result.standardizedValue || result.originalValue,

@@ -8,7 +8,7 @@
  * 
  * Features:
  * - FHIR R4 API integration
- * - Patient demographics and medical records
+ * - Customer demographics and medical records
  * - Lab results and vital signs
  * - Medications and allergies
  * - Appointments and encounters
@@ -75,7 +75,7 @@ export interface MeditechPatient {
 
 export interface MeditechEncounter {
   id: string;
-  patientId: string;
+  customerId: string;
   accountNumber?: string;
   type: string;
   status: string;
@@ -103,7 +103,7 @@ export interface MeditechEncounter {
 
 export interface MeditechLabResult {
   id: string;
-  patientId: string;
+  customerId: string;
   encounterId?: string;
   testCode: string;
   testName: string;
@@ -124,7 +124,7 @@ export interface MeditechLabResult {
 
 export interface MeditechMedication {
   id: string;
-  patientId: string;
+  customerId: string;
   encounterId?: string;
   medicationCode: string;
   medicationName: string;
@@ -148,7 +148,7 @@ export interface MeditechMedication {
 
 export interface MeditechVitalSign {
   id: string;
-  patientId: string;
+  customerId: string;
   encounterId?: string;
   type: string;
   value: number;
@@ -160,7 +160,7 @@ export interface MeditechVitalSign {
 
 export interface MeditechAllergy {
   id: string;
-  patientId: string;
+  customerId: string;
   allergen: string;
   allergenType: string;
   reaction?: string;
@@ -174,7 +174,7 @@ export interface MeditechAllergy {
 
 export interface MeditechProblem {
   id: string;
-  patientId: string;
+  customerId: string;
   problemCode: string;
   problemDescription: string;
   status: string;
@@ -186,7 +186,7 @@ export interface MeditechProblem {
 
 export interface MeditechImmunization {
   id: string;
-  patientId: string;
+  customerId: string;
   vaccineCode: string;
   vaccineName: string;
   administeredDate: string;
@@ -201,7 +201,7 @@ export interface MeditechImmunization {
 
 export interface MeditechSyncResult {
   success: boolean;
-  patientId: string;
+  customerId: string;
   recordsProcessed: {
     encounters: number;
     labResults: number;
@@ -302,11 +302,11 @@ export class MeditechEnhancedService {
   }
 
   // ==========================================================================
-  // PATIENT OPERATIONS
+  // CUSTOMER OPERATIONS
   // ==========================================================================
 
   /**
-   * Search for patients by various criteria
+   * Search for customers by various criteria
    */
   async searchPatients(criteria: {
     firstName?: string;
@@ -326,9 +326,9 @@ export class MeditechEnhancedService {
       if (criteria.mrn) params.identifier = `MRN|${criteria.mrn}`;
       if (criteria.accountNumber) params.identifier = `ACCT|${criteria.accountNumber}`;
 
-      const response = await this.client.get('/fhir/Patient', { params });
+      const response = await this.client.get('/fhir/Customer', { params });
 
-      const patients = response.data.entry?.map((entry: any) => 
+      const customers = response.data.entry?.map((entry: any) => 
         this.mapFHIRPatientToMeditech(entry.resource)
       ) || [];
 
@@ -336,21 +336,21 @@ export class MeditechEnhancedService {
         eventType: 'EHR_PATIENT_SEARCH',
         category: 'DATA_ACCESS',
         outcome: 'SUCCESS',
-        description: `Searched for patients in MEDITECH`,
+        description: `Searched for customers in MEDITECH`,
         metadata: {
           provider: 'MEDITECH',
           criteria,
-          resultsCount: patients.length,
+          resultsCount: customers.length,
         },
       });
 
-      return patients;
+      return customers;
     } catch (error: any) {
       await auditService.log({
         eventType: 'EHR_PATIENT_SEARCH',
         category: 'DATA_ACCESS',
         outcome: 'FAILURE',
-        description: 'Failed to search patients in MEDITECH',
+        description: 'Failed to search customers in MEDITECH',
         metadata: {
           provider: 'MEDITECH',
           error: error.message,
@@ -361,36 +361,36 @@ export class MeditechEnhancedService {
   }
 
   /**
-   * Get patient by ID
+   * Get customer by ID
    */
-  async getPatient(patientId: string): Promise<MeditechPatient> {
+  async getPatient(customerId: string): Promise<MeditechPatient> {
     await this.authenticate();
 
     try {
-      const response = await this.client.get(`/fhir/Patient/${patientId}`);
-      const patient = this.mapFHIRPatientToMeditech(response.data);
+      const response = await this.client.get(`/fhir/Customer/${customerId}`);
+      const customer = this.mapFHIRPatientToMeditech(response.data);
 
       await auditService.log({
         eventType: 'EHR_PATIENT_READ',
         category: 'DATA_ACCESS',
         outcome: 'SUCCESS',
-        description: `Retrieved patient from MEDITECH`,
+        description: `Retrieved customer from MEDITECH`,
         metadata: {
           provider: 'MEDITECH',
-          patientId,
+          customerId,
         },
       });
 
-      return patient;
+      return customer;
     } catch (error: any) {
       await auditService.log({
         eventType: 'EHR_PATIENT_READ',
         category: 'DATA_ACCESS',
         outcome: 'FAILURE',
-        description: 'Failed to retrieve patient from MEDITECH',
+        description: 'Failed to retrieve customer from MEDITECH',
         metadata: {
           provider: 'MEDITECH',
-          patientId,
+          customerId,
           error: error.message,
         },
       });
@@ -403,9 +403,9 @@ export class MeditechEnhancedService {
   // ==========================================================================
 
   /**
-   * Get patient encounters
+   * Get customer encounters
    */
-  async getEncounters(patientId: string, options?: {
+  async getEncounters(customerId: string, options?: {
     startDate?: string;
     endDate?: string;
     status?: string;
@@ -414,7 +414,7 @@ export class MeditechEnhancedService {
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -435,9 +435,9 @@ export class MeditechEnhancedService {
   }
 
   /**
-   * Get patient lab results
+   * Get customer lab results
    */
-  async getLabResults(patientId: string, options?: {
+  async getLabResults(customerId: string, options?: {
     category?: string;
     startDate?: string;
     endDate?: string;
@@ -446,7 +446,7 @@ export class MeditechEnhancedService {
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         category: 'laboratory',
         _count: 100,
       };
@@ -467,9 +467,9 @@ export class MeditechEnhancedService {
   }
 
   /**
-   * Get patient vital signs
+   * Get customer vital signs
    */
-  async getVitalSigns(patientId: string, options?: {
+  async getVitalSigns(customerId: string, options?: {
     startDate?: string;
     endDate?: string;
   }): Promise<MeditechVitalSign[]> {
@@ -477,7 +477,7 @@ export class MeditechEnhancedService {
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         category: 'vital-signs',
         _count: 100,
       };
@@ -498,16 +498,16 @@ export class MeditechEnhancedService {
   }
 
   /**
-   * Get patient medications
+   * Get customer medications
    */
-  async getMedications(patientId: string, options?: {
+  async getMedications(customerId: string, options?: {
     status?: string;
   }): Promise<MeditechMedication[]> {
     await this.authenticate();
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -526,14 +526,14 @@ export class MeditechEnhancedService {
   }
 
   /**
-   * Get patient allergies
+   * Get customer allergies
    */
-  async getAllergies(patientId: string): Promise<MeditechAllergy[]> {
+  async getAllergies(customerId: string): Promise<MeditechAllergy[]> {
     await this.authenticate();
 
     try {
       const params = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -550,14 +550,14 @@ export class MeditechEnhancedService {
   }
 
   /**
-   * Get patient problems/conditions
+   * Get customer problems/conditions
    */
-  async getProblems(patientId: string): Promise<MeditechProblem[]> {
+  async getProblems(customerId: string): Promise<MeditechProblem[]> {
     await this.authenticate();
 
     try {
       const params = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -574,14 +574,14 @@ export class MeditechEnhancedService {
   }
 
   /**
-   * Get patient immunizations
+   * Get customer immunizations
    */
-  async getImmunizations(patientId: string): Promise<MeditechImmunization[]> {
+  async getImmunizations(customerId: string): Promise<MeditechImmunization[]> {
     await this.authenticate();
 
     try {
       const params = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -602,15 +602,15 @@ export class MeditechEnhancedService {
   // ==========================================================================
 
   /**
-   * Sync all patient data from MEDITECH
+   * Sync all customer data from MEDITECH
    */
   async syncPatientData(
-    patientId: string,
+    customerId: string,
     meditechPatientId: string
   ): Promise<MeditechSyncResult> {
     const result: MeditechSyncResult = {
       success: false,
-      patientId,
+      customerId,
       recordsProcessed: {
         encounters: 0,
         labResults: 0,
@@ -656,7 +656,7 @@ export class MeditechEnhancedService {
       // Store sync history
       await prisma.syncHistory.create({
         data: {
-          patientId,
+          customerId,
           provider: 'MEDITECH',
           status: 'SUCCESS',
           recordsProcessed: Object.values(result.recordsProcessed).reduce((a, b) => a + b, 0),
@@ -671,10 +671,10 @@ export class MeditechEnhancedService {
         eventType: 'EHR_SYNC',
         category: 'DATA_SYNC',
         outcome: 'SUCCESS',
-        description: 'Successfully synced patient data from MEDITECH',
+        description: 'Successfully synced customer data from MEDITECH',
         metadata: {
           provider: 'MEDITECH',
-          patientId,
+          customerId,
           recordsProcessed: result.recordsProcessed,
         },
       });
@@ -683,7 +683,7 @@ export class MeditechEnhancedService {
 
       await prisma.syncHistory.create({
         data: {
-          patientId,
+          customerId,
           provider: 'MEDITECH',
           status: 'FAILED',
           errorMessage: error.message,
@@ -696,10 +696,10 @@ export class MeditechEnhancedService {
         eventType: 'EHR_SYNC',
         category: 'DATA_SYNC',
         outcome: 'FAILURE',
-        description: 'Failed to sync patient data from MEDITECH',
+        description: 'Failed to sync customer data from MEDITECH',
         metadata: {
           provider: 'MEDITECH',
-          patientId,
+          customerId,
           error: error.message,
         },
       });
@@ -752,7 +752,7 @@ export class MeditechEnhancedService {
   private mapFHIREncounterToMeditech(fhirEncounter: any): MeditechEncounter {
     return {
       id: fhirEncounter.id,
-      patientId: fhirEncounter.subject?.reference?.split('/')[1] || '',
+      customerId: fhirEncounter.subject?.reference?.split('/')[1] || '',
       accountNumber: fhirEncounter.identifier?.find((id: any) => id.type?.coding?.[0]?.code === 'VN')?.value,
       type: fhirEncounter.type?.[0]?.coding?.[0]?.display || '',
       status: fhirEncounter.status || '',
@@ -781,7 +781,7 @@ export class MeditechEnhancedService {
   private mapFHIRObservationToLabResult(fhirObservation: any): MeditechLabResult {
     return {
       id: fhirObservation.id,
-      patientId: fhirObservation.subject?.reference?.split('/')[1] || '',
+      customerId: fhirObservation.subject?.reference?.split('/')[1] || '',
       encounterId: fhirObservation.encounter?.reference?.split('/')[1],
       testCode: fhirObservation.code?.coding?.[0]?.code || '',
       testName: fhirObservation.code?.coding?.[0]?.display || '',
@@ -804,7 +804,7 @@ export class MeditechEnhancedService {
   private mapFHIRObservationToVitalSign(fhirObservation: any): MeditechVitalSign {
     return {
       id: fhirObservation.id,
-      patientId: fhirObservation.subject?.reference?.split('/')[1] || '',
+      customerId: fhirObservation.subject?.reference?.split('/')[1] || '',
       encounterId: fhirObservation.encounter?.reference?.split('/')[1],
       type: fhirObservation.code?.coding?.[0]?.display || '',
       value: fhirObservation.valueQuantity?.value || 0,
@@ -818,7 +818,7 @@ export class MeditechEnhancedService {
   private mapFHIRMedicationToMeditech(fhirMedication: any): MeditechMedication {
     return {
       id: fhirMedication.id,
-      patientId: fhirMedication.subject?.reference?.split('/')[1] || '',
+      customerId: fhirMedication.subject?.reference?.split('/')[1] || '',
       encounterId: fhirMedication.encounter?.reference?.split('/')[1],
       medicationCode: fhirMedication.medicationCodeableConcept?.coding?.[0]?.code || '',
       medicationName: fhirMedication.medicationCodeableConcept?.coding?.[0]?.display || '',
@@ -844,7 +844,7 @@ export class MeditechEnhancedService {
   private mapFHIRAllergyToMeditech(fhirAllergy: any): MeditechAllergy {
     return {
       id: fhirAllergy.id,
-      patientId: fhirAllergy.patient?.reference?.split('/')[1] || '',
+      customerId: fhirAllergy.customer?.reference?.split('/')[1] || '',
       allergen: fhirAllergy.code?.coding?.[0]?.display || '',
       allergenType: fhirAllergy.type || '',
       reaction: fhirAllergy.reaction?.[0]?.manifestation?.[0]?.coding?.[0]?.display,
@@ -860,7 +860,7 @@ export class MeditechEnhancedService {
   private mapFHIRConditionToProblem(fhirCondition: any): MeditechProblem {
     return {
       id: fhirCondition.id,
-      patientId: fhirCondition.subject?.reference?.split('/')[1] || '',
+      customerId: fhirCondition.subject?.reference?.split('/')[1] || '',
       problemCode: fhirCondition.code?.coding?.[0]?.code || '',
       problemDescription: fhirCondition.code?.coding?.[0]?.display || '',
       status: fhirCondition.clinicalStatus?.coding?.[0]?.code || '',
@@ -874,7 +874,7 @@ export class MeditechEnhancedService {
   private mapFHIRImmunizationToMeditech(fhirImmunization: any): MeditechImmunization {
     return {
       id: fhirImmunization.id,
-      patientId: fhirImmunization.patient?.reference?.split('/')[1] || '',
+      customerId: fhirImmunization.customer?.reference?.split('/')[1] || '',
       vaccineCode: fhirImmunization.vaccineCode?.coding?.[0]?.code || '',
       vaccineName: fhirImmunization.vaccineCode?.coding?.[0]?.display || '',
       administeredDate: fhirImmunization.occurrenceDateTime || '',

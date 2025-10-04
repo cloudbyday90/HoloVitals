@@ -18,20 +18,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get patient ID from query params
+    // Get customer ID from query params
     const searchParams = request.nextUrl.searchParams;
-    const patientId = searchParams.get('patientId');
+    const customerId = searchParams.get('customerId');
 
-    if (!patientId) {
+    if (!customerId) {
       return NextResponse.json(
-        { error: 'Patient ID is required' },
+        { error: 'Customer ID is required' },
         { status: 400 }
       );
     }
 
     // Generate comprehensive insights (health score included)
     const insights = await AIHealthInsightsService.generateComprehensiveInsights({
-      patientId,
+      customerId,
       includeRiskAssessment: false,
       includeTrendAnalysis: false,
       includeMedicationInteraction: false,

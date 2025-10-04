@@ -236,11 +236,11 @@ export function SyncHistoryTable({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Patient ID</label>
+              <label className="text-sm font-medium">Customer ID</label>
               <Input
-                placeholder="Search by patient ID"
-                value={filters.patientId || ''}
-                onChange={(e) => onFiltersChange({ patientId: e.target.value || undefined })}
+                placeholder="Search by customer ID"
+                value={filters.customerId || ''}
+                onChange={(e) => onFiltersChange({ customerId: e.target.value || undefined })}
               />
             </div>
 
@@ -265,7 +265,7 @@ export function SyncHistoryTable({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Patient</TableHead>
+                  <TableHead>Customer</TableHead>
                   <TableHead>Provider</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Records</TableHead>
@@ -284,7 +284,7 @@ export function SyncHistoryTable({
                           <User className="h-4 w-4 text-muted-foreground" />
                           <div>
                             <div className="font-medium">
-                              {sync.patientName || `Patient ${sync.patientId.slice(0, 8)}`}
+                              {sync.customerName || `Customer ${sync.customerId.slice(0, 8)}`}
                             </div>
                             <div className="text-xs text-muted-foreground">
                               {sync.syncType}

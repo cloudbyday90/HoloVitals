@@ -16,7 +16,7 @@ const repository = getMedicalStandardizationRepository();
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { loincNumber, value, unit, patientAge, patientGender, condition } = body;
+    const { loincNumber, value, unit, customerAge, customerGender, condition } = body;
 
     if (!loincNumber || value === undefined || !unit) {
       return NextResponse.json(
@@ -32,8 +32,8 @@ export async function POST(request: NextRequest) {
       loincNumber,
       value,
       unit,
-      patientAge,
-      patientGender,
+      customerAge,
+      customerGender,
       condition,
     });
 

@@ -16,10 +16,10 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 
 interface ConnectionWizardProps {
-  patientId: string;
+  customerId: string;
 }
 
-export function ConnectionWizard({ patientId }: ConnectionWizardProps) {
+export function ConnectionWizard({ customerId }: ConnectionWizardProps) {
   const {
     state,
     isLoading,
@@ -28,7 +28,7 @@ export function ConnectionWizard({ patientId }: ConnectionWizardProps) {
     retry,
     reset,
     goBack,
-  } = useConnectionWizard(patientId);
+  } = useConnectionWizard(customerId);
 
   // Calculate progress percentage
   const getProgress = () => {

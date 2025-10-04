@@ -21,11 +21,11 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body: GenerateInsightsRequest = await request.json();
-    const { patientId } = body;
+    const { customerId } = body;
 
-    if (!patientId) {
+    if (!customerId) {
       return NextResponse.json(
-        { error: 'Patient ID is required' },
+        { error: 'Customer ID is required' },
         { status: 400 }
       );
     }

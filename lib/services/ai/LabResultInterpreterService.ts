@@ -23,7 +23,7 @@ export class LabResultInterpreterService {
     const labResult = await prisma.labResult.findUnique({
       where: { id: testId },
       include: {
-        patient: true,
+        customer: true,
       },
     });
 
@@ -38,8 +38,8 @@ export class LabResultInterpreterService {
     // Get reference range
     const referenceRange = this.getReferenceRange(
       labResult.testName,
-      labResult.patient.gender,
-      this.calculateAge(labResult.patient.dateOfBirth)
+      labResult.customer.gender,
+      this.calculateAge(labResult.customer.dateOfBirth)
     );
 
     // Determine flag
@@ -58,7 +58,7 @@ export class LabResultInterpreterService {
     const interpretation = this.generateInterpretation(
       labResult.testName,
       result,
-      labResult.patient
+      labResult.customer
     );
 
     // Assess clinical significance
@@ -80,7 +80,7 @@ export class LabResultInterpreterService {
     const relatedTests = this.getRelatedTests(labResult.testName);
 
     // Analyze trends
-    const trends = await this.analyzeTrends(labResult.patientId, labResult.testName);
+    const trends = await this.analyzeTrends(labResult.customerId, labResult.testName);
 
     return {
       testId: labResult.id,
@@ -109,7 +109,7 @@ export class LabResultInterpreterService {
    * Get comprehensive lab panel interpretation
    */
   async interpretLabPanel(
-    patientId: string,
+    customerId: string,
     panelType: 'metabolic' | 'lipid' | 'cbc' | 'thyroid' | 'liver' | 'kidney'
   ): Promise<{
     panel: string;
@@ -123,7 +123,7 @@ export class LabResultInterpreterService {
     // Fetch recent results for panel tests
     const labResults = await prisma.labResult.findMany({
       where: {
-        patientId,
+        customerId,
         testName: { in: testNames },
       },
       orderBy: { resultDate: 'desc' },
@@ -224,7 +224,7 @@ export class LabResultInterpreterService {
   private generateInterpretation(
     testName: string,
     result: LabResult,
-    patient: any
+    customer: any
   ): Interpretation {
     const { flag, value, unit, referenceRange } = result;
 
@@ -611,11 +611,11 @@ export class LabResultInterpreterService {
     return [];
   }
 
-  private async analyzeTrends(patientId: string, testName: string): Promise<LabTrend[]> {
+  private async analyzeTrends(customerId: string, testName: string): Promise<LabTrend[]> {
     // Fetch historical results
     const historicalResults = await prisma.labResult.findMany({
       where: {
-        patientId,
+        customerId,
         testName: { contains: testName, mode: 'insensitive' },
       },
       orderBy: { resultDate: 'desc' },

@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch conditions
-    const conditions = await prisma.patientDiagnosis.findMany({
+    const conditions = await prisma.customerDiagnosis.findMany({
       where,
       include: {
         repository: {

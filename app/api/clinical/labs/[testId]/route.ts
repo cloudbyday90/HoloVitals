@@ -44,7 +44,7 @@ export async function GET(
     // Transform to API format
     const transformedResult = {
       id: labResult.id,
-      patientId: session.user.id,
+      customerId: session.user.id,
       testName: labResult.loincCode.longName,
       loincCode: labResult.loincCode.loincNumber,
       value: labResult.standardizedValue || labResult.originalValue,

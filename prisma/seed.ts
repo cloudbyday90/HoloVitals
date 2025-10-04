@@ -41,7 +41,7 @@ async function main() {
       update: {},
       create: {
         name: 'DOCTOR',
-        description: 'Healthcare provider with patient access',
+        description: 'Healthcare provider with customer access',
         isSystem: true,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -52,18 +52,18 @@ async function main() {
       update: {},
       create: {
         name: 'NURSE',
-        description: 'Nursing staff with limited patient access',
+        description: 'Nursing staff with limited customer access',
         isSystem: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     }),
     prisma.role.upsert({
-      where: { name: 'PATIENT' },
+      where: { name: 'CUSTOMER' },
       update: {},
       create: {
-        name: 'PATIENT',
-        description: 'Patient user with access to own records',
+        name: 'CUSTOMER',
+        description: 'Customer user with access to own records',
         isSystem: true,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -235,7 +235,7 @@ async function main() {
       update: {},
       create: {
         name: 'PATIENT_DOCUMENTS',
-        description: 'Patient document retention (10 years)',
+        description: 'Customer document retention (10 years)',
         retentionPeriodDays: 3650, // 10 years
         dataType: 'DOCUMENT',
         isActive: true,

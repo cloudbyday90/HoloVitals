@@ -1,9 +1,9 @@
 /**
- * EHR Patient Allergies API Endpoint
+ * EHR Customer Allergies API Endpoint
  * 
- * GET /api/ehr/patients/:patientId/allergies
+ * GET /api/ehr/customers/:customerId/allergies
  * 
- * Retrieves patient allergies from the connected EHR system.
+ * Retrieves customer allergies from the connected EHR system.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -22,7 +22,7 @@ const allergiesSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { patientId: string } }
+  { params }: { params: { customerId: string } }
 ) {
   try {
     // 1. Authenticate user
@@ -34,8 +34,8 @@ export async function GET(
       );
     }
 
-    // 2. Get patientId from URL params
-    const { patientId } = params;
+    // 2. Get customerId from URL params
+    const { customerId } = params;
 
     // 3. Parse and validate query parameters
     const { searchParams } = new URL(request.url);
@@ -61,7 +61,7 @@ export async function GET(
     const ehrService = new UnifiedEHRService();
 
     // 5. Get allergies
-    const allergies = await ehrService.getAllergies(patientId, ehrPatientId);
+    const allergies = await ehrService.getAllergies(customerId, ehrPatientId);
 
     // 6. Log access
     await auditService.log({
@@ -69,9 +69,9 @@ export async function GET(
       eventType: 'EHR_ALLERGIES_ACCESS',
       category: 'DATA_ACCESS',
       outcome: 'SUCCESS',
-      description: `Retrieved allergies for patient`,
+      description: `Retrieved allergies for customer`,
       metadata: {
-        patientId,
+        customerId,
         ehrPatientId,
         allergiesCount: allergies.length,
       },

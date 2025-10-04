@@ -55,7 +55,7 @@ export interface SyncJobConfig {
   ehrProvider: string;
   ehrConnectionId: string;
   userId: string;
-  patientId?: string;
+  customerId?: string;
   resourceType?: string;
   resourceIds?: string[];
   filters?: Record<string, any>;
@@ -210,7 +210,7 @@ export class SyncOrchestrationService {
           ehrProvider: config.ehrProvider,
           ehrConnectionId: config.ehrConnectionId,
           userId: config.userId,
-          patientId: config.patientId,
+          customerId: config.customerId,
           resourceType: config.resourceType,
           resourceIds: config.resourceIds,
           filters: config.filters,

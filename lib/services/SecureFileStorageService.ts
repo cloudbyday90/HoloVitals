@@ -24,7 +24,7 @@ const prisma = new PrismaClient();
 
 export interface FileUploadOptions {
   userId: string;
-  patientId?: string;
+  customerId?: string;
   fileName: string;
   fileType: string;
   fileSize: number;
@@ -45,7 +45,7 @@ export interface FileMetadata {
   encrypted: boolean;
   uploadedBy: string;
   uploadedAt: Date;
-  patientId?: string;
+  customerId?: string;
   accessCount: number;
 }
 
@@ -56,7 +56,7 @@ export interface FileAccessOptions {
 }
 
 export interface FileSearchOptions {
-  patientId?: string;
+  customerId?: string;
   category?: string;
   tags?: string[];
   uploadedBy?: string;
@@ -142,13 +142,13 @@ export class SecureFileStorageService {
         INSERT INTO secure_files (
           id, file_name, file_type, file_size, file_hash,
           category, description, tags, encrypted, encryption_metadata,
-          storage_path, uploaded_by, patient_id, created_at
+          storage_path, uploaded_by, customer_id, created_at
         ) VALUES (
           ${fileId}, ${options.fileName}, ${options.fileType}, ${options.fileSize},
           ${fileHash}, ${options.category}, ${options.description},
           ${JSON.stringify(options.tags || [])}, ${options.encrypt !== false},
           ${JSON.stringify(encryptionMetadata)}, ${storagePath},
-          ${options.userId}, ${options.patientId}, NOW()
+          ${options.userId}, ${options.customerId}, NOW()
         )
         RETURNING *
       `;
@@ -160,7 +160,7 @@ export class SecureFileStorageService {
           userRole: 'USER',
         },
         {
-          patientId: options.patientId || '',
+          customerId: options.customerId || '',
           dataAccessed: ['file_upload'],
           accessReason: 'File upload',
           action: 'CREATE',
@@ -223,7 +223,7 @@ export class SecureFileStorageService {
           userRole: 'USER',
         },
         {
-          patientId: metadata.patientId || '',
+          customerId: metadata.customerId || '',
           dataAccessed: ['file_download'],
           accessReason: options.reason,
           action: 'VIEW',
@@ -262,9 +262,9 @@ export class SecureFileStorageService {
     let whereConditions: string[] = [];
     let params: any[] = [];
     
-    if (options.patientId) {
-      whereConditions.push(`patient_id = $${params.length + 1}`);
-      params.push(options.patientId);
+    if (options.customerId) {
+      whereConditions.push(`customer_id = $${params.length + 1}`);
+      params.push(options.customerId);
     }
     
     if (options.category) {
@@ -348,7 +348,7 @@ export class SecureFileStorageService {
           userRole: 'USER',
         },
         {
-          patientId: metadata.patient_id || '',
+          customerId: metadata.customer_id || '',
           dataAccessed: ['file_delete'],
           accessReason: reason,
           action: 'DELETE',
@@ -381,14 +381,14 @@ export class SecureFileStorageService {
         return true;
       }
       
-      // Check access control for patient files
-      if (metadata.patient_id) {
+      // Check access control for customer files
+      if (metadata.customer_id) {
         const accessResult = await accessControlService.checkAccess({
           userId,
-          resource: 'patient_file',
+          resource: 'customer_file',
           action: 'read',
           context: {
-            patientId: metadata.patient_id,
+            customerId: metadata.customer_id,
           },
         });
         
@@ -532,7 +532,7 @@ export class SecureFileStorageService {
       encrypted: raw.encrypted,
       uploadedBy: raw.uploaded_by,
       uploadedAt: raw.created_at,
-      patientId: raw.patient_id,
+      customerId: raw.customer_id,
       accessCount: raw.access_count || 0,
     };
   }

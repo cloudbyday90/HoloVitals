@@ -239,10 +239,10 @@ export class MedicalStandardizationRepository {
     testName?: string;
     value: any;
     unit?: string;
-    patientAge?: number;
-    patientGender?: 'MALE' | 'FEMALE' | 'OTHER';
+    customerAge?: number;
+    customerGender?: 'MALE' | 'FEMALE' | 'OTHER';
   }): Promise<ValidationResult> {
-    const { loincNumber, testName, value, unit, patientAge, patientGender } = params;
+    const { loincNumber, testName, value, unit, customerAge, customerGender } = params;
 
     const errors: string[] = [];
     const warnings: string[] = [];
@@ -311,11 +311,11 @@ export class MedicalStandardizationRepository {
     loincNumber: string;
     value: any;
     unit: string;
-    patientAge?: number;
-    patientGender?: 'MALE' | 'FEMALE' | 'OTHER';
+    customerAge?: number;
+    customerGender?: 'MALE' | 'FEMALE' | 'OTHER';
     condition?: string;
   }): Promise<StandardizationResult> {
-    const { loincNumber, value, unit, patientAge, patientGender, condition } = params;
+    const { loincNumber, value, unit, customerAge, customerGender, condition } = params;
 
     // Get LOINC code
     const loincCode = await this.getLOINCCode(loincNumber);
@@ -344,8 +344,8 @@ export class MedicalStandardizationRepository {
     // Find applicable reference range
     const referenceRange = this.findApplicableReferenceRange(
       loincCode.referenceRanges,
-      patientAge,
-      patientGender,
+      customerAge,
+      customerGender,
       condition
     );
 
@@ -393,7 +393,7 @@ export class MedicalStandardizationRepository {
   }
 
   /**
-   * Find applicable reference range based on patient demographics
+   * Find applicable reference range based on customer demographics
    */
   private findApplicableReferenceRange(
     ranges: ReferenceRange[],
@@ -556,8 +556,8 @@ export class MedicalStandardizationRepository {
       loincNumber: string;
       value: any;
       unit: string;
-      patientAge?: number;
-      patientGender?: 'MALE' | 'FEMALE' | 'OTHER';
+      customerAge?: number;
+      customerGender?: 'MALE' | 'FEMALE' | 'OTHER';
       condition?: string;
     }>
   ): Promise<StandardizationResult[]> {

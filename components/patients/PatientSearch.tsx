@@ -1,7 +1,7 @@
 /**
- * Patient Search Component
+ * Customer Search Component
  * 
- * Advanced search interface with filters for finding patients
+ * Advanced search interface with filters for finding customers
  */
 
 'use client';
@@ -32,7 +32,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { PatientSearchFilters, SavedSearch, SearchHistory } from '@/lib/types/patient';
+import { PatientSearchFilters, SavedSearch, SearchHistory } from '@/lib/types/customer';
 
 interface PatientSearchProps {
   filters: PatientSearchFilters;
@@ -47,7 +47,7 @@ interface PatientSearchProps {
   onDeleteSavedSearch?: (searchId: string) => void;
 }
 
-export function PatientSearch({
+export function CustomerSearch({
   filters,
   onFiltersChange,
   onSearch,
@@ -229,7 +229,7 @@ export function PatientSearch({
                         <Label htmlFor="search-name">Search Name</Label>
                         <Input
                           id="search-name"
-                          placeholder="e.g., Diabetic Patients"
+                          placeholder="e.g., Diabetic Customers"
                           value={saveSearchName}
                           onChange={(e) => setSaveSearchName(e.target.value)}
                         />

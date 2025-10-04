@@ -78,7 +78,7 @@ export interface UnifiedPatient {
 export interface UnifiedEncounter {
   id: string;
   ehrProvider: EHRProvider;
-  patientId: string;
+  customerId: string;
   type: string;
   status: string;
   startDate: string;
@@ -97,7 +97,7 @@ export interface UnifiedEncounter {
 export interface UnifiedObservation {
   id: string;
   ehrProvider: EHRProvider;
-  patientId: string;
+  customerId: string;
   code: string;
   display: string;
   category: string;
@@ -110,7 +110,7 @@ export interface UnifiedObservation {
 export interface UnifiedMedication {
   id: string;
   ehrProvider: EHRProvider;
-  patientId: string;
+  customerId: string;
   medicationCode: string;
   medicationName: string;
   dosage?: string;
@@ -123,7 +123,7 @@ export interface UnifiedMedication {
 export interface UnifiedAllergy {
   id: string;
   ehrProvider: EHRProvider;
-  patientId: string;
+  customerId: string;
   substance: string;
   reaction?: string;
   severity?: string;
@@ -132,7 +132,7 @@ export interface UnifiedAllergy {
 
 export interface UnifiedSyncResult {
   success: boolean;
-  patientId: string;
+  customerId: string;
   ehrProvider: EHRProvider;
   recordsProcessed: {
     encounters: number;
@@ -164,7 +164,7 @@ export class UnifiedEHRService {
    * Initialize connection to an EHR system
    */
   async initializeConnection(
-    patientId: string,
+    customerId: string,
     config: EHRConnectionConfig
   ): Promise<void> {
     try {
@@ -249,7 +249,7 @@ export class UnifiedEHRService {
       await service.authenticate();
 
       // Store connection
-      this.connections.set(patientId, {
+      this.connections.set(customerId, {
         provider: config.provider,
         service,
       });
@@ -257,8 +257,8 @@ export class UnifiedEHRService {
       // Store connection in database
       await prisma.eHRConnection.upsert({
         where: {
-          patientId_provider: {
-            patientId,
+          customerId_provider: {
+            customerId,
             provider: config.provider,
           },
         },
@@ -267,7 +267,7 @@ export class UnifiedEHRService {
           lastSyncedAt: new Date(),
         },
         create: {
-          patientId,
+          customerId,
           provider: config.provider,
           status: 'ACTIVE',
           credentials: JSON.stringify({
@@ -281,9 +281,9 @@ export class UnifiedEHRService {
         eventType: 'EHR_CONNECTION_INITIALIZED',
         category: 'INTEGRATION',
         outcome: 'SUCCESS',
-        description: `Initialized EHR connection for patient`,
+        description: `Initialized EHR connection for customer`,
         metadata: {
-          patientId,
+          customerId,
           provider: config.provider,
         },
       });
@@ -294,7 +294,7 @@ export class UnifiedEHRService {
         outcome: 'FAILURE',
         description: `Failed to initialize EHR connection`,
         metadata: {
-          patientId,
+          customerId,
           provider: config.provider,
           error: error.message,
         },
@@ -304,21 +304,21 @@ export class UnifiedEHRService {
   }
 
   /**
-   * Get EHR service for a patient
+   * Get EHR service for a customer
    */
-  private getService(patientId: string): { provider: EHRProvider; service: any } {
-    const connection = this.connections.get(patientId);
+  private getService(customerId: string): { provider: EHRProvider; service: any } {
+    const connection = this.connections.get(customerId);
     if (!connection) {
-      throw new Error(`No EHR connection found for patient: ${patientId}`);
+      throw new Error(`No EHR connection found for customer: ${customerId}`);
     }
     return connection;
   }
 
   /**
-   * Search for patients across EHR system
+   * Search for customers across EHR system
    */
   async searchPatients(
-    patientId: string,
+    customerId: string,
     criteria: {
       firstName?: string;
       lastName?: string;
@@ -326,65 +326,65 @@ export class UnifiedEHRService {
       mrn?: string;
     }
   ): Promise<UnifiedPatient[]> {
-    const { provider, service } = this.getService(patientId);
+    const { provider, service } = this.getService(customerId);
 
     try {
-      const patients = await service.searchPatients(criteria);
+      const customers = await service.searchPatients(criteria);
       
-      return patients.map((patient: any) => ({
-        id: patient.id,
+      return customers.map((customer: any) => ({
+        id: customer.id,
         ehrProvider: provider,
-        ehrPatientId: patient.id,
-        mrn: patient.mrn,
-        firstName: patient.firstName,
-        lastName: patient.lastName,
-        middleName: patient.middleName,
-        dateOfBirth: patient.dateOfBirth,
-        gender: patient.gender,
-        phone: patient.phone,
-        email: patient.email,
-        address: patient.address,
-        identifiers: patient.identifiers,
+        ehrPatientId: customer.id,
+        mrn: customer.mrn,
+        firstName: customer.firstName,
+        lastName: customer.lastName,
+        middleName: customer.middleName,
+        dateOfBirth: customer.dateOfBirth,
+        gender: customer.gender,
+        phone: customer.phone,
+        email: customer.email,
+        address: customer.address,
+        identifiers: customer.identifiers,
       }));
     } catch (error: any) {
-      throw new Error(`Failed to search patients: ${error.message}`);
+      throw new Error(`Failed to search customers: ${error.message}`);
     }
   }
 
   /**
-   * Get patient by ID
+   * Get customer by ID
    */
-  async getPatient(patientId: string, ehrPatientId: string): Promise<UnifiedPatient> {
-    const { provider, service } = this.getService(patientId);
+  async getPatient(customerId: string, ehrPatientId: string): Promise<UnifiedPatient> {
+    const { provider, service } = this.getService(customerId);
 
     try {
-      const patient = await service.getPatient(ehrPatientId);
+      const customer = await service.getPatient(ehrPatientId);
       
       return {
-        id: patient.id,
+        id: customer.id,
         ehrProvider: provider,
-        ehrPatientId: patient.id,
-        mrn: patient.mrn,
-        firstName: patient.firstName,
-        lastName: patient.lastName,
-        middleName: patient.middleName,
-        dateOfBirth: patient.dateOfBirth,
-        gender: patient.gender,
-        phone: patient.phone,
-        email: patient.email,
-        address: patient.address,
-        identifiers: patient.identifiers,
+        ehrPatientId: customer.id,
+        mrn: customer.mrn,
+        firstName: customer.firstName,
+        lastName: customer.lastName,
+        middleName: customer.middleName,
+        dateOfBirth: customer.dateOfBirth,
+        gender: customer.gender,
+        phone: customer.phone,
+        email: customer.email,
+        address: customer.address,
+        identifiers: customer.identifiers,
       };
     } catch (error: any) {
-      throw new Error(`Failed to get patient: ${error.message}`);
+      throw new Error(`Failed to get customer: ${error.message}`);
     }
   }
 
   /**
-   * Get patient encounters
+   * Get customer encounters
    */
   async getEncounters(
-    patientId: string,
+    customerId: string,
     ehrPatientId: string,
     options?: {
       startDate?: string;
@@ -392,7 +392,7 @@ export class UnifiedEHRService {
       status?: string;
     }
   ): Promise<UnifiedEncounter[]> {
-    const { provider, service } = this.getService(patientId);
+    const { provider, service } = this.getService(customerId);
 
     try {
       const encounters = await service.getEncounters(ehrPatientId, options);
@@ -400,7 +400,7 @@ export class UnifiedEHRService {
       return encounters.map((encounter: any) => ({
         id: encounter.id,
         ehrProvider: provider,
-        patientId: encounter.patientId,
+        customerId: encounter.customerId,
         type: encounter.type,
         status: encounter.status,
         startDate: encounter.startDate || encounter.admissionDate || encounter.period?.start,
@@ -415,10 +415,10 @@ export class UnifiedEHRService {
   }
 
   /**
-   * Get patient observations (lab results, vitals)
+   * Get customer observations (lab results, vitals)
    */
   async getObservations(
-    patientId: string,
+    customerId: string,
     ehrPatientId: string,
     options?: {
       category?: string;
@@ -426,7 +426,7 @@ export class UnifiedEHRService {
       endDate?: string;
     }
   ): Promise<UnifiedObservation[]> {
-    const { provider, service } = this.getService(patientId);
+    const { provider, service } = this.getService(customerId);
 
     try {
       const observations = await service.getObservations(ehrPatientId, options);
@@ -434,7 +434,7 @@ export class UnifiedEHRService {
       return observations.map((obs: any) => ({
         id: obs.id,
         ehrProvider: provider,
-        patientId: obs.patientId,
+        customerId: obs.customerId,
         code: obs.code || obs.testCode,
         display: obs.display || obs.testName || obs.type,
         category: obs.category,
@@ -449,16 +449,16 @@ export class UnifiedEHRService {
   }
 
   /**
-   * Get patient medications
+   * Get customer medications
    */
   async getMedications(
-    patientId: string,
+    customerId: string,
     ehrPatientId: string,
     options?: {
       status?: string;
     }
   ): Promise<UnifiedMedication[]> {
-    const { provider, service } = this.getService(patientId);
+    const { provider, service } = this.getService(customerId);
 
     try {
       const medications = await service.getMedications(ehrPatientId, options);
@@ -466,7 +466,7 @@ export class UnifiedEHRService {
       return medications.map((med: any) => ({
         id: med.id,
         ehrProvider: provider,
-        patientId: med.patientId,
+        customerId: med.customerId,
         medicationCode: med.medicationCode,
         medicationName: med.medicationName,
         dosage: med.dosage || med.dose,
@@ -481,13 +481,13 @@ export class UnifiedEHRService {
   }
 
   /**
-   * Get patient allergies
+   * Get customer allergies
    */
   async getAllergies(
-    patientId: string,
+    customerId: string,
     ehrPatientId: string
   ): Promise<UnifiedAllergy[]> {
-    const { provider, service } = this.getService(patientId);
+    const { provider, service } = this.getService(customerId);
 
     try {
       const allergies = await service.getAllergies(ehrPatientId);
@@ -495,7 +495,7 @@ export class UnifiedEHRService {
       return allergies.map((allergy: any) => ({
         id: allergy.id,
         ehrProvider: provider,
-        patientId: allergy.patientId,
+        customerId: allergy.customerId,
         substance: allergy.substance || allergy.allergen,
         reaction: allergy.reaction,
         severity: allergy.severity,
@@ -507,16 +507,16 @@ export class UnifiedEHRService {
   }
 
   /**
-   * Sync all patient data from EHR
+   * Sync all customer data from EHR
    */
   async syncPatientData(
-    patientId: string,
+    customerId: string,
     ehrPatientId: string
   ): Promise<UnifiedSyncResult> {
-    const { provider, service } = this.getService(patientId);
+    const { provider, service } = this.getService(customerId);
 
     try {
-      const result = await service.syncPatientData(patientId, ehrPatientId);
+      const result = await service.syncPatientData(customerId, ehrPatientId);
       
       const totalRecords = Object.values(result.recordsProcessed).reduce(
         (sum: number, count: number) => sum + count,
@@ -525,7 +525,7 @@ export class UnifiedEHRService {
 
       return {
         success: result.success,
-        patientId: result.patientId,
+        customerId: result.customerId,
         ehrProvider: provider,
         recordsProcessed: {
           encounters: result.recordsProcessed.encounters || 0,
@@ -538,21 +538,21 @@ export class UnifiedEHRService {
         syncedAt: result.syncedAt,
       };
     } catch (error: any) {
-      throw new Error(`Failed to sync patient data: ${error.message}`);
+      throw new Error(`Failed to sync customer data: ${error.message}`);
     }
   }
 
   /**
-   * Get connection status for a patient
+   * Get connection status for a customer
    */
-  async getConnectionStatus(patientId: string): Promise<{
+  async getConnectionStatus(customerId: string): Promise<{
     connected: boolean;
     provider?: EHRProvider;
     lastSyncedAt?: Date;
   }> {
     try {
       const connection = await prisma.eHRConnection.findFirst({
-        where: { patientId },
+        where: { customerId },
       });
 
       if (!connection) {
@@ -572,14 +572,14 @@ export class UnifiedEHRService {
   /**
    * Disconnect from EHR system
    */
-  async disconnect(patientId: string): Promise<void> {
+  async disconnect(customerId: string): Promise<void> {
     try {
       // Remove from memory
-      this.connections.delete(patientId);
+      this.connections.delete(customerId);
 
       // Update database
       await prisma.eHRConnection.updateMany({
-        where: { patientId },
+        where: { customerId },
         data: {
           status: 'DISCONNECTED',
         },
@@ -589,9 +589,9 @@ export class UnifiedEHRService {
         eventType: 'EHR_CONNECTION_DISCONNECTED',
         category: 'INTEGRATION',
         outcome: 'SUCCESS',
-        description: `Disconnected EHR connection for patient`,
+        description: `Disconnected EHR connection for customer`,
         metadata: {
-          patientId,
+          customerId,
         },
       });
     } catch (error: any) {
@@ -601,7 +601,7 @@ export class UnifiedEHRService {
         outcome: 'FAILURE',
         description: `Failed to disconnect EHR connection`,
         metadata: {
-          patientId,
+          customerId,
           error: error.message,
         },
       });

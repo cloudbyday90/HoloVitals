@@ -25,7 +25,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
     currency: 'usd',
     stripePriceId: '', // No Stripe price for free plan
     features: [
-      'Up to 10 patients',
+      'Up to 10 customers',
       '1 GB storage',
       '10 AI insights per month',
       '1 user',
@@ -33,7 +33,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
       'Email support',
     ],
     limits: {
-      patients: 10,
+      customers: 10,
       storage: 1,
       aiInsights: 10,
       users: 1,
@@ -48,7 +48,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
     currency: 'usd',
     stripePriceId: process.env.STRIPE_BASIC_PRICE_ID || '',
     features: [
-      'Up to 100 patients',
+      'Up to 100 customers',
       '10 GB storage',
       '100 AI insights per month',
       '3 users',
@@ -57,7 +57,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
       'Basic analytics',
     ],
     limits: {
-      patients: 100,
+      customers: 100,
       storage: 10,
       aiInsights: 100,
       users: 3,
@@ -73,7 +73,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
     stripePriceId: process.env.STRIPE_PROFESSIONAL_PRICE_ID || '',
     popular: true,
     features: [
-      'Up to 500 patients',
+      'Up to 500 customers',
       '50 GB storage',
       'Unlimited AI insights',
       '10 users',
@@ -84,7 +84,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
       'API access',
     ],
     limits: {
-      patients: 500,
+      customers: 500,
       storage: 50,
       aiInsights: -1, // Unlimited
       users: 10,
@@ -99,7 +99,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
     currency: 'usd',
     stripePriceId: process.env.STRIPE_ENTERPRISE_PRICE_ID || '',
     features: [
-      'Unlimited patients',
+      'Unlimited customers',
       'Unlimited storage',
       'Unlimited AI insights',
       'Unlimited users',
@@ -112,7 +112,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
       'On-premise deployment option',
     ],
     limits: {
-      patients: -1, // Unlimited
+      customers: -1, // Unlimited
       storage: -1, // Unlimited
       aiInsights: -1, // Unlimited
       users: -1, // Unlimited
@@ -165,25 +165,25 @@ export const WEBHOOK_EVENTS = [
 // Usage Limits and Overage Pricing
 export const USAGE_LIMITS = {
   free: {
-    patients: 10,
+    customers: 10,
     storage: 1, // GB
     aiInsights: 10,
     users: 1,
   },
   basic: {
-    patients: 100,
+    customers: 100,
     storage: 10,
     aiInsights: 100,
     users: 3,
   },
   professional: {
-    patients: 500,
+    customers: 500,
     storage: 50,
     aiInsights: -1, // Unlimited
     users: 10,
   },
   enterprise: {
-    patients: -1, // Unlimited
+    customers: -1, // Unlimited
     storage: -1,
     aiInsights: -1,
     users: -1,
@@ -191,7 +191,7 @@ export const USAGE_LIMITS = {
 };
 
 export const OVERAGE_PRICING = {
-  patients: 0.5, // $0.50 per additional patient
+  customers: 0.5, // $0.50 per additional customer
   storage: 2, // $2 per additional GB
   aiInsights: 1, // $1 per additional AI insight
   users: 10, // $10 per additional user

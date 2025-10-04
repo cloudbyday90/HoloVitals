@@ -124,7 +124,7 @@ export class AccessControlService {
 
       // Check resource-specific permissions
       switch (resourceType) {
-        case ResourceType.PATIENT:
+        case ResourceType.CUSTOMER:
           return this.canAccessPatientData(role, userId, resourceId);
         
         case ResourceType.DOCUMENT:
@@ -149,38 +149,38 @@ export class AccessControlService {
   }
 
   /**
-   * Check if user can access patient data
+   * Check if user can access customer data
    */
   private async canAccessPatientData(
     role: UserRole,
     userId: string,
-    patientId: string
+    customerId: string
   ): Promise<AccessDecision> {
-    // OWNER and ADMIN can access all patient data
+    // OWNER and ADMIN can access all customer data
     if (this.isAdminOrHigher(role)) {
-      return { allowed: true, reason: 'Admin access to patient data' };
+      return { allowed: true, reason: 'Admin access to customer data' };
     }
 
-    // PATIENT can only access their own data
-    if (role === UserRole.PATIENT) {
-      if (userId === patientId) {
+    // CUSTOMER can only access their own data
+    if (role === UserRole.CUSTOMER) {
+      if (userId === customerId) {
         return { allowed: true, reason: 'User accessing own data' };
       }
       return {
         allowed: false,
-        reason: 'Patients can only access their own data',
+        reason: 'Customers can only access their own data',
       };
     }
 
-    // DOCTOR needs consent to access patient data
+    // DOCTOR needs consent to access customer data
     if (role === UserRole.DOCTOR) {
-      const hasConsent = await this.checkPatientConsent(userId, patientId);
+      const hasConsent = await this.checkPatientConsent(userId, customerId);
       if (hasConsent) {
-        return { allowed: true, reason: 'Doctor has patient consent' };
+        return { allowed: true, reason: 'Doctor has customer consent' };
       }
       return {
         allowed: false,
-        reason: 'Doctor requires patient consent',
+        reason: 'Doctor requires customer consent',
       };
     }
 
@@ -189,7 +189,7 @@ export class AccessControlService {
       return { allowed: true, reason: 'Support access for assistance' };
     }
 
-    return { allowed: false, reason: 'Insufficient role for patient data access' };
+    return { allowed: false, reason: 'Insufficient role for customer data access' };
   }
 
   /**
@@ -304,15 +304,15 @@ export class AccessControlService {
   }
 
   /**
-   * Check patient consent for doctor access
+   * Check customer consent for doctor access
    */
   private async checkPatientConsent(
     doctorId: string,
-    patientId: string
+    customerId: string
   ): Promise<boolean> {
     const consent = await prisma.consentGrant.findFirst({
       where: {
-        patientId,
+        customerId,
         grantedToUserId: doctorId,
         status: 'ACTIVE',
         expiresAt: {
@@ -376,7 +376,7 @@ export class AccessControlService {
       id: log.id,
       timestamp: log.timestamp,
       userId: log.userId,
-      userRole: UserRole.PATIENT, // Would need to fetch from user
+      userRole: UserRole.CUSTOMER, // Would need to fetch from user
       action: log.action,
       resourceType: log.resourceType as ResourceType,
       resourceId: log.resourceId || undefined,
@@ -429,7 +429,7 @@ export class AccessControlService {
       id: log.id,
       timestamp: log.timestamp,
       userId: log.userId,
-      userRole: UserRole.PATIENT,
+      userRole: UserRole.CUSTOMER,
       action: log.action,
       resourceType: log.resourceType as ResourceType,
       resourceId: log.resourceId || undefined,

@@ -21,13 +21,13 @@ export async function GET(request: NextRequest) {
 
     // Get query params
     const searchParams = request.nextUrl.searchParams;
-    const patientId = searchParams.get('patientId');
+    const customerId = searchParams.get('customerId');
     const metric = searchParams.get('metric');
     const timeframe = (searchParams.get('timeframe') || '90-days') as TimeFrame;
 
-    if (!patientId) {
+    if (!customerId) {
       return NextResponse.json(
-        { error: 'Patient ID is required' },
+        { error: 'Customer ID is required' },
         { status: 400 }
       );
     }
@@ -36,10 +36,10 @@ export async function GET(request: NextRequest) {
 
     if (metric) {
       // Analyze specific metric
-      trends = await TrendAnalysisService.analyzeTrend(patientId, metric, timeframe);
+      trends = await TrendAnalysisService.analyzeTrend(customerId, metric, timeframe);
     } else {
       // Get all trending metrics
-      trends = await TrendAnalysisService.getTrendingMetrics(patientId, timeframe);
+      trends = await TrendAnalysisService.getTrendingMetrics(customerId, timeframe);
     }
 
     return NextResponse.json({

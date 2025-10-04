@@ -601,13 +601,13 @@ export class WebhookService {
    * Initialize default event handlers
    */
   private initializeDefaultHandlers(): void {
-    // Patient events
+    // Customer events
     this.registerEventHandler(WebhookEventType.PATIENT_CREATED, async (payload) => {
-      console.log('Patient created:', payload.resourceId);
+      console.log('Customer created:', payload.resourceId);
     });
 
     this.registerEventHandler(WebhookEventType.PATIENT_UPDATED, async (payload) => {
-      console.log('Patient updated:', payload.resourceId);
+      console.log('Customer updated:', payload.resourceId);
     });
 
     // Observation events

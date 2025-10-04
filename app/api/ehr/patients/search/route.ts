@@ -1,9 +1,9 @@
 /**
- * EHR Patient Search API Endpoint
+ * EHR Customer Search API Endpoint
  * 
- * GET /api/ehr/patients/search
+ * GET /api/ehr/customers/search
  * 
- * Searches for patients across the connected EHR system.
+ * Searches for customers across the connected EHR system.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -17,7 +17,7 @@ const auditService = new AuditLoggingService();
 
 // Query validation schema
 const searchSchema = z.object({
-  patientId: z.string().uuid(),
+  customerId: z.string().uuid(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   dateOfBirth: z.string().optional(),
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     // 2. Parse and validate query parameters
     const { searchParams } = new URL(request.url);
     const queryParams = {
-      patientId: searchParams.get('patientId'),
+      customerId: searchParams.get('customerId'),
       firstName: searchParams.get('firstName') || undefined,
       lastName: searchParams.get('lastName') || undefined,
       dateOfBirth: searchParams.get('dateOfBirth') || undefined,
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { patientId, ...searchCriteria } = validationResult.data;
+    const { customerId, ...searchCriteria } = validationResult.data;
 
     // 3. Check if at least one search criterion is provided
     if (!searchCriteria.firstName && !searchCriteria.lastName && 
@@ -71,8 +71,8 @@ export async function GET(request: NextRequest) {
     // 4. Initialize EHR service
     const ehrService = new UnifiedEHRService();
 
-    // 5. Search for patients
-    const patients = await ehrService.searchPatients(patientId, searchCriteria);
+    // 5. Search for customers
+    const customers = await ehrService.searchPatients(customerId, searchCriteria);
 
     // 6. Log search
     await auditService.log({
@@ -80,11 +80,11 @@ export async function GET(request: NextRequest) {
       eventType: 'EHR_PATIENT_SEARCH',
       category: 'DATA_ACCESS',
       outcome: 'SUCCESS',
-      description: `Searched for patients in EHR`,
+      description: `Searched for customers in EHR`,
       metadata: {
-        patientId,
+        customerId,
         searchCriteria,
-        resultsCount: patients.length,
+        resultsCount: customers.length,
       },
     });
 
@@ -93,8 +93,8 @@ export async function GET(request: NextRequest) {
       {
         success: true,
         data: {
-          patients,
-          count: patients.length,
+          customers,
+          count: customers.length,
         },
       },
       { status: 200 }
@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
       eventType: 'EHR_PATIENT_SEARCH',
       category: 'DATA_ACCESS',
       outcome: 'FAILURE',
-      description: `Failed to search patients: ${error.message}`,
+      description: `Failed to search customers: ${error.message}`,
       metadata: {
         error: error.message,
       },
@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to search patients',
+        error: 'Failed to search customers',
         message: error.message,
       },
       { status: 500 }

@@ -1,25 +1,25 @@
 /**
- * Patient Search Service
- * Comprehensive patient search and management functionality
+ * Customer Search Service
+ * Comprehensive customer search and management functionality
  */
 
 import { PrismaClient } from '@prisma/client';
 import {
-  PatientSearchParams,
-  PatientSearchResult,
+  CustomerSearchParams,
+  CustomerSearchResult,
   PatientSummary,
-  Patient,
-  PatientDetails,
+  Customer,
+  CustomerDetails,
   PatientStatistics,
-} from '@/lib/types/patient-search';
+} from '@/lib/types/customer-search';
 
 const prisma = new PrismaClient();
 
-export class PatientSearchService {
+export class CustomerSearchService {
   /**
-   * Search patients with advanced filtering
+   * Search customers with advanced filtering
    */
-  async searchPatients(params: PatientSearchParams): Promise<PatientSearchResult> {
+  async searchPatients(params: CustomerSearchParams): Promise<CustomerSearchResult> {
     const {
       query,
       firstName,
@@ -145,14 +145,14 @@ export class PatientSearchService {
     }
 
     // Get total count
-    const total = await prisma.patient.count({ where });
+    const total = await prisma.customer.count({ where });
 
     // Calculate pagination
     const skip = (page - 1) * limit;
     const totalPages = Math.ceil(total / limit);
 
-    // Fetch patients with related data
-    const patients = await prisma.patient.findMany({
+    // Fetch customers with related data
+    const customers = await prisma.customer.findMany({
       where,
       skip,
       take: limit,
@@ -172,30 +172,30 @@ export class PatientSearchService {
       },
     });
 
-    // Transform to patient summaries
-    const patientSummaries: PatientSummary[] = patients.map((patient) => ({
-      id: patient.id,
-      firstName: patient.firstName,
-      lastName: patient.lastName,
-      fullName: `${patient.firstName} ${patient.lastName}`,
-      dateOfBirth: patient.dateOfBirth,
-      age: this.calculateAge(patient.dateOfBirth),
-      gender: patient.gender as any,
-      medicalRecordNumber: patient.medicalRecordNumber,
-      email: patient.email || undefined,
-      phone: patient.phone || undefined,
-      status: patient.status as any,
-      lastVisit: patient.lastVisit || undefined,
-      nextAppointment: patient.nextAppointment || undefined,
-      conditionsCount: patient.conditions.length,
-      medicationsCount: patient.medications.length,
-      allergiesCount: patient.allergies.length,
+    // Transform to customer summaries
+    const patientSummaries: PatientSummary[] = customers.map((customer) => ({
+      id: customer.id,
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      fullName: `${customer.firstName} ${customer.lastName}`,
+      dateOfBirth: customer.dateOfBirth,
+      age: this.calculateAge(customer.dateOfBirth),
+      gender: customer.gender as any,
+      medicalRecordNumber: customer.medicalRecordNumber,
+      email: customer.email || undefined,
+      phone: customer.phone || undefined,
+      status: customer.status as any,
+      lastVisit: customer.lastVisit || undefined,
+      nextAppointment: customer.nextAppointment || undefined,
+      conditionsCount: customer.conditions.length,
+      medicationsCount: customer.medications.length,
+      allergiesCount: customer.allergies.length,
       riskLevel: undefined, // Will be populated from AI insights if available
       healthScore: undefined, // Will be populated from AI insights if available
     }));
 
     return {
-      patients: patientSummaries,
+      customers: patientSummaries,
       total,
       page,
       limit,
@@ -205,11 +205,11 @@ export class PatientSearchService {
   }
 
   /**
-   * Get patient by ID with full details
+   * Get customer by ID with full details
    */
-  async getPatientById(patientId: string): Promise<PatientDetails | null> {
-    const patient = await prisma.patient.findUnique({
-      where: { id: patientId },
+  async getPatientById(customerId: string): Promise<CustomerDetails | null> {
+    const customer = await prisma.customer.findUnique({
+      where: { id: customerId },
       include: {
         vitalSigns: {
           orderBy: { recordedAt: 'desc' },
@@ -233,26 +233,26 @@ export class PatientSearchService {
       },
     });
 
-    if (!patient) {
+    if (!customer) {
       return null;
     }
 
-    return patient as any;
+    return customer as any;
   }
 
   /**
-   * Get patient statistics
+   * Get customer statistics
    */
   async getPatientStatistics(): Promise<PatientStatistics> {
     // Total counts
-    const total = await prisma.patient.count();
-    const active = await prisma.patient.count({ where: { status: 'active' } });
-    const inactive = await prisma.patient.count({ where: { status: 'inactive' } });
+    const total = await prisma.customer.count();
+    const active = await prisma.customer.count({ where: { status: 'active' } });
+    const inactive = await prisma.customer.count({ where: { status: 'inactive' } });
 
     // By gender
-    const male = await prisma.patient.count({ where: { gender: 'male' } });
-    const female = await prisma.patient.count({ where: { gender: 'female' } });
-    const other = await prisma.patient.count({ where: { gender: 'other' } });
+    const male = await prisma.customer.count({ where: { gender: 'male' } });
+    const female = await prisma.customer.count({ where: { gender: 'female' } });
+    const other = await prisma.customer.count({ where: { gender: 'other' } });
 
     // By age group
     const today = new Date();
@@ -269,15 +269,15 @@ export class PatientSearchService {
     const weekStart = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
     const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
 
-    const visitsToday = await prisma.patient.count({
+    const visitsToday = await prisma.customer.count({
       where: { lastVisit: { gte: todayStart } },
     });
 
-    const visitsThisWeek = await prisma.patient.count({
+    const visitsThisWeek = await prisma.customer.count({
       where: { lastVisit: { gte: weekStart } },
     });
 
-    const visitsThisMonth = await prisma.patient.count({
+    const visitsThisMonth = await prisma.customer.count({
       where: { lastVisit: { gte: monthStart } },
     });
 
@@ -345,7 +345,7 @@ export class PatientSearchService {
    * Quick search for autocomplete
    */
   async quickSearch(query: string, limit: number = 10): Promise<PatientSummary[]> {
-    const patients = await prisma.patient.findMany({
+    const customers = await prisma.customer.findMany({
       where: {
         OR: [
           { firstName: { contains: query, mode: 'insensitive' } },
@@ -369,18 +369,18 @@ export class PatientSearchService {
       },
     });
 
-    return patients.map((patient) => ({
-      id: patient.id,
-      firstName: patient.firstName,
-      lastName: patient.lastName,
-      fullName: `${patient.firstName} ${patient.lastName}`,
-      dateOfBirth: patient.dateOfBirth,
-      age: this.calculateAge(patient.dateOfBirth),
-      gender: patient.gender as any,
-      medicalRecordNumber: patient.medicalRecordNumber,
-      email: patient.email || undefined,
-      phone: patient.phone || undefined,
-      status: patient.status as any,
+    return customers.map((customer) => ({
+      id: customer.id,
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      fullName: `${customer.firstName} ${customer.lastName}`,
+      dateOfBirth: customer.dateOfBirth,
+      age: this.calculateAge(customer.dateOfBirth),
+      gender: customer.gender as any,
+      medicalRecordNumber: customer.medicalRecordNumber,
+      email: customer.email || undefined,
+      phone: customer.phone || undefined,
+      status: customer.status as any,
       conditionsCount: 0,
       medicationsCount: 0,
       allergiesCount: 0,
@@ -388,12 +388,12 @@ export class PatientSearchService {
   }
 
   /**
-   * Get recently viewed patients
+   * Get recently viewed customers
    */
   async getRecentlyViewed(userId: string, limit: number = 10): Promise<PatientSummary[]> {
-    // This would typically track user's recent patient views
-    // For now, return most recently updated patients
-    const patients = await prisma.patient.findMany({
+    // This would typically track user's recent customer views
+    // For now, return most recently updated customers
+    const customers = await prisma.customer.findMany({
       take: limit,
       orderBy: { updatedAt: 'desc' },
       include: {
@@ -411,23 +411,23 @@ export class PatientSearchService {
       },
     });
 
-    return patients.map((patient) => ({
-      id: patient.id,
-      firstName: patient.firstName,
-      lastName: patient.lastName,
-      fullName: `${patient.firstName} ${patient.lastName}`,
-      dateOfBirth: patient.dateOfBirth,
-      age: this.calculateAge(patient.dateOfBirth),
-      gender: patient.gender as any,
-      medicalRecordNumber: patient.medicalRecordNumber,
-      email: patient.email || undefined,
-      phone: patient.phone || undefined,
-      status: patient.status as any,
-      lastVisit: patient.lastVisit || undefined,
-      nextAppointment: patient.nextAppointment || undefined,
-      conditionsCount: patient.conditions.length,
-      medicationsCount: patient.medications.length,
-      allergiesCount: patient.allergies.length,
+    return customers.map((customer) => ({
+      id: customer.id,
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      fullName: `${customer.firstName} ${customer.lastName}`,
+      dateOfBirth: customer.dateOfBirth,
+      age: this.calculateAge(customer.dateOfBirth),
+      gender: customer.gender as any,
+      medicalRecordNumber: customer.medicalRecordNumber,
+      email: customer.email || undefined,
+      phone: customer.phone || undefined,
+      status: customer.status as any,
+      lastVisit: customer.lastVisit || undefined,
+      nextAppointment: customer.nextAppointment || undefined,
+      conditionsCount: customer.conditions.length,
+      medicationsCount: customer.medications.length,
+      allergiesCount: customer.allergies.length,
     }));
   }
 
@@ -451,7 +451,7 @@ export class PatientSearchService {
     const maxDate = new Date(today.getFullYear() - minAge, today.getMonth(), today.getDate());
     const minDate = new Date(today.getFullYear() - maxAge - 1, today.getMonth(), today.getDate());
 
-    return await prisma.patient.count({
+    return await prisma.customer.count({
       where: {
         dateOfBirth: {
           gte: minDate,
@@ -462,4 +462,4 @@ export class PatientSearchService {
   }
 }
 
-export default new PatientSearchService();
+export default new CustomerSearchService();

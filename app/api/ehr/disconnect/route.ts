@@ -3,7 +3,7 @@
  * 
  * DELETE /api/ehr/disconnect
  * 
- * Disconnects from an EHR system for a patient.
+ * Disconnects from an EHR system for a customer.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -17,7 +17,7 @@ const auditService = new AuditLoggingService();
 
 // Request validation schema
 const disconnectSchema = z.object({
-  patientId: z.string().uuid(),
+  customerId: z.string().uuid(),
 });
 
 export async function DELETE(request: NextRequest) {
@@ -45,16 +45,16 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const { patientId } = validationResult.data;
+    const { customerId } = validationResult.data;
 
     // 3. Initialize EHR service
     const ehrService = new UnifiedEHRService();
 
     // 4. Get connection status before disconnecting
-    const connectionStatus = await ehrService.getConnectionStatus(patientId);
+    const connectionStatus = await ehrService.getConnectionStatus(customerId);
 
     // 5. Disconnect
-    await ehrService.disconnect(patientId);
+    await ehrService.disconnect(customerId);
 
     // 6. Log disconnection
     await auditService.log({
@@ -62,9 +62,9 @@ export async function DELETE(request: NextRequest) {
       eventType: 'EHR_CONNECTION_DISCONNECTED',
       category: 'INTEGRATION',
       outcome: 'SUCCESS',
-      description: `Disconnected from EHR for patient ${patientId}`,
+      description: `Disconnected from EHR for customer ${customerId}`,
       metadata: {
-        patientId,
+        customerId,
         provider: connectionStatus.provider,
       },
     });
@@ -75,7 +75,7 @@ export async function DELETE(request: NextRequest) {
         success: true,
         message: 'Successfully disconnected from EHR',
         data: {
-          patientId,
+          customerId,
           disconnectedAt: new Date().toISOString(),
         },
       },

@@ -81,7 +81,7 @@ export function SuccessScreen({ provider, connectionResult, onReset }: SuccessSc
               onClick={handleSyncNow}
             >
               <RefreshCw className="mr-2 h-4 w-4" />
-              Sync Patient Data Now
+              Sync Customer Data Now
             </Button>
 
             <Button
@@ -111,7 +111,7 @@ export function SuccessScreen({ provider, connectionResult, onReset }: SuccessSc
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                <span>Sync your patient data to get the latest information</span>
+                <span>Sync your customer data to get the latest information</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />

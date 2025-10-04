@@ -7,7 +7,7 @@
 import { useState, useCallback } from 'react';
 import { EHRProvider, WizardState, WizardStep, EHRConnectionConfig, EHRConnectionResponse } from '@/lib/types/ehr';
 
-export function useConnectionWizard(patientId: string) {
+export function useConnectionWizard(customerId: string) {
   const [state, setState] = useState<WizardState>({
     currentStep: 'provider',
   });
@@ -45,7 +45,7 @@ export function useConnectionWizard(patientId: string) {
         },
         credentials: 'include',
         body: JSON.stringify({
-          patientId,
+          customerId,
           provider: credentials.provider,
           config: {
             baseUrl: credentials.baseUrl,
@@ -81,7 +81,7 @@ export function useConnectionWizard(patientId: string) {
     } finally {
       setIsLoading(false);
     }
-  }, [patientId]);
+  }, [customerId]);
 
   // Retry connection
   const retry = useCallback(() => {

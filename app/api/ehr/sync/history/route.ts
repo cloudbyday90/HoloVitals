@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     const dataType = searchParams.get('dataType')?.split(',');
     const dateFrom = searchParams.get('dateFrom');
     const dateTo = searchParams.get('dateTo');
-    const patientId = searchParams.get('patientId');
+    const customerId = searchParams.get('customerId');
 
     // 3. Import Prisma client
     const { PrismaClient } = await import('@prisma/client');
@@ -71,8 +71,8 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      if (patientId) {
-        where.patientId = patientId;
+      if (customerId) {
+        where.customerId = customerId;
       }
 
       // 5. Get total count
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
       const syncs = await prisma.syncHistory.findMany({
         where,
         include: {
-          patient: {
+          customer: {
             select: {
               firstName: true,
               lastName: true,
@@ -114,9 +114,9 @@ export async function GET(request: NextRequest) {
 
         return {
           id: sync.id,
-          patientId: sync.patientId,
-          patientName: sync.patient
-            ? `${sync.patient.firstName} ${sync.patient.lastName}`
+          customerId: sync.customerId,
+          customerName: sync.customer
+            ? `${sync.customer.firstName} ${sync.customer.lastName}`
             : undefined,
           ehrProvider: sync.ehrProvider,
           status: sync.status,

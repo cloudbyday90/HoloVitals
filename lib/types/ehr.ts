@@ -34,7 +34,7 @@ export interface EHRConnectionConfig {
 }
 
 export interface EHRConnectionRequest {
-  patientId: string;
+  customerId: string;
   provider: EHRProvider;
   config: {
     baseUrl: string;
@@ -48,7 +48,7 @@ export interface EHRConnectionResponse {
   success: boolean;
   message: string;
   data?: {
-    patientId: string;
+    customerId: string;
     provider: EHRProvider;
     connectedAt: string;
   };

@@ -1,37 +1,37 @@
 /**
- * Patient Right to Restrict Uses and Disclosures API Endpoint
+ * Customer Right to Restrict Uses and Disclosures API Endpoint
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { patientRights } from '@/lib/services/PatientRightsService';
+import { customerRights } from '@/lib/services/CustomerRightsService';
 
 /**
- * POST /api/patient-rights/restriction
+ * POST /api/customer-rights/restriction
  * Request restriction on uses and disclosures
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const {
-      patientId,
+      customerId,
       restrictionType,
       dataType,
       recipient,
       reason,
     } = body;
 
-    if (!patientId || !restrictionType || !dataType || !reason) {
+    if (!customerId || !restrictionType || !dataType || !reason) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Patient ID, restriction type, data type, and reason are required',
+          error: 'Customer ID, restriction type, data type, and reason are required',
         },
         { status: 400 }
       );
     }
 
-    const requestId = await patientRights.requestRestriction({
-      patientId,
+    const requestId = await customerRights.requestRestriction({
+      customerId,
       restrictionType,
       dataType,
       recipient,

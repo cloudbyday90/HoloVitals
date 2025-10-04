@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
 
     const options = {
-      patientId: searchParams.get('patientId') || undefined,
+      customerId: searchParams.get('customerId') || undefined,
       category: searchParams.get('category') || undefined,
       tags: searchParams.get('tags')?.split(',') || undefined,
       uploadedBy: searchParams.get('uploadedBy') || undefined,

@@ -1,0 +1,22 @@
+HoloVitals v1.4.1 - Terminology Update Script
+============================================================
+Updating: patient → customer
+
+Processing directory: HoloVitals/app
+Processing directory: HoloVitals/components
+Processing directory: HoloVitals/lib
+Processing directory: HoloVitals/prisma
+  ✓ prisma/schema.prisma (50 replacements)
+  ✓ prisma/seed.ts (6 replacements)
+
+============================================================
+Summary:
+  Files scanned: 189
+  Files updated: 2
+  Total replacements: 56
+
+Updated files:
+  HoloVitals/prisma/schema.prisma: 50 replacements
+  HoloVitals/prisma/seed.ts: 6 replacements
+
+Terminology update complete!

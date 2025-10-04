@@ -1,19 +1,19 @@
 /**
- * Patient Right to Amend API Endpoints
+ * Customer Right to Amend API Endpoints
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { patientRights } from '@/lib/services/PatientRightsService';
+import { customerRights } from '@/lib/services/CustomerRightsService';
 
 /**
- * POST /api/patient-rights/amendment
+ * POST /api/customer-rights/amendment
  * Request amendment to PHI
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const {
-      patientId,
+      customerId,
       recordId,
       recordType,
       currentValue,
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       reason,
     } = body;
 
-    if (!patientId || !recordId || !recordType || !currentValue || !proposedValue || !reason) {
+    if (!customerId || !recordId || !recordType || !currentValue || !proposedValue || !reason) {
       return NextResponse.json(
         {
           success: false,
@@ -31,8 +31,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const requestId = await patientRights.requestAmendment({
-      patientId,
+    const requestId = await customerRights.requestAmendment({
+      customerId,
       recordId,
       recordType,
       currentValue,

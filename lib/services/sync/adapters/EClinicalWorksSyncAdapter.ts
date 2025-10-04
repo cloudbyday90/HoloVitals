@@ -38,7 +38,7 @@ export class EClinicalWorksSyncAdapter {
     this.config = config;
   }
 
-  async syncPatientInbound(patientId: string): Promise<EClinicalWorksSyncResult> {
+  async syncPatientInbound(customerId: string): Promise<EClinicalWorksSyncResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
     const conflicts: any[] = [];
@@ -47,12 +47,12 @@ export class EClinicalWorksSyncAdapter {
     let resourcesFailed = 0;
 
     try {
-      const ecwPatient = await this.fetchPatientFromECW(patientId);
+      const ecwPatient = await this.fetchPatientFromECW(customerId);
       resourcesProcessed++;
 
       const transformContext: TransformationContext = {
         ehrProvider: 'eclinicalworks',
-        resourceType: 'Patient',
+        resourceType: 'Customer',
         direction: 'INBOUND',
         sourceFormat: this.config.useFHIR ? DataFormat.FHIR_R4 : DataFormat.CUSTOM_JSON,
         targetFormat: DataFormat.CUSTOM_JSON,
@@ -69,46 +69,46 @@ export class EClinicalWorksSyncAdapter {
 
       warnings.push(...transformResult.warnings.map(w => w.message));
 
-      const existingPatient = await prisma.patient.findFirst({
-        where: { OR: [{ ecwId: patientId }, { mrn: transformResult.data.mrn }] },
+      const existingPatient = await prisma.customer.findFirst({
+        where: { OR: [{ ecwId: customerId }, { mrn: transformResult.data.mrn }] },
       });
 
       if (existingPatient) {
         const conflictResult = await conflictResolutionService.detectConflicts(
-          'Patient', existingPatient.id, existingPatient, transformResult.data
+          'Customer', existingPatient.id, existingPatient, transformResult.data
         );
         if (conflictResult.hasConflicts) {
           conflicts.push(...conflictResult.conflicts);
-          const resolutions = await conflictResolutionService.autoResolveConflicts('Patient', existingPatient.id);
+          const resolutions = await conflictResolutionService.autoResolveConflicts('Customer', existingPatient.id);
           for (const resolution of resolutions) {
             if (resolution.success) {
               transformResult.data[resolution.conflictId.split('-')[1]] = resolution.resolvedValue;
             }
           }
         }
-        await prisma.patient.update({
+        await prisma.customer.update({
           where: { id: existingPatient.id },
-          data: { ...transformResult.data, ecwId: patientId, lastSyncedAt: new Date() },
+          data: { ...transformResult.data, ecwId: customerId, lastSyncedAt: new Date() },
         });
       } else {
-        await prisma.patient.create({
-          data: { ...transformResult.data, ecwId: patientId, lastSyncedAt: new Date() },
+        await prisma.customer.create({
+          data: { ...transformResult.data, ecwId: customerId, lastSyncedAt: new Date() },
         });
       }
 
       resourcesSucceeded++;
-      await this.syncPatientClinicalData(patientId);
+      await this.syncPatientClinicalData(customerId);
 
       return { success: true, resourcesProcessed, resourcesSucceeded, resourcesFailed, errors, warnings, conflicts };
     } catch (error) {
-      console.error('Error syncing patient from eClinicalWorks:', error);
+      console.error('Error syncing customer from eClinicalWorks:', error);
       errors.push(error.message);
       resourcesFailed++;
       return { success: false, resourcesProcessed, resourcesSucceeded, resourcesFailed, errors, warnings, conflicts };
     }
   }
 
-  async syncPatientOutbound(patientId: string): Promise<EClinicalWorksSyncResult> {
+  async syncPatientOutbound(customerId: string): Promise<EClinicalWorksSyncResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
     const conflicts: any[] = [];
@@ -117,14 +117,14 @@ export class EClinicalWorksSyncAdapter {
     let resourcesFailed = 0;
 
     try {
-      const holoPatient = await prisma.patient.findUnique({ where: { id: patientId } });
-      if (!holoPatient) throw new Error('Patient not found in HoloVitals');
+      const holoPatient = await prisma.customer.findUnique({ where: { id: customerId } });
+      if (!holoPatient) throw new Error('Customer not found in HoloVitals');
 
       resourcesProcessed++;
 
       const transformContext: TransformationContext = {
         ehrProvider: 'eclinicalworks',
-        resourceType: 'Patient',
+        resourceType: 'Customer',
         direction: 'OUTBOUND',
         sourceFormat: DataFormat.CUSTOM_JSON,
         targetFormat: this.config.useFHIR ? DataFormat.FHIR_R4 : DataFormat.CUSTOM_JSON,
@@ -145,27 +145,27 @@ export class EClinicalWorksSyncAdapter {
         await this.updatePatientInECW(holoPatient.ecwId, transformResult.data);
       } else {
         const ecwId = await this.createPatientInECW(transformResult.data);
-        await prisma.patient.update({ where: { id: patientId }, data: { ecwId } });
+        await prisma.customer.update({ where: { id: customerId }, data: { ecwId } });
       }
 
       resourcesSucceeded++;
       return { success: true, resourcesProcessed, resourcesSucceeded, resourcesFailed, errors, warnings, conflicts };
     } catch (error) {
-      console.error('Error syncing patient to eClinicalWorks:', error);
+      console.error('Error syncing customer to eClinicalWorks:', error);
       errors.push(error.message);
       resourcesFailed++;
       return { success: false, resourcesProcessed, resourcesSucceeded, resourcesFailed, errors, warnings, conflicts };
     }
   }
 
-  private async syncPatientClinicalData(patientId: string): Promise<void> {
-    console.log('Syncing clinical data for patient:', patientId);
+  private async syncPatientClinicalData(customerId: string): Promise<void> {
+    console.log('Syncing clinical data for customer:', customerId);
   }
 
-  private async fetchPatientFromECW(patientId: string): Promise<any> {
+  private async fetchPatientFromECW(customerId: string): Promise<any> {
     const endpoint = this.config.useFHIR 
-      ? `${this.config.baseUrl}/fhir/Patient/${patientId}`
-      : `${this.config.baseUrl}/api/patients/${patientId}`;
+      ? `${this.config.baseUrl}/fhir/Customer/${customerId}`
+      : `${this.config.baseUrl}/api/customers/${customerId}`;
     
     const response = await fetch(endpoint, {
       headers: {
@@ -178,10 +178,10 @@ export class EClinicalWorksSyncAdapter {
     return await response.json();
   }
 
-  private async createPatientInECW(patientData: any): Promise<string> {
+  private async createPatientInECW(customerData: any): Promise<string> {
     const endpoint = this.config.useFHIR 
-      ? `${this.config.baseUrl}/fhir/Patient`
-      : `${this.config.baseUrl}/api/patients`;
+      ? `${this.config.baseUrl}/fhir/Customer`
+      : `${this.config.baseUrl}/api/customers`;
     
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -190,17 +190,17 @@ export class EClinicalWorksSyncAdapter {
         'X-Customer-ID': this.config.customerId,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(patientData),
+      body: JSON.stringify(customerData),
     });
     if (!response.ok) throw new Error(`eClinicalWorks API error: ${response.statusText}`);
     const result = await response.json();
-    return result.id || result.patientId;
+    return result.id || result.customerId;
   }
 
-  private async updatePatientInECW(patientId: string, patientData: any): Promise<void> {
+  private async updatePatientInECW(customerId: string, customerData: any): Promise<void> {
     const endpoint = this.config.useFHIR 
-      ? `${this.config.baseUrl}/fhir/Patient/${patientId}`
-      : `${this.config.baseUrl}/api/patients/${patientId}`;
+      ? `${this.config.baseUrl}/fhir/Customer/${customerId}`
+      : `${this.config.baseUrl}/api/customers/${customerId}`;
     
     const response = await fetch(endpoint, {
       method: 'PUT',
@@ -209,7 +209,7 @@ export class EClinicalWorksSyncAdapter {
         'X-Customer-ID': this.config.customerId,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(patientData),
+      body: JSON.stringify(customerData),
     });
     if (!response.ok) throw new Error(`eClinicalWorks API error: ${response.statusText}`);
   }

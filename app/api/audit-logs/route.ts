@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     // Extract filters from query parameters
     const filters = {
       userId: searchParams.get('userId') || undefined,
-      patientId: searchParams.get('patientId') || undefined,
+      customerId: searchParams.get('customerId') || undefined,
       eventType: searchParams.get('eventType') || undefined,
       eventCategory: searchParams.get('eventCategory') || undefined,
       outcome: searchParams.get('outcome') || undefined,

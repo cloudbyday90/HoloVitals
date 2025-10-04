@@ -1,11 +1,11 @@
 /**
- * Patient Quick Search API Endpoint (for autocomplete)
- * GET /api/patients/quick-search
+ * Customer Quick Search API Endpoint (for autocomplete)
+ * GET /api/customers/quick-search
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import PatientSearchService from '@/lib/services/PatientSearchService';
+import CustomerSearchService from '@/lib/services/CustomerSearchService';
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Quick search
-    const results = await PatientSearchService.quickSearch(query, limit);
+    const results = await CustomerSearchService.quickSearch(query, limit);
 
     return NextResponse.json({
       success: true,

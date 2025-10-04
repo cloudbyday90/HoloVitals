@@ -35,7 +35,7 @@ export function createAuditMiddleware(options: AuditMiddlewareOptions = {}) {
     logRequestBody = true,
     logResponseBody = false,
     sensitiveFields = ['password', 'token', 'secret', 'apiKey', 'ssn', 'creditCard'],
-    phiRoutes = ['/api/patients', '/api/lab-results', '/api/medical-records'],
+    phiRoutes = ['/api/customers', '/api/lab-results', '/api/medical-records'],
   } = options;
 
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -98,8 +98,8 @@ export function createAuditMiddleware(options: AuditMiddlewareOptions = {}) {
         // Determine risk level
         const riskLevel = determineRiskLevel(req, statusCode, isPHIRoute);
 
-        // Extract patient ID if present
-        const patientId = extractPatientId(req);
+        // Extract customer ID if present
+        const customerId = extractPatientId(req);
 
         // Log the request
         await auditLogging.log({
@@ -111,7 +111,7 @@ export function createAuditMiddleware(options: AuditMiddlewareOptions = {}) {
           resourceId: extractResourceId(req),
           outcome,
           phiAccessed: isPHIRoute,
-          patientId,
+          customerId,
           accessReason: extractAccessReason(req),
           dataAccessed: isPHIRoute ? extractDataAccessed(req) : undefined,
           requestDetails: {
@@ -160,14 +160,14 @@ export function phiAccessMiddleware(options: {
     res.on('finish', async () => {
       if (res.statusCode >= 200 && res.statusCode < 300) {
         try {
-          const patientId = options.extractPatientId(req);
+          const customerId = options.extractPatientId(req);
           const dataAccessed = options.extractDataAccessed(req);
           const accessReason = options.extractAccessReason
             ? options.extractAccessReason(req)
             : 'Treatment';
 
           await auditLogging.logPHIAccess(context, {
-            patientId,
+            customerId,
             dataAccessed,
             accessReason,
             action: options.action,
@@ -250,7 +250,7 @@ export function dataModificationMiddleware(options: {
           const changes = options.extractChanges
             ? options.extractChanges(req)
             : req.body;
-          const patientId = options.extractPatientId
+          const customerId = options.extractPatientId
             ? options.extractPatientId(req)
             : undefined;
 
@@ -261,7 +261,7 @@ export function dataModificationMiddleware(options: {
             resourceName,
             changes,
             phiInvolved: options.phiInvolved,
-            patientId,
+            customerId,
           });
         } catch (error) {
           console.error('Data modification logging failed:', error);
@@ -400,10 +400,10 @@ function determineRiskLevel(
 }
 
 /**
- * Extract patient ID from request
+ * Extract customer ID from request
  */
 function extractPatientId(req: Request): string | undefined {
-  return req.params.patientId || req.query.patientId as string || (req.body as any)?.patientId;
+  return req.params.customerId || req.query.customerId as string || (req.body as any)?.customerId;
 }
 
 /**

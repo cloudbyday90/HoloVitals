@@ -1,33 +1,33 @@
 /**
- * Patient Right to Accounting of Disclosures API Endpoint
+ * Customer Right to Accounting of Disclosures API Endpoint
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { patientRights } from '@/lib/services/PatientRightsService';
+import { customerRights } from '@/lib/services/CustomerRightsService';
 
 /**
- * GET /api/patient-rights/disclosures
+ * GET /api/customer-rights/disclosures
  * Request accounting of disclosures
  */
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const patientId = searchParams.get('patientId');
+    const customerId = searchParams.get('customerId');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
 
-    if (!patientId || !startDate || !endDate) {
+    if (!customerId || !startDate || !endDate) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Patient ID, start date, and end date are required',
+          error: 'Customer ID, start date, and end date are required',
         },
         { status: 400 }
       );
     }
 
-    const disclosures = await patientRights.requestDisclosureAccounting({
-      patientId,
+    const disclosures = await customerRights.requestDisclosureAccounting({
+      customerId,
       startDate: new Date(startDate),
       endDate: new Date(endDate),
     });

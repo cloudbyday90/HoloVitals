@@ -43,7 +43,7 @@ export interface HealthFactor {
 
 export interface RiskAssessment {
   id: string;
-  patientId: string;
+  customerId: string;
   assessmentDate: Date;
   overallRisk: RiskLevel;
   risks: HealthRisk[];
@@ -149,7 +149,7 @@ export type TimeFrame = '7-days' | '30-days' | '90-days' | '6-months' | '1-year'
 // ============================================================================
 
 export interface MedicationInteractionAnalysis {
-  patientId: string;
+  customerId: string;
   analysisDate: Date;
   medications: MedicationInfo[];
   interactions: DrugInteraction[];
@@ -272,7 +272,7 @@ export interface LabTrend {
 // ============================================================================
 
 export interface PersonalizedRecommendations {
-  patientId: string;
+  customerId: string;
   generatedDate: Date;
   categories: RecommendationCategory[];
   priorityActions: Recommendation[];
@@ -356,7 +356,7 @@ export interface Resource {
 // ============================================================================
 
 export interface InsightTimeline {
-  patientId: string;
+  customerId: string;
   insights: TimelineInsight[];
   filters: TimelineFilters;
 }
@@ -418,7 +418,7 @@ export interface AIServiceConfig {
 // ============================================================================
 
 export interface GenerateInsightsRequest {
-  patientId: string;
+  customerId: string;
   includeRiskAssessment?: boolean;
   includeTrendAnalysis?: boolean;
   includeMedicationInteraction?: boolean;

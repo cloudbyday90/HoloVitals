@@ -8,7 +8,7 @@
 
 export interface LabResult {
   id: string;
-  patientId: string;
+  customerId: string;
   testName: string;
   loincCode: string;
   value: string | number;
@@ -71,7 +71,7 @@ export interface LabResultsFilter {
 
 export interface Medication {
   id: string;
-  patientId: string;
+  customerId: string;
   name: string;
   genericName?: string;
   brandName?: string;
@@ -129,7 +129,7 @@ export interface MedicationSchedule {
 
 export interface TimelineEvent {
   id: string;
-  patientId: string;
+  customerId: string;
   type: TimelineEventType;
   title: string;
   description?: string;
@@ -171,7 +171,7 @@ export interface TimelineFilter {
 
 export interface ClinicalDocument {
   id: string;
-  patientId: string;
+  customerId: string;
   title: string;
   type: DocumentType;
   category: string;
@@ -212,7 +212,7 @@ export enum DocumentStatus {
 
 export interface Allergy {
   id: string;
-  patientId: string;
+  customerId: string;
   allergen: string;
   type: AllergyType;
   category: string;
@@ -239,7 +239,7 @@ export enum AllergySeverity {
 
 export interface Condition {
   id: string;
-  patientId: string;
+  customerId: string;
   condition: string;
   icd10Code?: string;
   snomedCode?: string;
@@ -283,7 +283,7 @@ export enum VerificationStatus {
 
 export interface HealthInsight {
   id: string;
-  patientId: string;
+  customerId: string;
   type: InsightType;
   title: string;
   description: string;

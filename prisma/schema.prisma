@@ -190,7 +190,7 @@ enum BulkExportStatus {
 }
 
 enum BulkExportType {
-  PATIENT
+  CUSTOMER
   GROUP
   SYSTEM
 }
@@ -288,7 +288,7 @@ enum EHRProvider {
 }
 
 enum FHIRResourceType {
-  PATIENT
+  CUSTOMER
   DOCUMENT_REFERENCE
   OBSERVATION
   CONDITION
@@ -362,7 +362,7 @@ enum NotificationStatus {
 
 enum PermissionScope {
   OWN       // User's own data only
-  ASSIGNED  // Assigned patients/resources
+  ASSIGNED  // Assigned customers/resources
   DEPARTMENT // Department-level access
   ORGANIZATION // Organization-level access
   SYSTEM    // System-wide access
@@ -640,12 +640,12 @@ model AnalysisQueue {
 model AnalysisSession {
   id            String    @id @default(uuid())
   userId        String    @map("user_id")
-  patientId     String?   @map("patient_id")
+  customerId     String?   @map("customer_id")
   sessionType   String    @map("session_type")
   createdAt     DateTime  @default(now()) @map("created_at")
   
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  patient       Patient?  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  customer       Customer?  @relation(fields: [customerId], references: [id], onDelete: Cascade)
   interactions  AiInteraction[]
   
   @@map("analysis_sessions")
@@ -811,7 +811,7 @@ model BreachIncident {
   riskAssessment    String
   
   // Affected Parties
-  affectedPatientIds String[]
+  affectedCustomerIds String[]
   affectedUserIds    String[]
   
   // Notification Status
@@ -1183,7 +1183,7 @@ model ComplianceReport {
 
 model ConsentGrant {
   id                      String    @id @default(uuid())
-  patientId               String    @map("patient_id")
+  customerId               String    @map("customer_id")
   specialistId            String    @map("specialist_id")
   permissions             String    @db.Text
   reason                  String    @db.Text
@@ -1202,12 +1202,12 @@ model ConsentGrant {
   createdAt               DateTime  @default(now()) @map("created_at")
   updatedAt               DateTime  @updatedAt @map("updated_at")
   
-  patient                 User      @relation("PatientConsents", fields: [patientId], references: [id], onDelete: Cascade)
+  customer                 User      @relation("PatientConsents", fields: [customerId], references: [id], onDelete: Cascade)
   specialist              User      @relation("SpecialistConsents", fields: [specialistId], references: [id], onDelete: Cascade)
   accessLogs              AccessLog[]
   
   @@map("consent_grants")
-  @@index([patientId])
+  @@index([customerId])
   @@index([specialistId])
   @@index([status])
   @@index([expiresAt])
@@ -1307,7 +1307,7 @@ model DataRetentionPolicy {
   description String
   
   // Scope
-  dataType    String   // e.g., "patient_record", "audit_log", "lab_result"
+  dataType    String   // e.g., "customer_record", "audit_log", "lab_result"
   category    String?
   
   // Retention Rules
@@ -1335,7 +1335,7 @@ model DataRetentionPolicy {
 model Document {
   id            String    @id @default(uuid())
   userId        String    @map("user_id")
-  patientId     String?   @map("patient_id")
+  customerId     String?   @map("customer_id")
   filePath      String    @map("file_path")
   fileName      String    @map("file_name")
   fileSize      Int?      @map("file_size")
@@ -1348,7 +1348,7 @@ model Document {
   updatedAt     DateTime  @updatedAt @map("updated_at")
   
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  patient       Patient?  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  customer       Customer?  @relation(fields: [customerId], references: [id], onDelete: Cascade)
   ocrResults    OcrResult[]
   extractedData ExtractedData[]
   sourceLinks   DocumentLink[] @relation("SourceDocument")
@@ -1458,9 +1458,9 @@ model EHRConnection {
   refreshToken          String?           @map("refresh_token") @db.Text
   tokenExpiresAt        DateTime?         @map("token_expires_at")
   
-  // Patient context
-  patientId             String?           @map("patient_id") // FHIR Patient ID
-  patientName           String?           @map("patient_name")
+  // Customer context
+  customerId             String?           @map("customer_id") // FHIR Customer ID
+  customerName           String?           @map("customer_name")
   
   // Sync settings
   autoSync              Boolean           @default(true) @map("auto_sync")
@@ -1849,8 +1849,8 @@ model LabResultStandardization {
   referenceRange      ReferenceRange? @relation(fields: [referenceRangeId], references: [id])
   
   // Context
-  patientId           String
-  patient             User            @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  customerId           String
+  customer             User            @relation(fields: [customerId], references: [id], onDelete: Cascade)
   fhirResourceId      String?
   fhirResource        FHIRResource?   @relation(fields: [fhirResourceId], references: [id])
   
@@ -1864,7 +1864,7 @@ model LabResultStandardization {
   
   @@index([originalCode, originalCodeSystem])
   @@index([loincCodeId])
-  @@index([patientId])
+  @@index([customerId])
   @@index([interpretation])
   @@index([standardizedAt])
 }
@@ -1924,7 +1924,7 @@ model ModelPerformance {
 
 model Notification {
   id              String    @id @default(uuid())
-  patientId       String    @map("patient_id")
+  customerId       String    @map("customer_id")
   type            String
   message         String    @db.Text
   requiresAction  Boolean   @default(false) @map("requires_action")
@@ -1933,7 +1933,7 @@ model Notification {
   createdAt       DateTime  @default(now()) @map("created_at")
   
   @@map("notifications")
-  @@index([patientId])
+  @@index([customerId])
   @@index([read])
   @@index([createdAt])
 }
@@ -1950,7 +1950,7 @@ model OcrResult {
   @@map("ocr_results")
 }
 
-model Patient {
+model Customer {
   id            String    @id @default(uuid())
   userId        String    @map("user_id")
   firstName     String?   @map("first_name")
@@ -1962,13 +1962,13 @@ model Patient {
   documents     Document[]
   analysisSessions AnalysisSession[]
   
-  @@map("patients")
+  @@map("customers")
 }
 
-model PatientAccessRequest {
+model CustomerAccessRequest {
   id              String   @id @default(cuid())
   
-  patientId       String
+  customerId       String
   requestType     AccessRequestType
   specificRecords String[] // JSON array
   startDate       DateTime?
@@ -1983,12 +1983,12 @@ model PatientAccessRequest {
   fulfilledBy     String?
   notes           String?
   
-  @@index([patientId])
+  @@index([customerId])
   @@index([status])
-  @@map("patient_access_requests")
+  @@map("customer_access_requests")
 }
 
-model PatientAllergy {
+model CustomerAllergy {
   id              String    @id @default(uuid())
   repositoryId    String    @map("repository_id")
   allergen        String
@@ -1998,16 +1998,16 @@ model PatientAllergy {
   diagnosedDate   DateTime? @map("diagnosed_date")
   createdAt       DateTime  @default(now()) @map("created_at")
   
-  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repository      CustomerRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   
-  @@map("patient_allergies")
+  @@map("customer_allergies")
   @@index([repositoryId])
 }
 
-model PatientAmendmentRequest {
+model CustomerAmendmentRequest {
   id            String   @id @default(cuid())
   
-  patientId     String
+  customerId     String
   recordId      String
   recordType    String
   currentValue  String
@@ -2020,15 +2020,15 @@ model PatientAmendmentRequest {
   reviewedBy    String?
   reviewNotes   String?
   
-  @@index([patientId])
+  @@index([customerId])
   @@index([status])
-  @@map("patient_amendment_requests")
+  @@map("customer_amendment_requests")
 }
 
-model PatientCommunicationRequest {
+model CustomerCommunicationRequest {
   id                 String   @id @default(cuid())
   
-  patientId          String
+  customerId          String
   communicationType  CommunicationType
   alternativeContact String
   reason             String
@@ -2038,16 +2038,16 @@ model PatientCommunicationRequest {
   reviewedAt         DateTime?
   reviewedBy         String?
   
-  @@index([patientId])
+  @@index([customerId])
   @@index([status])
-  @@map("patient_communication_requests")
+  @@map("customer_communication_requests")
 }
 
-model PatientConsent {
+model CustomerConsent {
   id          String   @id @default(cuid())
   
-  // Patient Information
-  patientId   String
+  // Customer Information
+  customerId   String
   
   // Consent Details
   consentType ConsentType
@@ -2057,7 +2057,7 @@ model PatientConsent {
   // Consent Status
   status      ConsentStatus @default(ACTIVE)
   givenAt     DateTime @default(now())
-  givenBy     String   // Patient or authorized representative
+  givenBy     String   // Customer or authorized representative
   
   // Expiration
   expiresAt   DateTime?
@@ -2076,13 +2076,13 @@ model PatientConsent {
   // Audit
   auditLogId  String?
   
-  @@index([patientId])
+  @@index([customerId])
   @@index([consentType])
   @@index([status])
-  @@map("patient_consents")
+  @@map("customer_consents")
 }
 
-model PatientDiagnosis {
+model CustomerDiagnosis {
   id              String    @id @default(uuid())
   repositoryId    String    @map("repository_id")
   condition       String
@@ -2093,14 +2093,14 @@ model PatientDiagnosis {
   notes           String?   @db.Text
   createdAt       DateTime  @default(now()) @map("created_at")
   
-  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repository      CustomerRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   
-  @@map("patient_diagnoses")
+  @@map("customer_diagnoses")
   @@index([repositoryId])
   @@index([diagnosedDate])
 }
 
-model PatientFamilyHistory {
+model CustomerFamilyHistory {
   id              String    @id @default(uuid())
   repositoryId    String    @map("repository_id")
   relationship    String
@@ -2109,13 +2109,13 @@ model PatientFamilyHistory {
   notes           String?   @db.Text
   createdAt       DateTime  @default(now()) @map("created_at")
   
-  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repository      CustomerRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   
-  @@map("patient_family_history")
+  @@map("customer_family_history")
   @@index([repositoryId])
 }
 
-model PatientImmunization {
+model CustomerImmunization {
   id              String    @id @default(uuid())
   repositoryId    String    @map("repository_id")
   vaccine         String
@@ -2125,14 +2125,14 @@ model PatientImmunization {
   lotNumber       String?   @map("lot_number")
   createdAt       DateTime  @default(now()) @map("created_at")
   
-  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repository      CustomerRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   
-  @@map("patient_immunizations")
+  @@map("customer_immunizations")
   @@index([repositoryId])
   @@index([date])
 }
 
-model PatientMedication {
+model CustomerMedication {
   id              String    @id @default(uuid())
   repositoryId    String    @map("repository_id")
   name            String
@@ -2145,14 +2145,14 @@ model PatientMedication {
   status          String
   createdAt       DateTime  @default(now()) @map("created_at")
   
-  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repository      CustomerRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   
-  @@map("patient_medications")
+  @@map("customer_medications")
   @@index([repositoryId])
   @@index([status])
 }
 
-model PatientProcedure {
+model CustomerProcedure {
   id              String    @id @default(uuid())
   repositoryId    String    @map("repository_id")
   name            String
@@ -2162,14 +2162,14 @@ model PatientProcedure {
   notes           String?   @db.Text
   createdAt       DateTime  @default(now()) @map("created_at")
   
-  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repository      CustomerRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   
-  @@map("patient_procedures")
+  @@map("customer_procedures")
   @@index([repositoryId])
   @@index([date])
 }
 
-model PatientRepository {
+model CustomerRepository {
   id                      String    @id @default(uuid())
   userId                  String    @unique @map("user_id")
   primaryIdentityHash     String    @unique @map("primary_identity_hash")
@@ -2183,15 +2183,15 @@ model PatientRepository {
   lastAccessedAt          DateTime? @map("last_accessed_at")
   version                 Int       @default(1)
   
-  diagnoses               PatientDiagnosis[]
-  medications             PatientMedication[]
-  allergies               PatientAllergy[]
-  vitalSigns              PatientVitalSign[]
-  procedures              PatientProcedure[]
-  immunizations           PatientImmunization[]
-  familyHistory           PatientFamilyHistory[]
+  diagnoses               CustomerDiagnosis[]
+  medications             CustomerMedication[]
+  allergies               CustomerAllergy[]
+  vitalSigns              CustomerVitalSign[]
+  procedures              CustomerProcedure[]
+  immunizations           CustomerImmunization[]
+  familyHistory           CustomerFamilyHistory[]
   
-  @@map("patient_repositories")
+  @@map("customer_repositories")
   @@index([userId])
   @@index([compositeIdentityHash])
 }
@@ -2199,7 +2199,7 @@ model PatientRepository {
 model PatientRestrictionRequest {
   id              String   @id @default(cuid())
   
-  patientId       String
+  customerId       String
   restrictionType RestrictionType
   dataType        String
   recipient       String?
@@ -2211,12 +2211,12 @@ model PatientRestrictionRequest {
   reviewedBy      String?
   reviewNotes     String?
   
-  @@index([patientId])
+  @@index([customerId])
   @@index([status])
   @@map("patient_restriction_requests")
 }
 
-model PatientVitalSign {
+model CustomerVitalSign {
   id                      String    @id @default(uuid())
   repositoryId            String    @map("repository_id")
   date                    DateTime
@@ -2230,9 +2230,9 @@ model PatientVitalSign {
   oxygenSaturation        Int?      @map("oxygen_saturation")
   createdAt               DateTime  @default(now()) @map("created_at")
   
-  repository              PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repository              CustomerRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   
-  @@map("patient_vital_signs")
+  @@map("customer_vital_signs")
   @@index([repositoryId])
   @@index([date])
 }
@@ -2266,7 +2266,7 @@ model Permission {
   description String?
   
   // Permission Properties
-  resource    String   // e.g., "patient", "lab_result", "user"
+  resource    String   // e.g., "customer", "lab_result", "user"
   action      String   // e.g., "read", "write", "delete"
   scope       PermissionScope @default(OWN)
   
@@ -2557,7 +2557,7 @@ model SecureFile {
   
   // Ownership
   uploadedBy  String
-  patientId   String?
+  customerId   String?
   
   // Access Tracking
   accessCount Int      @default(0)
@@ -2575,7 +2575,7 @@ model SecureFile {
   // Relationships
   accessGrants FileAccessGrant[]
   
-  @@index([patientId])
+  @@index([customerId])
   @@index([uploadedBy])
   @@index([category])
   @@index([deleted])
@@ -2887,7 +2887,7 @@ model User {
   id                    String    @id @default(uuid())
   email                 String    @unique
   passwordHash          String    @map("password_hash")
-  role                  String    @default("PATIENT") // OWNER, ADMIN, DOCTOR, PATIENT, SUPPORT, ANALYST
+  role                  String    @default("CUSTOMER") // OWNER, ADMIN, DOCTOR, CUSTOMER, SUPPORT, ANALYST
   mfaEnabled            Boolean   @default(false) @map("mfa_enabled")
   mfaSecret             String?   @map("mfa_secret")
   mfaBackupCodes        String?   @map("mfa_backup_codes")
@@ -2896,11 +2896,11 @@ model User {
   createdAt             DateTime  @default(now()) @map("created_at")
   updatedAt             DateTime  @updatedAt @map("updated_at")
   
-  patients              Patient[]
+  customers              Customer[]
   documents             Document[]
   analysisSessions      AnalysisSession[]
   sessions              UserSession[]
-  consentRequestsAsPatient ConsentGrant[] @relation("PatientConsents")
+  consentRequestsAsPatient ConsentGrant[] @relation("CustomerConsents")
   consentRequestsAsSpecialist ConsentGrant[] @relation("SpecialistConsents")
   auditLogs             AuditLog[]
   rbacAccessLogs        RBACAccessLog[]

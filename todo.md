@@ -1,50 +1,59 @@
-# HoloVitals v1.4.1 Release - Build Fixes & Terminology Update
+# HoloVitals v1.4.1 Development - Comprehensive Terminology Update
 
-## Current Status: Fixing Build Errors
+## Overview
+Comprehensive update from "patient" to "customer" terminology throughout the entire codebase including database schema, APIs, services, and UI.
 
-### Phase 1: Repository Analysis [x]
-- [x] Check current branch state (on main)
-- [x] Review all branches
-- [x] Check for uncommitted changes (todo.md modified, release-notes-body.md untracked)
-- [x] Review GitHub Actions status (6 failed deployments)
-- [x] Identify errors: Missing UI components (alert-dialog and 82 others)
-- [x] Check for merge conflicts (none)
+## 1. Planning & Analysis ✅
+- [x] Create feature branch for v1.4.1
+- [x] Analyze codebase for all "patient" references
+- [x] Create terminology update scripts
+- [x] Document scope and impact
+- [x] User selected Option 2: Comprehensive Update
 
-### Phase 2: Build Error Resolution [x]
-- [x] Identify all missing UI components (8 components missing)
-- [x] Create missing alert-dialog component
-- [x] Create missing form component
-- [x] Create missing popover component
-- [x] Create missing scroll-area component
-- [x] Create missing separator component
-- [x] Create missing sheet component
-- [x] Create missing skeleton component
-- [x] Create missing table component
-- [x] Create authOptions re-export file
-- [x] Add formatDate utility function
-- [x] Add stripe instance export
-- [x] Install stripe package
-- [x] Test build locally - SUCCESS!
-- [ ] Commit fixes
-- [ ] Push and verify GitHub Actions pass
+## 2. Code Updates ✅
+- [x] Update Prisma schema model names (93 replacements)
+- [x] Update table mappings and field names
+- [x] Update API route handlers (2,079 total replacements)
+- [x] Update service class names and methods
+- [x] Update type definitions
+- [x] Update component names and UI text
+- [x] Update Prisma client calls (142 replacements)
+- [x] Update SQL table references (74 replacements)
 
-### Phase 3: Cleanup & Commit [ ]
-- [ ] Commit uncommitted changes (todo.md)
-- [ ] Remove untracked files (release-notes-body.md, screenshots)
-- [ ] Clean up workspace
-- [ ] Verify repository state
+### Update Summary:
+- **110 files updated** with comprehensive terminology changes
+- **2,295 total replacements** across the codebase
+- Database schema, APIs, services, components all updated
 
-### Phase 4: Terminology Update (v1.4.1) [ ]
-- [ ] Create feature branch for v1.4.1
-- [ ] Update "patient" to "customer" in codebase
-- [ ] Update "patient" to "customer" in documentation
-- [ ] Update UI components and labels
-- [ ] Update API responses and messages
-- [ ] Test all changes
+## 3. Database Migration
+- [ ] Generate Prisma migration
+- [ ] Review migration SQL
+- [ ] Test migration locally
+- [ ] Create migration rollback plan
 
-### Phase 5: Release Preparation [ ]
-- [ ] Create changelog for v1.4.1
+## 4. Documentation Updates
+- [ ] Update README.md
+- [ ] Create MIGRATION_GUIDE.md
+- [ ] Create BREAKING_CHANGES.md
+- [ ] Update API documentation
+- [ ] Update code comments
+
+## 5. Testing & Verification
+- [ ] Verify build passes
+- [ ] Test API endpoints
+- [ ] Test UI functionality
+- [ ] Check for missed references
+- [ ] Run integration tests
+
+## 6. Release Preparation
+- [ ] Create CHANGELOG for v1.4.1
 - [ ] Update version numbers
-- [ ] Create release notes
-- [ ] Test installation script
+- [ ] Create comprehensive release notes
+- [ ] Commit and push all changes
+- [ ] Create pull request
+
+## 7. Completion
+- [ ] Review all changes
+- [ ] Merge to main
 - [ ] Create GitHub release
+- [ ] Update documentation

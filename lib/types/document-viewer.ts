@@ -8,7 +8,7 @@
 
 export interface Document {
   id: string;
-  patientId: string;
+  customerId: string;
   title: string;
   description?: string;
   type: DocumentType;
