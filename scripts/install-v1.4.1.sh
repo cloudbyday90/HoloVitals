@@ -15,13 +15,10 @@ NC='\033[0m' # No Color
 # Version
 VERSION="1.4.1"
 
-echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║                                                            ║${NC}"
-echo -e "${BLUE}║           HoloVitals v${VERSION} Installation Script          ║${NC}"
-echo -e "${BLUE}║                                                            ║${NC}"
-echo -e "${BLUE}║  Comprehensive Terminology Update - Breaking Changes      ║${NC}"
-echo -e "${BLUE}║                                                            ║${NC}"
-echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}"
+echo "=================================================="
+echo "HoloVitals v${VERSION} Production Installer"
+echo "Comprehensive Terminology Update - Breaking Changes"
+echo "=================================================="
 echo ""
 
 # Function to print status messages
@@ -43,8 +40,74 @@ print_error() {
 
 # Check if running as root
 if [ "$EUID" -eq 0 ]; then 
-    print_warning "Running as root. Consider using a non-root user for security."
+    echo "❌ Please do not run as root. Run as your regular user."
+    echo "   The script will use sudo when needed."
+    exit 1
 fi
+
+# Get current user info
+CURRENT_USER=$(whoami)
+CURRENT_GROUP=$(id -gn)
+USER_HOME=$(eval echo ~$CURRENT_USER)
+
+echo "👤 Current user: $CURRENT_USER"
+echo "👥 Primary group: $CURRENT_GROUP"
+echo "🏠 Home directory: $USER_HOME"
+echo ""
+
+echo "=================================================="
+echo "Domain & Configuration"
+echo "=================================================="
+echo ""
+
+read -p "Enter your domain name (e.g., holovitals.com): " DOMAIN_NAME
+read -p "Enter your email for notifications: " ADMIN_EMAIL
+
+if [ -z "$DOMAIN_NAME" ] || [ -z "$ADMIN_EMAIL" ]; then
+    echo "❌ Domain name and email are required"
+    exit 1
+fi
+
+# Validate email format
+if ! [[ "$ADMIN_EMAIL" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+    echo "❌ Invalid email format"
+    exit 1
+fi
+
+echo ""
+echo "=================================================="
+echo "Cloudflare Tunnel Setup"
+echo "=================================================="
+echo ""
+echo "You will need your Cloudflare Tunnel token."
+echo ""
+echo "To get your tunnel token:"
+echo "1. Go to https://one.dash.cloudflare.com/"
+echo "2. Navigate to Networks > Tunnels"
+echo "3. Create a new tunnel or select existing"
+echo "4. Copy the tunnel token (starts with 'eyJ...')"
+echo ""
+read -p "Enter your Cloudflare Tunnel token: " CLOUDFLARE_TOKEN
+
+if [ -z "$CLOUDFLARE_TOKEN" ]; then
+    echo "❌ Cloudflare Tunnel token is required"
+    exit 1
+fi
+
+echo ""
+echo "Configuration Summary:"
+echo "  Domain: $DOMAIN_NAME"
+echo "  Admin Email: $ADMIN_EMAIL"
+echo "  Tunnel: Configured"
+echo ""
+
+read -p "Continue with installation? (yes/no): " confirm
+if [ "$confirm" != "yes" ]; then
+    echo "❌ Installation cancelled"
+    exit 1
+fi
+
+echo ""
 
 echo "=================================================="
 echo "Phase 1: Checking Prerequisites"
@@ -116,8 +179,8 @@ echo "=================================================="
 echo "Phase 3: Installing Dependencies"
 echo "=================================================="
 echo ""
-print_status "Installing dependencies (this may take a few minutes)..."
-npm install --legacy-peer-deps
+print_status "Installing application dependencies..."
+npm install
 
 print_success "Dependencies installed"
 
@@ -126,19 +189,36 @@ echo "=================================================="
 echo "Phase 4: Environment Configuration"
 echo "=================================================="
 echo ""
-if [ ! -f .env ]; then
-    print_status "Creating .env file..."
-    
-    if [ -f .env.example ]; then
-        cp .env.example .env
-        print_success ".env file created from .env.example"
-        print_warning "Please configure your .env file with your database credentials"
-    else
-        print_warning "No .env.example found. You'll need to create .env manually"
-    fi
-else
-    print_success ".env file already exists"
-fi
+# Generate secure database password
+DB_PASSWORD=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-25)
+DB_NAME="holovitals"
+DB_USER="holovitals"
+
+print_status "Creating environment configuration..."
+
+cat > .env.local << EOF
+# Database
+DATABASE_URL="postgresql://$DB_USER:$DB_PASSWORD@localhost:5432/$DB_NAME"
+
+# Application
+NODE_ENV=production
+NEXT_PUBLIC_APP_URL=https://$DOMAIN_NAME
+
+# Admin
+ADMIN_EMAIL=$ADMIN_EMAIL
+
+# NextAuth
+NEXTAUTH_URL=https://$DOMAIN_NAME
+NEXTAUTH_SECRET=$(openssl rand -base64 32)
+
+# Add your API keys here
+OPENAI_API_KEY=your_openai_key_here
+ANTHROPIC_API_KEY=your_anthropic_key_here
+EOF
+
+chmod 600 .env.local
+
+print_success "Environment configuration created"
 
 echo ""
 echo "=================================================="
@@ -152,7 +232,52 @@ print_success "Prisma client generated"
 
 echo ""
 echo "=================================================="
-echo "Phase 6: Next Steps & Instructions"
+echo "Phase 6: Cloudflare Tunnel Setup"
+echo "=================================================="
+echo ""
+
+# Install cloudflared
+print_status "Installing Cloudflare Tunnel..."
+if ! command -v cloudflared &> /dev/null; then
+    wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+    sudo dpkg -i cloudflared-linux-amd64.deb
+    rm cloudflared-linux-amd64.deb
+fi
+
+# Create tunnel configuration
+sudo mkdir -p /etc/cloudflared
+sudo tee /etc/cloudflared/config.yml > /dev/null << EOF
+tunnel: $CLOUDFLARE_TOKEN
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  - hostname: $DOMAIN_NAME
+    service: http://localhost:3000
+  - service: http_status:404
+EOF
+
+# Install tunnel as a service
+print_status "Installing Cloudflare Tunnel as system service..."
+sudo cloudflared service install
+sudo systemctl enable cloudflared
+sudo systemctl start cloudflared
+
+print_success "Cloudflare Tunnel configured"
+
+echo ""
+echo "=================================================="
+echo "Phase 7: Build Application"
+echo "=================================================="
+echo ""
+
+print_status "Building Next.js application..."
+npm run build
+
+print_success "Application built successfully"
+
+echo ""
+echo "=================================================="
+echo "Phase 8: Next Steps & Instructions"
 echo "=================================================="
 echo ""
 print_status "Database setup instructions..."
@@ -192,18 +317,66 @@ echo "  • Migration required"
 echo ""
 
 # Success message
-echo -e "${GREEN}╔════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║              Installation Complete!                        ║${NC}"
-echo -e "${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
 echo ""
-echo -e "${BLUE}Documentation:${NC}"
+echo "=================================================="
+echo "Installation Complete! 🎉"
+echo "=================================================="
+echo ""
+echo "✅ HoloVitals v${VERSION} is now running!"
+echo ""
+echo "📊 Application URL: https://$DOMAIN_NAME"
+echo "📧 Admin Email: $ADMIN_EMAIL"
+echo ""
+echo "🔐 Database Credentials (SAVE THESE SECURELY):"
+echo "   Database: $DB_NAME"
+echo "   User: $DB_USER"
+echo "   Password: $DB_PASSWORD"
+echo ""
+echo "⚠️  v1.4.1 includes BREAKING CHANGES!"
+echo ""
+echo "If upgrading from v1.4.0, please review:"
+echo "  • MIGRATION_GUIDE_V1.4.1.md"
+echo "  • BREAKING_CHANGES_V1.4.1.md"
+echo ""
+echo "Key changes:"
+echo "  • All 'patient' terminology changed to 'customer'"
+echo "  • Database models renamed"
+echo "  • API endpoints updated"
+echo "  • Migration required"
+echo ""
+echo "📚 Documentation:"
 echo "  • README.md"
 echo "  • RELEASE_NOTES_V1.4.1.md"
 echo "  • MIGRATION_GUIDE_V1.4.1.md"
 echo ""
-echo -e "${BLUE}Support:${NC}"
+echo "🔗 Support:"
 echo "  • GitHub: https://github.com/cloudbyday90/HoloVitals"
 echo "  • Issues: https://github.com/cloudbyday90/HoloVitals/issues"
 echo ""
-echo -e "${GREEN}Happy coding! 🚀${NC}"
+echo "=================================================="
+echo "Next Steps:"
+echo "=================================================="
+echo ""
+echo "1. Update API keys in .env.local:"
+echo "   nano .env.local"
+echo ""
+echo "2. Set up PostgreSQL database:"
+echo "   sudo -u postgres psql"
+echo "   CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';"
+echo "   CREATE DATABASE $DB_NAME OWNER $DB_USER;"
+echo "   GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
+echo "   \\q"
+echo ""
+echo "3. Run database migrations:"
+echo "   npx prisma migrate deploy"
+echo ""
+echo "4. Start the application:"
+echo "   npm run dev"
+echo ""
+echo "5. Access your application:"
+echo "   https://$DOMAIN_NAME"
+echo ""
+echo "=================================================="
+echo "Happy coding! 🚀"
+echo "=================================================="
 echo ""
