@@ -896,20 +896,29 @@ model AnalysisTask {
 // ============================================================================
 
 model ErrorLog {
-  id          String   @id @default(uuid())
-  severity    String   // LOW, MEDIUM, HIGH, CRITICAL
-  message     String   @db.Text
-  code        String?
-  statusCode  Int?
-  stack       String?  @db.Text
-  details     String?  @db.Text // JSON string
-  userId      String?
-  requestId   String?
-  endpoint    String?
-  method      String?
-  userAgent   String?
-  ipAddress   String?
-  timestamp   DateTime @default(now())
+  id              String    @id @default(uuid())
+  severity        String    // LOW, MEDIUM, HIGH, CRITICAL
+  message         String    @db.Text
+  code            String?
+  masterCode      String?   // Master error code for grouping
+  statusCode      Int?
+  stack           String?   @db.Text
+  details         String?   @db.Text // JSON string
+  userId          String?
+  requestId       String?
+  endpoint        String?
+  method          String?
+  userAgent       String?
+  ipAddress       String?
+  timestamp       DateTime  @default(now())
+  
+  // Deduplication fields
+  errorHash       String?   // MD5 hash for deduplication
+  occurrenceCount Int       @default(1)
+  firstSeen       DateTime?
+  lastSeen        DateTime?
+  sampleStacks    String?   @db.Text // JSON array of sample stack traces
+  isDuplicate     Boolean   @default(false)
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
@@ -918,7 +927,27 @@ model ErrorLog {
   @@index([severity])
   @@index([code])
   @@index([endpoint])
+  @@index([errorHash])
+  @@index([masterCode])
+  @@index([errorHash, lastSeen])
+  @@index([severity, timestamp])
+  @@index([occurrenceCount])
   @@map("error_logs")
+}
+
+model ErrorMaster {
+  id              String   @id @default(uuid())
+  masterCode      String   @unique
+  category        String
+  description     String   @db.Text
+  severity        String
+  resolutionGuide String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([masterCode])
+  @@index([category])
+  @@map("error_masters")
 }
 
 // ============================================================================
