@@ -1,0 +1,110 @@
+// Server Monitoring Schema
+// Add this to your main schema.prisma file
+
+model ServerMetrics {
+  id        String   @id @default(cuid())
+  timestamp DateTime @default(now())
+
+  // CPU Metrics
+  cpuUsage       Float
+  cpuLoadAverage Float[]
+  cpuCores       Int
+
+  // Memory Metrics
+  memoryTotal         BigInt
+  memoryUsed          BigInt
+  memoryFree          BigInt
+  memoryUsagePercent  Float
+
+  // Disk Metrics
+  diskTotal         BigInt
+  diskUsed          BigInt
+  diskFree          BigInt
+  diskUsagePercent  Float
+
+  // Network Metrics
+  networkBytesReceived BigInt
+  networkBytesSent     BigInt
+
+  // Process Metrics
+  processesTotal   Int
+  processesRunning Int
+
+  @@index([timestamp])
+  @@map("server_metrics")
+}
+
+model ServerLog {
+  id        String   @id @default(cuid())
+  timestamp DateTime @default(now())
+  level     String   // info, warn, error, debug
+  source    String   // application, system, database, etc.
+  message   String   @db.Text
+  metadata  Json?
+
+  @@index([timestamp])
+  @@index([level])
+  @@index([source])
+  @@map("server_logs")
+}
+
+model DeploymentHistory {
+  id              String   @id @default(cuid())
+  timestamp       DateTime @default(now())
+  commit          String
+  previousCommit  String?
+  deployedBy      String
+  status          String   // success, failed, rolled_back
+  duration        Int?     // seconds
+  errorMessage    String?  @db.Text
+  
+  @@index([timestamp])
+  @@index([status])
+  @@map("deployment_history")
+}
+
+model ServerAlert {
+  id          String   @id @default(cuid())
+  timestamp   DateTime @default(now())
+  severity    String   // info, warning, critical
+  type        String   // cpu, memory, disk, error, etc.
+  message     String   @db.Text
+  resolved    Boolean  @default(false)
+  resolvedAt  DateTime?
+  resolvedBy  String?
+  metadata    Json?
+
+  @@index([timestamp])
+  @@index([severity])
+  @@index([resolved])
+  @@map("server_alerts")
+}
+
+model ApplicationMetrics {
+  id        String   @id @default(cuid())
+  timestamp DateTime @default(now())
+
+  // Request Metrics
+  requestsTotal              Int
+  requestsSuccessful         Int
+  requestsFailed             Int
+  requestsAverageResponseTime Float
+
+  // Error Metrics
+  errorsTotal    Int
+  errorsCritical Int
+  errorsWarnings Int
+
+  // Database Metrics
+  databaseConnections Int
+  databaseQueries     Int
+  databaseSlowQueries Int
+
+  // Cache Metrics
+  cacheHits    Int
+  cacheMisses  Int
+  cacheHitRate Float
+
+  @@index([timestamp])
+  @@map("application_metrics")
+}

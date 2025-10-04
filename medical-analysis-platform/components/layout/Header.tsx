@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Menu, Bell, User, Search, Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +19,50 @@ interface HeaderProps {
 }
 
 export default function Header({ onMenuClick, sidebarOpen }: HeaderProps) {
+  const router = useRouter();
+  const [isEmployee, setIsEmployee] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkEmployeeStatus();
+  }, []);
+
+  const checkEmployeeStatus = async () => {
+    try {
+      const response = await fetch('/api/view-mode');
+      if (response.ok) {
+        const data = await response.json();
+        setIsEmployee(data.isEmployee);
+      }
+    } catch (error) {
+      console.error('Failed to check employee status:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const switchToStaffView = async () => {
+    try {
+      const response = await fetch('/api/view-mode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'staff' }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        router.push(data.redirectUrl);
+        router.refresh();
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to switch to staff view');
+      }
+    } catch (error) {
+      console.error('Failed to switch view:', error);
+      alert('Failed to switch to staff view');
+    }
+  };
+
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-gray-200">
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
@@ -55,6 +101,20 @@ export default function Header({ onMenuClick, sidebarOpen }: HeaderProps) {
               <DropdownMenuContent align="end" className="w-56 bg-white border-gray-200">
                 <DropdownMenuLabel className="text-gray-900">Launch Console</DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-gray-200" />
+                {!loading && isEmployee && (
+                  <>
+                    <DropdownMenuItem onClick={switchToStaffView} className="focus:bg-gray-100 cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                        <div>
+                          <p className="font-medium text-gray-900">Staff Portal</p>
+                          <p className="text-xs text-gray-600">Employee access</p>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-gray-200" />
+                  </>
+                )}
                 <DropdownMenuItem asChild className="focus:bg-gray-100">
                   <a href="/admin" className="cursor-pointer">
                     <div className="flex items-center gap-2">

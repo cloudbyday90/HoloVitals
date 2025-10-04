@@ -1,0 +1,1678 @@
+// HoloVitals Complete Database Schema
+// Includes: Base platform + AI Architecture + All Repository Systems
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+// ============================================================================
+// USER MANAGEMENT & AUTHENTICATION
+// ============================================================================
+
+model User {
+  id                    String    @id @default(uuid())
+  email                 String    @unique
+  passwordHash          String    @map("password_hash")
+  role                  String    @default("PATIENT") // OWNER, ADMIN, DOCTOR, PATIENT, SUPPORT, ANALYST
+  mfaEnabled            Boolean   @default(false) @map("mfa_enabled")
+  mfaSecret             String?   @map("mfa_secret")
+  mfaBackupCodes        String?   @map("mfa_backup_codes")
+  failedLoginAttempts   Int       @default(0) @map("failed_login_attempts")
+  lastFailedLogin       DateTime? @map("last_failed_login")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  
+  patients              Patient[]
+  documents             Document[]
+  analysisSessions      AnalysisSession[]
+  sessions              UserSession[]
+  consentRequestsAsPatient ConsentGrant[] @relation("PatientConsents")
+  consentRequestsAsSpecialist ConsentGrant[] @relation("SpecialistConsents")
+  auditLogs             AuditLog[]
+  rbacAccessLogs        RBACAccessLog[]
+  errorLogs             ErrorLog[]
+  systemNotifications   SystemNotification[]
+  
+  // AI Architecture Relations
+  chatConversations     ChatConversation[]
+  analysisQueue         AnalysisQueue[]
+  chatbotCosts          ChatbotCost[]
+  analysisCosts         AnalysisCost[]
+  contextOptimizations  ContextOptimization[]
+  analysisTasks         AnalysisTask[]
+    cloudInstances        CloudInstance[]
+    
+    // Subscription & Pricing Relations
+    subscription          Subscription?
+    tokenBalance          TokenBalance?
+    fileUploads           FileUpload[]
+    paymentIntents        PaymentIntent[]
+    
+    // EHR Integration Relations
+    ehrConnections        EHRConnection[]
+  
+  @@map("users")
+}
+
+model Patient {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  firstName     String?   @map("first_name")
+  lastName      String?   @map("last_name")
+  dateOfBirth   DateTime? @map("date_of_birth")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents     Document[]
+  analysisSessions AnalysisSession[]
+  
+  @@map("patients")
+}
+
+// ============================================================================
+// DOCUMENT MANAGEMENT
+// ============================================================================
+
+model Document {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  patientId     String?   @map("patient_id")
+  filePath      String    @map("file_path")
+  fileName      String    @map("file_name")
+  fileSize      Int?      @map("file_size")
+  mimeType      String?   @map("mime_type")
+  documentType  String?   @map("document_type")
+  uploadDate    DateTime  @default(now()) @map("upload_date")
+  documentDate  DateTime? @map("document_date")
+  status        String    @default("pending")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patient       Patient?  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  ocrResults    OcrResult[]
+  extractedData ExtractedData[]
+  sourceLinks   DocumentLink[] @relation("SourceDocument")
+  targetLinks   DocumentLink[] @relation("TargetDocument")
+  embeddings    DocumentEmbedding[]
+  
+  @@map("documents")
+}
+
+model OcrResult {
+  id              String    @id @default(uuid())
+  documentId      String    @map("document_id")
+  rawText         String    @map("raw_text") @db.Text
+  confidenceScore Float?    @map("confidence_score")
+  processedAt     DateTime  @default(now()) @map("processed_at")
+  
+  document        Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@map("ocr_results")
+}
+
+model ExtractedData {
+  id            String    @id @default(uuid())
+  documentId    String    @map("document_id")
+  dataType      String    @map("data_type")
+  fieldName     String    @map("field_name")
+  fieldValue    String    @map("field_value") @db.Text
+  unit          String?
+  referenceRange String?  @map("reference_range")
+  isAbnormal    Boolean?  @map("is_abnormal")
+  extractedAt   DateTime  @default(now()) @map("extracted_at")
+  
+  document      Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@map("extracted_data")
+}
+
+model DocumentLink {
+  id                  String    @id @default(uuid())
+  sourceDocumentId    String    @map("source_document_id")
+  targetDocumentId    String    @map("target_document_id")
+  relationshipType    String    @map("relationship_type")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  
+  sourceDocument      Document  @relation("SourceDocument", fields: [sourceDocumentId], references: [id], onDelete: Cascade)
+  targetDocument      Document  @relation("TargetDocument", fields: [targetDocumentId], references: [id], onDelete: Cascade)
+  
+  @@unique([sourceDocumentId, targetDocumentId])
+  @@map("document_links")
+}
+
+model DocumentEmbedding {
+  id            String    @id @default(uuid())
+  documentId    String    @map("document_id")
+  chunkIndex    Int       @map("chunk_index")
+  chunkText     String    @map("chunk_text") @db.Text
+  embedding     Float[]
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  document      Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@map("document_embeddings")
+}
+
+// ============================================================================
+// ANALYSIS SESSIONS (Legacy)
+// ============================================================================
+
+model AnalysisSession {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  patientId     String?   @map("patient_id")
+  sessionType   String    @map("session_type")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patient       Patient?  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  interactions  AiInteraction[]
+  
+  @@map("analysis_sessions")
+}
+
+model AiInteraction {
+  id                String    @id @default(uuid())
+  sessionId         String    @map("session_id")
+  query             String    @db.Text
+  response          String?   @db.Text
+  contextDocuments  String[]  @map("context_documents")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  
+  session           AnalysisSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@map("ai_interactions")
+}
+
+// ============================================================================
+// CHATBOT CONVERSATIONS (New AI Architecture)
+// ============================================================================
+
+model ChatConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title     String?
+  startedAt DateTime @default(now())
+  lastMessageAt DateTime @default(now())
+  
+  messages  ChatMessage[]
+  
+  @@index([userId])
+  @@index([lastMessageAt])
+  @@map("chat_conversations")
+}
+
+model ChatMessage {
+  id             String   @id @default(cuid())
+  conversationId String
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  role           String
+  content        String   @db.Text
+  timestamp      DateTime @default(now())
+  
+  type           String   @default("quick")
+  confidence     Float?
+  
+  needsEscalation Boolean @default(false)
+  escalationReason String? @db.Text
+  escalatedToTaskId String?
+  
+  documentId     String?
+  analysisId     String?
+  
+  metadata       Json?
+  
+  @@index([conversationId])
+  @@index([timestamp])
+  @@map("chat_messages")
+}
+
+// ============================================================================
+// ANALYSIS QUEUE SYSTEM (New AI Architecture)
+// ============================================================================
+
+model AnalysisQueue {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type      String
+  priority  Int      @default(3)
+  
+  prompt    String   @db.Text
+  documents Json
+  
+  totalTokens      Int
+  contextWindow    Int
+  needsSplitting   Boolean @default(false)
+  splitStrategy    String?
+  estimatedCost    Float
+  recommendedModel String
+  
+  status    String   @default("queued")
+  
+  createdAt   DateTime @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+  
+  result    Json?
+  error     String?  @db.Text
+  
+  instanceId String?
+  instance   CloudInstance? @relation(fields: [instanceId], references: [id])
+  
+  actualCost Float?
+  
+  @@index([userId])
+  @@index([status])
+  @@index([priority, createdAt])
+  @@index([createdAt])
+  @@map("analysis_queue")
+}
+
+// ============================================================================
+// CLOUD INSTANCE TRACKING (New AI Architecture)
+// ============================================================================
+
+  model CloudInstance {
+    id                  String    @id @default(cuid())
+    userId              String
+    user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    taskId              String?
+    task                AnalysisTask? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+    
+    provider            String
+    instanceType        String
+    region              String
+    cloudInstanceId     String?
+    
+    publicIp            String?
+    privateIp           String?
+    
+    status              String
+    
+    diskSizeGB          Int       @default(100)
+    autoTerminateMinutes Int      @default(60)
+    
+    costPerHour         Float
+    totalCost           Float     @default(0)
+    
+    purpose             String?
+    metadata            Json?
+    
+    tasks               AnalysisQueue[]
+    
+    createdAt           DateTime  @default(now())
+    terminatedAt        DateTime?
+    updatedAt           DateTime  @updatedAt
+    
+    @@index([userId])
+    @@index([taskId])
+    @@index([status])
+    @@index([provider])
+    @@index([createdAt])
+    @@map("cloud_instances")
+  }
+
+
+// ============================================================================
+// COST TRACKING (New AI Architecture)
+// ============================================================================
+
+model InstanceCost {
+  id           String   @id @default(cuid())
+  
+  instanceId   String
+  provider     String
+  instanceType String
+  model        String
+  
+  createdAt    DateTime
+  terminatedAt DateTime
+  duration     Float
+  
+  costPerMinute Float
+  totalCost     Float
+  
+  tasksCompleted Int    @default(0)
+  tokensProcessed Int   @default(0)
+  
+  metadata     Json?
+  
+  @@index([createdAt])
+  @@index([provider])
+  @@index([model])
+  @@map("instance_costs")
+}
+
+model ChatbotCost {
+  id        String   @id @default(cuid())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  messageId String
+  timestamp DateTime @default(now())
+  
+  inputTokens  Int
+  outputTokens Int
+  totalTokens  Int
+  
+  cost      Float
+  
+  model     String   @default("gpt-3.5-turbo")
+  
+  @@index([userId])
+  @@index([timestamp])
+  @@map("chatbot_costs")
+}
+
+model AnalysisCost {
+  id        String   @id @default(cuid())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  taskId    String
+  timestamp DateTime @default(now())
+  
+  inputTokens  Int
+  outputTokens Int
+  totalTokens  Int
+  
+  modelCost      Float
+  infrastructureCost Float
+  totalCost      Float
+  
+  model        String
+  instanceType String?
+  
+  duration     Float
+  
+  @@index([userId])
+  @@index([timestamp])
+  @@map("analysis_costs")
+}
+
+// ============================================================================
+// CONTEXT OPTIMIZATION (New AI Architecture)
+// ============================================================================
+
+model PromptOptimization {
+  id        String   @id @default(cuid())
+  
+  originalPrompt String @db.Text
+  originalTokens Int
+  
+  optimizedPrompt String @db.Text
+  optimizedTokens Int
+  
+  strategy       String
+  tokenReduction Int
+  reductionPercent Float
+  
+  executionTime  Float?
+  successRate    Float?
+  
+  createdAt DateTime @default(now())
+  
+  metadata  Json?
+  
+  @@index([createdAt])
+  @@map("prompt_optimizations")
+}
+
+model PromptSplit {
+  id        String   @id @default(cuid())
+  
+  taskId    String
+  
+  splitId   String
+  content   String   @db.Text
+  tokens    Int
+  order     Int
+  
+  dependencies Json
+  
+  status    String   @default("pending")
+  
+  result    Json?
+  error     String?  @db.Text
+  
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+  
+  @@index([taskId])
+  @@index([order])
+  @@map("prompt_splits")
+}
+
+// ============================================================================
+// MODEL PERFORMANCE TRACKING (New AI Architecture)
+// ============================================================================
+
+model ModelPerformance {
+  id        String   @id @default(cuid())
+  
+  model     String
+  provider  String
+  
+  avgResponseTime Float
+  avgTokensPerSecond Float
+  successRate Float
+  errorRate   Float
+  
+  avgCostPerRequest Float
+  avgCostPerToken   Float
+  
+  totalRequests Int
+  totalTokens   Int
+  totalCost     Float
+  
+  periodStart DateTime
+  periodEnd   DateTime
+  
+  metadata    Json?
+  
+  @@index([model])
+  @@index([periodStart])
+  @@map("model_performance")
+}
+
+// ============================================================================
+// SYSTEM HEALTH MONITORING (New AI Architecture)
+// ============================================================================
+
+model SystemHealth {
+  id        String   @id @default(cuid())
+  
+  component String
+  
+  status    String
+  
+  responseTime Float?
+  errorRate    Float?
+  throughput   Float?
+  
+  cpuUsage    Float?
+  memoryUsage Float?
+  diskUsage   Float?
+  
+  timestamp DateTime @default(now())
+  
+  message   String?  @db.Text
+  metadata  Json?
+  
+  @@index([component])
+  @@index([timestamp])
+  @@index([status])
+  @@map("system_health")
+}
+
+// ============================================================================
+// AUTHENTICATION & SESSIONS
+// ============================================================================
+
+model UserSession {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  expiresAt     DateTime  @map("expires_at")
+  ipAddress     String?   @map("ip_address")
+  userAgent     String?   @map("user_agent")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_sessions")
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ============================================================================
+// CONSENT MANAGEMENT
+// ============================================================================
+
+model ConsentGrant {
+  id                      String    @id @default(uuid())
+  patientId               String    @map("patient_id")
+  specialistId            String    @map("specialist_id")
+  permissions             String    @db.Text
+  reason                  String    @db.Text
+  requestedDuration       Int       @map("requested_duration")
+  urgency                 String
+  status                  String
+  restrictions            String?   @db.Text
+  grantedAt               DateTime? @map("granted_at")
+  expiresAt               DateTime  @map("expires_at")
+  revokedAt               DateTime? @map("revoked_at")
+  revocationReason        String?   @map("revocation_reason") @db.Text
+  denialReason            String?   @map("denial_reason") @db.Text
+  lastAccessed            DateTime? @map("last_accessed")
+  accessCount             Int       @default(0) @map("access_count")
+  expirationWarningSent   Boolean   @default(false) @map("expiration_warning_sent")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  patient                 User      @relation("PatientConsents", fields: [patientId], references: [id], onDelete: Cascade)
+  specialist              User      @relation("SpecialistConsents", fields: [specialistId], references: [id], onDelete: Cascade)
+  accessLogs              AccessLog[]
+  
+  @@map("consent_grants")
+  @@index([patientId])
+  @@index([specialistId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model AccessLog {
+  id            String    @id @default(uuid())
+  consentId     String    @map("consent_id")
+  specialistId  String    @map("specialist_id")
+  action        String
+  resource      String
+  ipAddress     String?   @map("ip_address")
+  userAgent     String?   @map("user_agent")
+  details       String?   @db.Text
+  timestamp     DateTime  @default(now())
+  success       Boolean   @default(true)
+  
+  consent       ConsentGrant @relation(fields: [consentId], references: [id], onDelete: Cascade)
+  
+  @@map("access_logs")
+  @@index([consentId])
+  @@index([specialistId])
+  @@index([timestamp])
+}
+
+// ============================================================================
+// AUDIT & COMPLIANCE
+// ============================================================================
+
+model AuditLog {
+  id              String    @id @default(uuid())
+  userId          String    @map("user_id")
+  action          String
+  resource        String
+  resourceId      String    @map("resource_id")
+  details         String?   @db.Text
+  ipAddress       String?   @map("ip_address")
+  userAgent       String?   @map("user_agent")
+  sessionId       String?   @map("session_id")
+  severity        String
+  requiresReview  Boolean   @default(false) @map("requires_review")
+  reviewed        Boolean   @default(false)
+  reviewedBy      String?   @map("reviewed_by")
+  reviewedAt      DateTime? @map("reviewed_at")
+  reviewNotes     String?   @map("review_notes") @db.Text
+  consentId       String?   @map("consent_id")
+  timestamp       DateTime  @default(now())
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("audit_logs")
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([timestamp])
+  @@index([severity])
+  @@index([requiresReview])
+}
+
+// ============================================================================
+// NOTIFICATIONS & ALERTS
+// ============================================================================
+
+model Notification {
+  id              String    @id @default(uuid())
+  patientId       String    @map("patient_id")
+  type            String
+  message         String    @db.Text
+  requiresAction  Boolean   @default(false) @map("requires_action")
+  read            Boolean   @default(false)
+  readAt          DateTime? @map("read_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  @@map("notifications")
+  @@index([patientId])
+  @@index([read])
+  @@index([createdAt])
+}
+
+model SecurityAlert {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  action        String
+  details       String    @db.Text
+  severity      String    @default("high")
+  acknowledged  Boolean   @default(false)
+  acknowledgedBy String?  @map("acknowledged_by")
+  acknowledgedAt DateTime? @map("acknowledged_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  @@map("security_alerts")
+  @@index([userId])
+  @@index([acknowledged])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// PATIENT REPOSITORY (Sandboxed per patient)
+// ============================================================================
+
+model PatientRepository {
+  id                      String    @id @default(uuid())
+  userId                  String    @unique @map("user_id")
+  primaryIdentityHash     String    @unique @map("primary_identity_hash")
+  secondaryIdentityHash   String    @map("secondary_identity_hash")
+  compositeIdentityHash   String    @unique @map("composite_identity_hash")
+  encryptedPersonalInfo   String    @map("encrypted_personal_info") @db.Text
+  hasMothersMaidenName    Boolean   @default(false) @map("has_mothers_maiden_name")
+  hasPreviousAddress      Boolean   @default(false) @map("has_previous_address")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  lastAccessedAt          DateTime? @map("last_accessed_at")
+  version                 Int       @default(1)
+  
+  diagnoses               PatientDiagnosis[]
+  medications             PatientMedication[]
+  allergies               PatientAllergy[]
+  vitalSigns              PatientVitalSign[]
+  procedures              PatientProcedure[]
+  immunizations           PatientImmunization[]
+  familyHistory           PatientFamilyHistory[]
+  
+  @@map("patient_repositories")
+  @@index([userId])
+  @@index([compositeIdentityHash])
+}
+
+model PatientDiagnosis {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  condition       String
+  icd10Code       String?   @map("icd10_code")
+  diagnosedDate   DateTime  @map("diagnosed_date")
+  status          String
+  severity        String?
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_diagnoses")
+  @@index([repositoryId])
+  @@index([diagnosedDate])
+}
+
+model PatientMedication {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  name            String
+  dosage          String
+  frequency       String
+  startDate       DateTime  @map("start_date")
+  endDate         DateTime? @map("end_date")
+  prescribedBy    String?   @map("prescribed_by")
+  purpose         String?   @db.Text
+  status          String
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_medications")
+  @@index([repositoryId])
+  @@index([status])
+}
+
+model PatientAllergy {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  allergen        String
+  type            String
+  reaction        String
+  severity        String
+  diagnosedDate   DateTime? @map("diagnosed_date")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_allergies")
+  @@index([repositoryId])
+}
+
+model PatientVitalSign {
+  id                      String    @id @default(uuid())
+  repositoryId            String    @map("repository_id")
+  date                    DateTime
+  bloodPressureSystolic   Int?      @map("blood_pressure_systolic")
+  bloodPressureDiastolic  Int?      @map("blood_pressure_diastolic")
+  heartRate               Int?      @map("heart_rate")
+  temperature             Float?
+  weight                  Float?
+  height                  Float?
+  bmi                     Float?
+  oxygenSaturation        Int?      @map("oxygen_saturation")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  
+  repository              PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_vital_signs")
+  @@index([repositoryId])
+  @@index([date])
+}
+
+model PatientProcedure {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  name            String
+  date            DateTime
+  performedBy     String?   @map("performed_by")
+  location        String?
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_procedures")
+  @@index([repositoryId])
+  @@index([date])
+}
+
+model PatientImmunization {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  vaccine         String
+  date            DateTime
+  doseNumber      Int?      @map("dose_number")
+  administeredBy  String?   @map("administered_by")
+  lotNumber       String?   @map("lot_number")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_immunizations")
+  @@index([repositoryId])
+  @@index([date])
+}
+
+model PatientFamilyHistory {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  relationship    String
+  condition       String
+  ageAtDiagnosis  Int?      @map("age_at_diagnosis")
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      PatientRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("patient_family_history")
+  @@index([repositoryId])
+}
+
+model IdentityChallenge {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  questions       String    @db.Text
+  expiresAt       DateTime  @map("expires_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  @@map("identity_challenges")
+  @@index([repositoryId])
+  @@index([expiresAt])
+}
+
+model ContextOptimization {
+  id                  String   @id @default(cuid())
+  userId              String
+  originalTokens      Int
+  optimizedTokens     Int
+  reductionPercentage Float
+  strategy            String
+  compressionRatio    Float
+  relevanceScore      Float
+  informationDensity  Float
+  processingTimeMs    Int
+  qualityScore        Float
+  createdAt           DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([strategy])
+}
+
+
+model AnalysisTask {
+  id                      String    @id @default(cuid())
+  userId                  String
+  type                    String
+  priority                String
+  status                  String
+  progress                Int       @default(0)
+  data                    String    @db.Text
+  result                  String?   @db.Text
+  error                   String?   @db.Text
+  retryCount              Int       @default(0)
+  maxRetries              Int       @default(2)
+  estimatedCompletionTime DateTime?
+  startedAt               DateTime?
+  completedAt             DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  metadata                String?   @db.Text
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cloudInstances CloudInstance[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([priority])
+  @@index([type])
+  @@index([createdAt])
+}
+
+
+
+// ============================================================================
+// ACCESS CONTROL & AUDIT LOGGING
+// ============================================================================
+
+// ============================================================================
+// ERROR HANDLING & LOGGING
+// ============================================================================
+
+model ErrorLog {
+  id          String   @id @default(uuid())
+  severity    String   // LOW, MEDIUM, HIGH, CRITICAL
+  message     String   @db.Text
+  code        String?
+  statusCode  Int?
+  stack       String?  @db.Text
+  details     String?  @db.Text // JSON string
+  userId      String?
+  requestId   String?
+  endpoint    String?
+  method      String?
+  userAgent   String?
+  ipAddress   String?
+  timestamp   DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([timestamp])
+  @@index([severity])
+  @@index([code])
+  @@index([endpoint])
+  @@map("error_logs")
+}
+
+// ============================================================================
+// SUBSCRIPTION & PRICING SYSTEM
+// ============================================================================
+
+enum SubscriptionTier {
+  BASIC         // $9.99/month, 10MB free upload, 100K tokens/month
+  PROFESSIONAL  // $29.99/month, 25MB free upload, 500K tokens/month
+  ENTERPRISE    // $99.99/month, 100MB free upload, 2M tokens/month
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+  TRIAL
+}
+
+enum TokenTransactionType {
+  INITIAL_DEPOSIT      // First-time subscription tokens
+  MONTHLY_REFRESH      // Monthly token top-up
+  PURCHASE             // One-time token purchase
+  DEDUCTION            // Token usage
+  REFUND               // Token refund
+  BONUS                // Promotional tokens
+  ADJUSTMENT           // Manual adjustment
+}
+
+enum FileProcessingStatus {
+  PENDING              // Awaiting cost approval
+  APPROVED             // Cost approved, queued for processing
+  PROCESSING           // Currently being processed
+  COMPLETED            // Successfully processed
+  FAILED               // Processing failed
+  CANCELLED            // User cancelled
+  SCHEDULED            // Multi-month processing scheduled
+}
+
+model Subscription {
+  id                    String              @id @default(uuid())
+  userId                String              @unique @map("user_id")
+  tier                  SubscriptionTier
+  status                SubscriptionStatus  @default(ACTIVE)
+  monthlyPrice          Float               @map("monthly_price") // In USD
+  billingCycleStart     DateTime            @map("billing_cycle_start")
+  billingCycleEnd       DateTime            @map("billing_cycle_end")
+  nextBillingDate       DateTime?           @map("next_billing_date")
+  cancelledAt           DateTime?           @map("cancelled_at")
+  trialEndsAt           DateTime?           @map("trial_ends_at")
+  metadata              String?             @db.Text // JSON: payment method, billing address, etc.
+  createdAt             DateTime            @default(now()) @map("created_at")
+  updatedAt             DateTime            @updatedAt @map("updated_at")
+
+  user                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenBalance          TokenBalance?
+  subscriptionHistory   SubscriptionHistory[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([nextBillingDate])
+  @@map("subscriptions")
+}
+
+model SubscriptionHistory {
+  id                String              @id @default(uuid())
+  subscriptionId    String              @map("subscription_id")
+  fromTier          SubscriptionTier?   @map("from_tier")
+  toTier            SubscriptionTier    @map("to_tier")
+  fromStatus        SubscriptionStatus? @map("from_status")
+  toStatus          SubscriptionStatus  @map("to_status")
+  reason            String?             @db.Text
+  changedAt         DateTime            @default(now()) @map("changed_at")
+
+  subscription      Subscription        @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+  @@index([changedAt])
+  @@map("subscription_history")
+}
+
+model TokenBalance {
+  id                    String      @id @default(uuid())
+  userId                String      @unique @map("user_id")
+  subscriptionId        String      @unique @map("subscription_id")
+  currentBalance        Int         @default(0) @map("current_balance") // Available tokens
+  totalEarned           Int         @default(0) @map("total_earned")    // Lifetime earned
+  totalUsed             Int         @default(0) @map("total_used")      // Lifetime used
+  totalPurchased        Int         @default(0) @map("total_purchased") // Lifetime purchased
+  freeUploadUsed        Int         @default(0) @map("free_upload_used") // Bytes used from free upload limit
+  lastRefreshDate       DateTime?   @map("last_refresh_date")
+  createdAt             DateTime    @default(now()) @map("created_at")
+  updatedAt             DateTime    @updatedAt @map("updated_at")
+
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription          Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  transactions          TokenTransaction[]
+
+  @@index([userId])
+  @@index([subscriptionId])
+  @@map("token_balances")
+}
+
+model TokenTransaction {
+  id                String                @id @default(uuid())
+  tokenBalanceId    String                @map("token_balance_id")
+  type              TokenTransactionType
+  amount            Int                   // Positive for credits, negative for debits
+  balanceBefore     Int                   @map("balance_before")
+  balanceAfter      Int                   @map("balance_after")
+  description       String?               @db.Text
+  referenceId       String?               @map("reference_id") // Link to related entity (upload, chat, etc.)
+  referenceType     String?               @map("reference_type") // Type of reference (FileUpload, ChatMessage, etc.)
+  metadata          String?               @db.Text // JSON: additional details
+  createdAt         DateTime              @default(now()) @map("created_at")
+
+  tokenBalance      TokenBalance          @relation(fields: [tokenBalanceId], references: [id], onDelete: Cascade)
+
+  @@index([tokenBalanceId])
+  @@index([type])
+  @@index([referenceId])
+  @@index([createdAt])
+  @@map("token_transactions")
+}
+
+model FileUpload {
+  id                    String                @id @default(uuid())
+  userId                String                @map("user_id")
+  fileName              String                @map("file_name")
+  filePath              String                @map("file_path")
+  fileSize              Int                   @map("file_size") // In bytes
+  mimeType              String                @map("mime_type")
+  status                FileProcessingStatus  @default(PENDING)
+  estimatedTokens       Int?                  @map("estimated_tokens")
+  estimatedCost         Float?                @map("estimated_cost") // In USD
+  actualTokens          Int?                  @map("actual_tokens")
+  actualCost            Float?                @map("actual_cost") // In USD
+  processingStartedAt   DateTime?             @map("processing_started_at")
+  processingCompletedAt DateTime?             @map("processing_completed_at")
+  scheduledMonths       Int?                  @map("scheduled_months") // For multi-month processing
+  currentMonth          Int?                  @map("current_month") // Current processing month
+  errorMessage          String?               @db.Text @map("error_message")
+  usedFreeUpload        Boolean               @default(false) @map("used_free_upload") // Whether this used free upload limit
+  metadata              String?               @db.Text // JSON: processing details, chunks, etc.
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("file_uploads")
+}
+
+model PaymentIntent {
+  id                String    @id @default(uuid())
+  userId            String    @map("user_id")
+  amount            Float     // In USD
+  currency          String    @default("USD")
+  status            String    // pending, succeeded, failed, cancelled
+  paymentMethod     String?   @map("payment_method") // stripe, paypal, etc.
+  paymentMethodId   String?   @map("payment_method_id") // External payment ID
+  tokensPurchased   Int?      @map("tokens_purchased")
+  description       String?   @db.Text
+  metadata          String?   @db.Text // JSON: additional payment details
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("payment_intents")
+}
+
+
+// ============================================================================
+// RBAC ACCESS LOGGING
+// ============================================================================
+
+model RBACAccessLog {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  action       String
+  resourceType String   @map("resource_type")
+  resourceId   String?  @map("resource_id")
+  allowed      Boolean
+  reason       String?
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  timestamp    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([timestamp])
+  @@index([allowed])
+  @@index([resourceType])
+  @@map("rbac_access_logs")
+}
+
+model SystemNotification {
+  id        String   @id @default(uuid())
+  type      String   // CRITICAL_ERROR, INFO, WARNING, etc.
+  title     String
+  message   String   @db.Text
+  severity  String   // LOW, MEDIUM, HIGH, CRITICAL
+  metadata  String?  @db.Text // JSON string
+  read      Boolean  @default(false)
+  userId    String?  @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([read])
+  @@map("system_notifications")
+}
+
+// ============================================================================
+// EHR INTEGRATION & FHIR DATA
+// ============================================================================
+
+enum EHRProvider {
+  EPIC
+  CERNER
+  ALLSCRIPTS
+  ATHENAHEALTH
+  ECLINICALWORKS
+  NEXTGEN
+  MEDITECH
+  PRACTICE_FUSION
+  GREENWAY
+  OTHER
+}
+
+enum ConnectionStatus {
+  PENDING           // Awaiting user authorization
+  ACTIVE            // Connected and syncing
+  EXPIRED           // Token expired, needs reauth
+  REVOKED           // User revoked access
+  ERROR             // Connection error
+  DISCONNECTED      // User disconnected
+}
+
+enum SyncStatus {
+  IDLE              // Not syncing
+  QUEUED            // Queued for sync
+  SYNCING           // Currently syncing
+  COMPLETED         // Sync completed successfully
+  FAILED            // Sync failed
+  CANCELLED         // Sync cancelled by user
+}
+
+enum FHIRResourceType {
+  PATIENT
+  DOCUMENT_REFERENCE
+  OBSERVATION
+  CONDITION
+  MEDICATION_REQUEST
+  ALLERGY_INTOLERANCE
+  IMMUNIZATION
+  PROCEDURE
+  DIAGNOSTIC_REPORT
+  CARE_PLAN
+  ENCOUNTER
+  PRACTITIONER
+  ORGANIZATION
+  OTHER
+}
+
+model EHRConnection {
+  id                    String            @id @default(uuid())
+  userId                String            @map("user_id")
+  provider              EHRProvider
+  providerName          String            @map("provider_name") // e.g., "Kaiser Permanente"
+  fhirBaseUrl           String            @map("fhir_base_url")
+  status                ConnectionStatus  @default(PENDING)
+  
+  // OAuth tokens (encrypted)
+  accessToken           String?           @map("access_token") @db.Text
+  refreshToken          String?           @map("refresh_token") @db.Text
+  tokenExpiresAt        DateTime?         @map("token_expires_at")
+  
+  // Patient context
+  patientId             String?           @map("patient_id") // FHIR Patient ID
+  patientName           String?           @map("patient_name")
+  
+  // Sync settings
+  autoSync              Boolean           @default(true) @map("auto_sync")
+  syncFrequency         Int               @default(24) @map("sync_frequency") // hours
+  lastSyncAt            DateTime?         @map("last_sync_at")
+  nextSyncAt            DateTime?         @map("next_sync_at")
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: additional provider-specific data
+  errorMessage          String?           @db.Text @map("error_message")
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  user                  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fhirResources         FHIRResource[]
+  syncHistory           SyncHistory[]
+  bulkExportJobs        BulkExportJob[]
+  
+  @@index([userId])
+  @@index([status])
+  @@index([provider])
+  @@index([nextSyncAt])
+  @@map("ehr_connections")
+}
+
+model FHIRResource {
+  id                    String            @id @default(uuid())
+  connectionId          String            @map("connection_id")
+  resourceType          FHIRResourceType  @map("resource_type")
+  fhirId                String            @map("fhir_id") // Resource ID from FHIR server
+  fhirVersion           String            @default("R4") @map("fhir_version")
+  
+  // Raw FHIR data
+  rawData               String            @db.Text @map("raw_data") // JSON string of FHIR resource
+  
+  // Extracted metadata for quick access
+  title                 String?
+  description           String?           @db.Text
+  date                  DateTime?
+  category              String?
+  status                String?
+  
+  // Document-specific fields
+  contentType           String?           @map("content_type") // e.g., "application/pdf"
+  contentUrl            String?           @map("content_url") @db.Text
+  contentSize           Int?              @map("content_size") // bytes
+  documentDownloaded    Boolean           @default(false) @map("document_downloaded")
+  localFilePath         String?           @map("local_file_path")
+  
+  // Processing status
+  processed             Boolean           @default(false)
+  processedAt           DateTime?         @map("processed_at")
+  tokensUsed            Int?              @map("tokens_used")
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: additional resource-specific data
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  connection            EHRConnection     @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  epicSpecificData      EpicSpecificData?
+  
+  @@unique([connectionId, fhirId, resourceType])
+  @@index([connectionId])
+  @@index([resourceType])
+  @@index([date])
+  @@index([processed])
+  @@map("fhir_resources")
+}
+
+model SyncHistory {
+  id                    String            @id @default(uuid())
+  connectionId          String            @map("connection_id")
+  status                SyncStatus        @default(QUEUED)
+  syncType              String            @default("incremental") @map("sync_type") // incremental, full
+  
+  // Sync metrics
+  startedAt             DateTime?         @map("started_at")
+  completedAt           DateTime?         @map("completed_at")
+  duration              Int?              // seconds
+  
+  // Resources synced
+  resourcesQueried      Int               @default(0) @map("resources_queried")
+  resourcesCreated      Int               @default(0) @map("resources_created")
+  resourcesUpdated      Int               @default(0) @map("resources_updated")
+  resourcesSkipped      Int               @default(0) @map("resources_skipped")
+  resourcesFailed       Int               @default(0) @map("resources_failed")
+  
+  // Documents downloaded
+  documentsDownloaded   Int               @default(0) @map("documents_downloaded")
+  totalBytesDownloaded  BigInt            @default(0) @map("total_bytes_downloaded")
+  
+  // Cost tracking
+  tokensEstimated       Int?              @map("tokens_estimated")
+  tokensUsed            Int?              @map("tokens_used")
+  costEstimated         Float?            @map("cost_estimated")
+  costActual            Float?            @map("cost_actual")
+  
+  // Error tracking
+  errorMessage          String?           @db.Text @map("error_message")
+  errorDetails          String?           @db.Text @map("error_details") // JSON
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: sync details, resource types synced, etc.
+  createdAt             DateTime          @default(now()) @map("created_at")
+  
+  connection            EHRConnection     @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  
+  @@index([connectionId])
+  @@index([status])
+  @@index([startedAt])
+  @@index([createdAt])
+  @@map("sync_history")
+}
+
+model ProviderConfiguration {
+  id                    String            @id @default(uuid())
+  provider              EHRProvider
+  providerName          String            @map("provider_name")
+  
+  // FHIR endpoints
+  fhirBaseUrl           String            @map("fhir_base_url")
+  authorizationUrl      String            @map("authorization_url")
+  tokenUrl              String            @map("token_url")
+  
+  // OAuth configuration
+  clientId              String?           @map("client_id")
+  clientSecret          String?           @map("client_secret")
+  redirectUri           String?           @map("redirect_uri")
+  scopes                String            // Space-separated scopes
+  
+  // Capabilities
+  supportsDocumentReference Boolean       @default(true) @map("supports_document_reference")
+  supportsObservation   Boolean           @default(true) @map("supports_observation")
+  supportsCondition     Boolean           @default(true) @map("supports_condition")
+  supportsMedication    Boolean           @default(true) @map("supports_medication")
+  supportsAllergy       Boolean           @default(true) @map("supports_allergy")
+  supportsImmunization  Boolean           @default(true) @map("supports_immunization")
+  supportsProcedure     Boolean           @default(true) @map("supports_procedure")
+  
+  // Rate limiting
+  rateLimit             Int?              @map("rate_limit") // requests per minute
+  
+  // Status
+  enabled               Boolean           @default(true)
+  isSandbox             Boolean           @default(false) @map("is_sandbox")
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: additional provider-specific config
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  @@unique([provider, providerName])
+  @@index([provider])
+  @@index([enabled])
+  @@map("provider_configurations")
+}
+
+
+// ============================================================================
+// EPIC-SPECIFIC MODELS
+// ============================================================================
+
+model BulkExportJob {
+  id                    String            @id @default(uuid())
+  connectionId          String            @map("connection_id")
+  exportType            BulkExportType    @map("export_type")
+  status                BulkExportStatus  @default(INITIATED)
+  
+  // Export URLs
+  kickoffUrl            String?           @map("kickoff_url")
+  statusUrl             String?           @map("status_url")
+  outputUrls            String?           @db.Text @map("output_urls") // JSON array
+  
+  // Export parameters
+  resourceTypes         String?           @db.Text @map("resource_types") // JSON array
+  since                 DateTime?         // Only resources modified after this date
+  
+  // Progress tracking
+  startedAt             DateTime          @default(now()) @map("started_at")
+  completedAt           DateTime?         @map("completed_at")
+  expiresAt             DateTime?         @map("expires_at")
+  
+  // Metrics
+  resourceCount         Int               @default(0) @map("resource_count")
+  totalSize             BigInt            @default(0) @map("total_size") // bytes
+  
+  // Error tracking
+  errorMessage          String?           @db.Text @map("error_message")
+  errorDetails          String?           @db.Text @map("error_details") // JSON
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: additional export details
+  
+  connection            EHRConnection     @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  
+  @@index([connectionId])
+  @@index([status])
+  @@index([startedAt])
+  @@map("bulk_export_jobs")
+}
+
+model EpicSpecificData {
+  id                    String            @id @default(uuid())
+  resourceId            String            @unique @map("resource_id")
+  
+  // Epic-specific extensions
+  extensions            String?           @db.Text // JSON: Epic FHIR extensions
+  customFields          String?           @db.Text @map("custom_fields") // JSON: Epic custom fields
+  
+  // Enhanced data
+  clinicalNotes         String?           @db.Text @map("clinical_notes")
+  labResultDetails      String?           @db.Text @map("lab_result_details") // JSON
+  imagingMetadata       String?           @db.Text @map("imaging_metadata") // JSON
+  carePlanDetails       String?           @db.Text @map("care_plan_details") // JSON
+  encounterDetails      String?           @db.Text @map("encounter_details") // JSON
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  resource              FHIRResource      @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  
+  @@index([resourceId])
+  @@map("epic_specific_data")
+}
+
+enum BulkExportType {
+  PATIENT
+  GROUP
+  SYSTEM
+}
+
+enum BulkExportStatus {
+  INITIATED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  EXPIRED
+  CANCELLED
+}
+
+// ============================================================================
+// EHR DATA SYNCHRONIZATION ENGINE
+// ============================================================================
+
+model SyncJob {
+  id                String          @id @default(cuid())
+  type              String          // FULL_SYNC, INCREMENTAL_SYNC, PATIENT_SYNC, RESOURCE_SYNC, WEBHOOK_SYNC
+  direction         String          // INBOUND, OUTBOUND, BIDIRECTIONAL
+  priority          Int             @default(3) // 1=CRITICAL, 2=HIGH, 3=NORMAL, 4=LOW, 5=BACKGROUND
+  status            String          @default("PENDING") // PENDING, QUEUED, PROCESSING, COMPLETED, FAILED, CANCELLED, RETRYING
+
+  // Connection info
+  ehrProvider       String
+  ehrConnectionId   String
+  userId            String
+
+  // Resource info
+  patientId         String?
+  resourceType      String?
+  resourceIds       String[]        @default([])
+
+  // Configuration
+  filters           Json?
+  options           Json?
+  metadata          Json?
+
+  // Execution tracking
+  startTime         DateTime?
+  endTime           DateTime?
+  duration          Int?            // milliseconds
+  retryCount        Int             @default(0)
+
+  // Results
+  recordsProcessed  Int             @default(0)
+  recordsSucceeded  Int             @default(0)
+  recordsFailed     Int             @default(0)
+  recordsSkipped    Int             @default(0)
+  summary           Json?
+
+  // Timestamps
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // Relations
+  errors            SyncError[]
+  conflicts         SyncConflict[]
+
+  @@index([ehrConnectionId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([userId])
+  @@map("sync_jobs")
+}
+
+model SyncError {
+  id                String          @id @default(cuid())
+  syncJobId         String
+  syncJob           SyncJob         @relation(fields: [syncJobId], references: [id], onDelete: Cascade)
+
+  severity          String          // CRITICAL, ERROR, WARNING
+  code              String
+  message           String          @db.Text
+  resourceType      String?
+  resourceId        String?
+  stackTrace        String?         @db.Text
+  context           Json?
+
+  timestamp         DateTime        @default(now())
+
+  @@index([syncJobId])
+  @@index([severity])
+  @@map("sync_errors")
+}
+
+model SyncConflict {
+  id                String          @id @default(cuid())
+  syncJobId         String?
+  syncJob           SyncJob?        @relation(fields: [syncJobId], references: [id], onDelete: SetNull)
+
+  type              String          // UPDATE_UPDATE, UPDATE_DELETE, DELETE_UPDATE, CREATE_CREATE, FIELD_MISMATCH
+  severity          String          // CRITICAL, HIGH, MEDIUM, LOW
+  status            String          @default("DETECTED") // DETECTED, PENDING_REVIEW, RESOLVED, IGNORED
+
+  resourceType      String
+  resourceId        String
+  field             String
+
+  localValue        Json?
+  remoteValue       Json?
+  localTimestamp    DateTime
+  remoteTimestamp   DateTime
+  localVersion      String?
+  remoteVersion     String?
+
+  resolution        Json?           // Contains strategy, resolvedValue, resolvedBy, resolvedAt, reason
+
+  detectedAt        DateTime        @default(now())
+  detectedBy        String
+  metadata          Json?
+
+  @@index([syncJobId])
+  @@index([status])
+  @@index([resourceType, resourceId])
+  @@map("sync_conflicts")
+}
+
+model WebhookConfig {
+  id                String          @id @default(cuid())
+  ehrProvider       String
+  ehrConnectionId   String
+  endpoint          String
+  secret            String
+  enabled           Boolean         @default(true)
+
+  events            String[]        @default([])
+  retryAttempts     Int             @default(3)
+  retryDelay        Int             @default(2000) // milliseconds
+  timeout           Int             @default(30000) // milliseconds
+
+  signatureHeader   String?
+  signatureAlgorithm String?        // sha256, sha512
+  customHeaders     Json?
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([ehrProvider, ehrConnectionId])
+  @@map("webhook_configs")
+}
+
+model WebhookLog {
+  id                String          @id @default(cuid())
+  ehrProvider       String
+  ehrConnectionId   String
+
+  payload           Json
+  status            String          @default("RECEIVED") // RECEIVED, VALIDATED, PROCESSING, COMPLETED, FAILED, RETRYING, IGNORED
+
+  syncJobId         String?
+  errors            String[]        @default([])
+  warnings          String[]        @default([])
+
+  receivedAt        DateTime        @default(now())
+  processedAt       DateTime?
+
+  @@index([ehrProvider, ehrConnectionId])
+  @@index([status])
+  @@index([receivedAt])
+  @@map("webhook_logs")
+}
+
+model TransformationRule {
+  id                String          @id @default(cuid())
+  name              String
+  type              String          // FIELD_MAPPING, VALUE_MAPPING, DATA_TYPE_CONVERSION, etc.
+
+  ehrProvider       String
+  resourceType      String
+  direction         String          // INBOUND, OUTBOUND
+
+  sourceFormat      String          // FHIR_R4, FHIR_STU3, HL7_V2, CUSTOM_JSON, etc.
+  targetFormat      String
+
+  sourceField       String
+  targetField       String
+
+  mapping           Json?
+  function          String?         @db.Text
+  condition         String?         @db.Text
+
+  priority          Int             @default(100)
+  enabled           Boolean         @default(true)
+  metadata          Json?
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([ehrProvider, resourceType, direction])
+  @@map("transformation_rules")
+}
+
+model FieldMapping {
+  id                String          @id @default(cuid())
+  ehrProvider       String
+  resourceType      String
+
+  sourceField       String
+  targetField       String
+  required          Boolean         @default(false)
+  defaultValue      Json?
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([ehrProvider, resourceType])
+  @@map("field_mappings")
+}
+
+model SyncStatistics {
+  id                String          @id @default(cuid())
+  ehrConnectionId   String
+  date              DateTime        @db.Date
+
+  totalJobs         Int             @default(0)
+  completedJobs     Int             @default(0)
+  failedJobs        Int             @default(0)
+
+  recordsProcessed  Int             @default(0)
+  recordsSucceeded  Int             @default(0)
+  recordsFailed     Int             @default(0)
+
+  averageDuration   Int             @default(0) // milliseconds
+  totalDuration     Int             @default(0) // milliseconds
+
+  bytesTransferred  BigInt          @default(0)
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([ehrConnectionId, date])
+  @@index([date])
+  @@map("sync_statistics")
+}

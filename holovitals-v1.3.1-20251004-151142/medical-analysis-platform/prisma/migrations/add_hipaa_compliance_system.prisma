@@ -1,0 +1,120 @@
+-- HIPAA Compliance Monitoring System
+-- CRITICAL: Separate from general error logging
+-- Every incident tracked individually, NO deduplication
+
+-- HIPAA Incidents Table (NEVER deleted, 6+ year retention)
+CREATE TABLE hipaa_incidents (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  incident_number VARCHAR(50) UNIQUE NOT NULL,
+  timestamp TIMESTAMP NOT NULL,
+  severity VARCHAR(20) NOT NULL, -- CRITICAL, HIGH, MEDIUM, LOW
+  category VARCHAR(100) NOT NULL,
+  description TEXT NOT NULL,
+  
+  -- PHI Information
+  phi_exposed BOOLEAN DEFAULT FALSE,
+  phi_type TEXT, -- JSON array
+  number_of_records_affected INTEGER,
+  patient_ids TEXT, -- JSON array
+  
+  -- Context
+  user_id UUID,
+  user_role VARCHAR(50),
+  ip_address VARCHAR(50),
+  endpoint TEXT,
+  action TEXT,
+  stack_trace TEXT,
+  
+  -- Investigation
+  status VARCHAR(50) DEFAULT 'NEW',
+  assigned_to UUID,
+  investigation_notes TEXT,
+  resolution_notes TEXT,
+  
+  -- Compliance
+  reported_to_ocr BOOLEAN DEFAULT FALSE,
+  reported_date TIMESTAMP,
+  breach_notification_sent BOOLEAN DEFAULT FALSE,
+  breach_notification_date TIMESTAMP,
+  
+  -- Audit
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  closed_at TIMESTAMP
+);
+
+-- Indexes for HIPAA incidents
+CREATE INDEX idx_hipaa_incident_number ON hipaa_incidents(incident_number);
+CREATE INDEX idx_hipaa_timestamp ON hipaa_incidents(timestamp DESC);
+CREATE INDEX idx_hipaa_severity ON hipaa_incidents(severity);
+CREATE INDEX idx_hipaa_status ON hipaa_incidents(status);
+CREATE INDEX idx_hipaa_category ON hipaa_incidents(category);
+CREATE INDEX idx_hipaa_assigned_to ON hipaa_incidents(assigned_to);
+CREATE INDEX idx_hipaa_phi_exposed ON hipaa_incidents(phi_exposed);
+CREATE INDEX idx_hipaa_user_id ON hipaa_incidents(user_id);
+
+-- HIPAA Incident Audit Log (complete history, immutable)
+CREATE TABLE hipaa_incident_audit_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  incident_id UUID NOT NULL REFERENCES hipaa_incidents(id) ON DELETE RESTRICT,
+  timestamp TIMESTAMP DEFAULT NOW(),
+  action VARCHAR(100) NOT NULL,
+  performed_by UUID,
+  previous_state TEXT, -- JSON
+  new_state TEXT, -- JSON
+  notes TEXT
+);
+
+-- Indexes for audit log
+CREATE INDEX idx_hipaa_audit_incident_id ON hipaa_incident_audit_log(incident_id);
+CREATE INDEX idx_hipaa_audit_timestamp ON hipaa_incident_audit_log(timestamp DESC);
+CREATE INDEX idx_hipaa_audit_performed_by ON hipaa_incident_audit_log(performed_by);
+
+-- HIPAA Compliance Team Members
+CREATE TABLE hipaa_compliance_team (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID UNIQUE NOT NULL,
+  role VARCHAR(50) NOT NULL, -- COMPLIANCE_OFFICER, PRIVACY_OFFICER, SECURITY_OFFICER, INVESTIGATOR
+  email VARCHAR(255) NOT NULL,
+  phone VARCHAR(50),
+  notification_preferences TEXT, -- JSON
+  active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Indexes for compliance team
+CREATE INDEX idx_hipaa_team_user_id ON hipaa_compliance_team(user_id);
+CREATE INDEX idx_hipaa_team_role ON hipaa_compliance_team(role);
+CREATE INDEX idx_hipaa_team_active ON hipaa_compliance_team(active);
+
+-- HIPAA Notification Log
+CREATE TABLE hipaa_notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  incident_id UUID NOT NULL REFERENCES hipaa_incidents(id) ON DELETE RESTRICT,
+  notification_type VARCHAR(50) NOT NULL, -- EMAIL, SMS, PHONE, CRITICAL_ALERT, ESCALATION
+  recipient_id UUID,
+  recipient_email VARCHAR(255),
+  sent_at TIMESTAMP DEFAULT NOW(),
+  delivered BOOLEAN DEFAULT FALSE,
+  delivery_confirmed_at TIMESTAMP,
+  error_message TEXT
+);
+
+-- Indexes for notifications
+CREATE INDEX idx_hipaa_notif_incident_id ON hipaa_notifications(incident_id);
+CREATE INDEX idx_hipaa_notif_sent_at ON hipaa_notifications(sent_at DESC);
+CREATE INDEX idx_hipaa_notif_recipient_id ON hipaa_notifications(recipient_id);
+CREATE INDEX idx_hipaa_notif_delivered ON hipaa_notifications(delivered);
+
+-- Insert default compliance team roles (to be updated with actual users)
+INSERT INTO hipaa_compliance_team (user_id, role, email, notification_preferences, active) VALUES
+  (gen_random_uuid(), 'COMPLIANCE_OFFICER', 'compliance@holovitals.com', '{"email": true, "sms": true, "critical_phone": true}', true),
+  (gen_random_uuid(), 'PRIVACY_OFFICER', 'privacy@holovitals.com', '{"email": true, "sms": true, "critical_phone": true}', true),
+  (gen_random_uuid(), 'SECURITY_OFFICER', 'security@holovitals.com', '{"email": true, "sms": true, "critical_phone": false}', true)
+ON CONFLICT (user_id) DO NOTHING;
+
+-- Add comment to clarify this is separate from error_logs
+COMMENT ON TABLE hipaa_incidents IS 'HIPAA compliance incidents - SEPARATE from general error logging. Every incident tracked individually. NO deduplication. 6+ year retention.';
+COMMENT ON TABLE hipaa_incident_audit_log IS 'Complete audit trail for HIPAA incidents - IMMUTABLE, never delete.';
+COMMENT ON TABLE hipaa_compliance_team IS 'HIPAA compliance team members - separate from IT operations team.';

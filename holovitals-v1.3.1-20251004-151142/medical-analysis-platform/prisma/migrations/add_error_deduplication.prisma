@@ -1,0 +1,54 @@
+-- Add error deduplication and master error code support
+
+-- Add new columns to error_logs table
+ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS error_hash VARCHAR(32);
+ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS master_code VARCHAR(100);
+ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS occurrence_count INTEGER DEFAULT 1;
+ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS first_seen TIMESTAMP;
+ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS last_seen TIMESTAMP;
+ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS sample_stacks TEXT;
+ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS is_duplicate BOOLEAN DEFAULT FALSE;
+
+-- Create indexes for performance
+CREATE INDEX IF NOT EXISTS idx_error_hash ON error_logs(error_hash);
+CREATE INDEX IF NOT EXISTS idx_master_code ON error_logs(master_code);
+CREATE INDEX IF NOT EXISTS idx_error_dedup ON error_logs(error_hash, last_seen);
+CREATE INDEX IF NOT EXISTS idx_error_cleanup ON error_logs(severity, timestamp);
+CREATE INDEX IF NOT EXISTS idx_occurrence_count ON error_logs(occurrence_count DESC);
+
+-- Update existing records to set first_seen and last_seen
+UPDATE error_logs 
+SET first_seen = timestamp, 
+    last_seen = timestamp 
+WHERE first_seen IS NULL;
+
+-- Create error_masters table for master error code definitions
+CREATE TABLE IF NOT EXISTS error_masters (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  master_code VARCHAR(100) UNIQUE NOT NULL,
+  category VARCHAR(50) NOT NULL,
+  description TEXT NOT NULL,
+  severity VARCHAR(20) NOT NULL,
+  resolution_guide TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Create index on master_code
+CREATE INDEX IF NOT EXISTS idx_error_master_code ON error_masters(master_code);
+CREATE INDEX IF NOT EXISTS idx_error_master_category ON error_masters(category);
+
+-- Insert master error code definitions
+INSERT INTO error_masters (master_code, category, description, severity, resolution_guide) VALUES
+  ('DB_CONNECTION_ERROR', 'DATABASE', 'Database connection failures', 'CRITICAL', 'Check database connection string, network connectivity, and database server status'),
+  ('DB_QUERY_ERROR', 'DATABASE', 'Database query execution failures', 'HIGH', 'Review query syntax, check table schema, verify data types'),
+  ('API_INTEGRATION_ERROR', 'API_INTEGRATION', 'External API integration failures', 'HIGH', 'Check API credentials, rate limits, and service status'),
+  ('EHR_SYNC_ERROR', 'EHR_SYNC', 'EHR data synchronization failures', 'HIGH', 'Verify EHR credentials, check data format, review sync logs'),
+  ('EHR_FHIR_ERROR', 'EHR_SYNC', 'FHIR protocol errors', 'MEDIUM', 'Check FHIR resource format, validate against FHIR specification'),
+  ('VALIDATION_ERROR', 'VALIDATION', 'Input validation failures', 'MEDIUM', 'Review input data format and required fields'),
+  ('AUTHORIZATION_ERROR', 'AUTHORIZATION', 'Access control and authentication failures', 'HIGH', 'Verify user permissions, check authentication tokens'),
+  ('SYSTEM_ERROR', 'SYSTEM', 'System-level failures', 'CRITICAL', 'Check system resources, logs, and service status'),
+  ('FILE_SYSTEM_ERROR', 'SYSTEM', 'File system operation failures', 'MEDIUM', 'Check file permissions, disk space, and file paths'),
+  ('NETWORK_ERROR', 'NETWORK', 'Network connectivity failures', 'HIGH', 'Check network connectivity, firewall rules, and DNS resolution'),
+  ('HIPAA_VIOLATION', 'HIPAA_COMPLIANCE', 'HIPAA compliance violations', 'CRITICAL', 'Immediate review required - potential PHI exposure or unauthorized access')
+ON CONFLICT (master_code) DO NOTHING;
