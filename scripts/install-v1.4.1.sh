@@ -108,9 +108,11 @@ main() {
         exit 1
     fi
     
+    echo ""
     print_success "All system requirements met!"
     echo ""
-    sleep 1
+    echo -e "${YELLOW}Press Enter to continue to Phase 2...${NC}"
+    read -r
     
     # Phase 2: Clone repository
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -128,7 +130,8 @@ main() {
     cd "$INSTALL_DIR"
     print_success "Repository cloned successfully"
     echo ""
-    sleep 1
+    echo -e "${YELLOW}Press Enter to continue to Phase 3...${NC}"
+    read -r
     
     # Phase 3: Install dependencies
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -140,7 +143,8 @@ main() {
     npm install --silent 2>&1 | grep -E "(added|removed|changed|audited)" || true
     print_success "Dependencies installed successfully"
     echo ""
-    sleep 1
+    echo -e "${YELLOW}Press Enter to continue to Phase 4...${NC}"
+    read -r
     
     # Phase 4: Set up environment
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -162,7 +166,8 @@ main() {
         print_info ".env file already exists"
     fi
     echo ""
-    sleep 1
+    echo -e "${YELLOW}Press Enter to continue to Phase 5...${NC}"
+    read -r
     
     # Phase 5: Generate Prisma client
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -174,7 +179,8 @@ main() {
     npx prisma generate 2>&1 | grep -E "(Generated|Prisma Client)" || true
     print_success "Prisma client generated successfully"
     echo ""
-    sleep 1
+    echo -e "${YELLOW}Press Enter to continue to Phase 6...${NC}"
+    read -r
     
     # Phase 6: Database setup instructions
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
