@@ -3,7 +3,14 @@
  * Centralized configuration for Stripe integration
  */
 
+import Stripe from 'stripe';
 import { SubscriptionPlanDetails } from '@/lib/types/payment';
+
+// Initialize Stripe instance
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  apiVersion: '2024-11-20.acacia',
+  typescript: true,
+});
 
 // Stripe API Keys
 export const STRIPE_CONFIG = {
