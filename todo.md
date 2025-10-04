@@ -18,16 +18,16 @@ Fix v1.4.8 installation script to keep Cloudflare Tunnel in development mode (on
 - [x] Create release-body-v1.4.9.md
 
 ### 3. Commit and Push Changes
-- [ ] Add all files to git
-- [ ] Commit with descriptive message
-- [ ] Push to main branch
+- [x] Add all files to git
+- [x] Commit with descriptive message
+- [x] Push to main branch
 
 ### 4. Create GitHub Release
-- [ ] Create v1.4.9 release
-- [ ] Mark as latest
-- [ ] Verify release is live
+- [x] Create v1.4.9 release
+- [x] Mark as latest
+- [x] Verify release is live
 
 ### 5. Final Verification
-- [ ] Verify installation command
-- [ ] Create completion summary
-- [ ] Mark all tasks complete
+- [x] Verify installation command
+- [x] Create completion summary
+- [x] Mark all tasks complete
