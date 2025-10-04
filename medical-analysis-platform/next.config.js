@@ -23,11 +23,18 @@ const nextConfig = {
         'ioredis': false,
       };
     }
+    
+    // Handle tiktoken WASM files
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'tiktoken': false,
+    };
+    
     return config;
   },
   // Ensure API routes are server-side only
   experimental: {
-    serverComponentsExternalPackages: ['bull', 'bullmq', 'ioredis'],
+    serverComponentsExternalPackages: ['bull', 'bullmq', 'ioredis', 'tiktoken'],
   },
 };
 
