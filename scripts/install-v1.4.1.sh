@@ -99,9 +99,19 @@ echo "=================================================="
 
 # Clone repository
 if [ -d "HoloVitals" ]; then
-    echo "HoloVitals directory exists, updating..."
+    echo "HoloVitals directory exists..."
     cd HoloVitals
-    git pull origin main
+    # Check if it's a git repository
+    if [ -d ".git" ]; then
+        echo "Updating existing repository..."
+        git pull origin main
+    else
+        echo "Directory exists but is not a git repository. Removing and cloning fresh..."
+        cd ..
+        rm -rf HoloVitals
+        git clone https://github.com/cloudbyday90/HoloVitals.git
+        cd HoloVitals
+    fi
 else
     echo "Cloning HoloVitals repository..."
     git clone https://github.com/cloudbyday90/HoloVitals.git
