@@ -5,7 +5,7 @@ import { MedicationStatus } from '@/lib/types/clinical-data';
 
 /**
  * GET /api/clinical/medications
- * Fetch medications for the authenticated patient
+ * Fetch medications for the authenticated customer
  */
 export async function GET(request: NextRequest) {
   try {
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     
-    const patientId = searchParams.get('patientId') || session.user.id;
+    const customerId = searchParams.get('customerId') || session.user.id;
     const status = searchParams.get('status');
     const limit = parseInt(searchParams.get('limit') || '100');
     const offset = parseInt(searchParams.get('offset') || '0');
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     // Build where clause
     const where: any = {
       repository: {
-        userId: patientId,
+        userId: customerId,
       },
     };
 
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch medications
-    const medications = await prisma.patientMedication.findMany({
+    const medications = await prisma.customerMedication.findMany({
       where,
       include: {
         repository: {
@@ -56,12 +56,12 @@ export async function GET(request: NextRequest) {
     });
 
     // Get total count
-    const total = await prisma.patientMedication.count({ where });
+    const total = await prisma.customerMedication.count({ where });
 
     // Transform to API format
     const transformedMedications = medications.map((med) => ({
       id: med.id,
-      patientId,
+      customerId,
       name: med.name,
       dosage: med.dosage,
       frequency: med.frequency,

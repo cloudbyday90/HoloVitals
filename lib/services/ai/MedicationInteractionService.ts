@@ -70,15 +70,15 @@ export class MedicationInteractionService {
   };
 
   /**
-   * Analyze medication interactions for a patient
+   * Analyze medication interactions for a customer
    */
-  async analyzeMedicationInteractions(patientId: string): Promise<MedicationInteractionAnalysis> {
+  async analyzeMedicationInteractions(customerId: string): Promise<MedicationInteractionAnalysis> {
     // Fetch active medications
-    const medications = await this.fetchActiveMedications(patientId);
+    const medications = await this.fetchActiveMedications(customerId);
 
     if (medications.length === 0) {
       return {
-        patientId,
+        customerId,
         analysisDate: new Date(),
         medications: [],
         interactions: [],
@@ -92,13 +92,13 @@ export class MedicationInteractionService {
     const drugDrugInteractions = this.checkDrugDrugInteractions(medications);
 
     // Check for drug-disease interactions
-    const drugDiseaseInteractions = await this.checkDrugDiseaseInteractions(patientId, medications);
+    const drugDiseaseInteractions = await this.checkDrugDiseaseInteractions(customerId, medications);
 
     // Check for drug-allergy interactions
-    const drugAllergyWarnings = await this.checkDrugAllergyInteractions(patientId, medications);
+    const drugAllergyWarnings = await this.checkDrugAllergyInteractions(customerId, medications);
 
     // Check for other warnings
-    const otherWarnings = this.checkOtherWarnings(patientId, medications);
+    const otherWarnings = this.checkOtherWarnings(customerId, medications);
 
     // Combine all interactions and warnings
     const allInteractions = [...drugDrugInteractions, ...drugDiseaseInteractions];
@@ -111,7 +111,7 @@ export class MedicationInteractionService {
     const recommendations = this.generateRecommendations(allInteractions, allWarnings);
 
     return {
-      patientId,
+      customerId,
       analysisDate: new Date(),
       medications,
       interactions: allInteractions,
@@ -149,12 +149,12 @@ export class MedicationInteractionService {
   }
 
   /**
-   * Fetch active medications for a patient
+   * Fetch active medications for a customer
    */
-  private async fetchActiveMedications(patientId: string): Promise<MedicationInfo[]> {
+  private async fetchActiveMedications(customerId: string): Promise<MedicationInfo[]> {
     const medications = await prisma.medication.findMany({
       where: {
-        patientId,
+        customerId,
         status: 'active',
       },
       orderBy: {
@@ -211,15 +211,15 @@ export class MedicationInteractionService {
    * Check for drug-disease interactions
    */
   private async checkDrugDiseaseInteractions(
-    patientId: string,
+    customerId: string,
     medications: MedicationInfo[]
   ): Promise<DrugInteraction[]> {
     const interactions: DrugInteraction[] = [];
 
-    // Fetch patient conditions
+    // Fetch customer conditions
     const conditions = await prisma.condition.findMany({
       where: {
-        patientId,
+        customerId,
         clinicalStatus: 'active',
       },
     });
@@ -251,15 +251,15 @@ export class MedicationInteractionService {
    * Check for drug-allergy interactions
    */
   private async checkDrugAllergyInteractions(
-    patientId: string,
+    customerId: string,
     medications: MedicationInfo[]
   ): Promise<MedicationWarning[]> {
     const warnings: MedicationWarning[] = [];
 
-    // Fetch patient allergies
+    // Fetch customer allergies
     const allergies = await prisma.allergy.findMany({
       where: {
-        patientId,
+        customerId,
       },
     });
 
@@ -272,7 +272,7 @@ export class MedicationInteractionService {
             medication: med.name,
             warningType: 'allergy',
             severity: allergy.severity === 'severe' ? 'critical' : 'high',
-            message: `Patient has documented allergy to ${allergy.allergen}`,
+            message: `Customer has documented allergy to ${allergy.allergen}`,
             action: 'Discontinue medication immediately and use alternative',
             urgent: true,
           });
@@ -286,7 +286,7 @@ export class MedicationInteractionService {
   /**
    * Check for other medication warnings
    */
-  private checkOtherWarnings(patientId: string, medications: MedicationInfo[]): MedicationWarning[] {
+  private checkOtherWarnings(customerId: string, medications: MedicationInfo[]): MedicationWarning[] {
     const warnings: MedicationWarning[] = [];
 
     // Check for duplicate therapy

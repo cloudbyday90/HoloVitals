@@ -1,9 +1,9 @@
 /**
- * EHR Patient Medications API Endpoint
+ * EHR Customer Medications API Endpoint
  * 
- * GET /api/ehr/patients/:patientId/medications
+ * GET /api/ehr/customers/:customerId/medications
  * 
- * Retrieves patient medications from the connected EHR system.
+ * Retrieves customer medications from the connected EHR system.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -23,7 +23,7 @@ const medicationsSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { patientId: string } }
+  { params }: { params: { customerId: string } }
 ) {
   try {
     // 1. Authenticate user
@@ -35,8 +35,8 @@ export async function GET(
       );
     }
 
-    // 2. Get patientId from URL params
-    const { patientId } = params;
+    // 2. Get customerId from URL params
+    const { customerId } = params;
 
     // 3. Parse and validate query parameters
     const { searchParams } = new URL(request.url);
@@ -64,7 +64,7 @@ export async function GET(
 
     // 5. Get medications
     const medications = await ehrService.getMedications(
-      patientId,
+      customerId,
       ehrPatientId,
       options
     );
@@ -75,9 +75,9 @@ export async function GET(
       eventType: 'EHR_MEDICATIONS_ACCESS',
       category: 'DATA_ACCESS',
       outcome: 'SUCCESS',
-      description: `Retrieved medications for patient`,
+      description: `Retrieved medications for customer`,
       metadata: {
-        patientId,
+        customerId,
         ehrPatientId,
         medicationsCount: medications.length,
         filters: options,

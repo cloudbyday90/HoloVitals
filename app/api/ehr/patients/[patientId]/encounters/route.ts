@@ -1,9 +1,9 @@
 /**
- * EHR Patient Encounters API Endpoint
+ * EHR Customer Encounters API Endpoint
  * 
- * GET /api/ehr/patients/:patientId/encounters
+ * GET /api/ehr/customers/:customerId/encounters
  * 
- * Retrieves patient encounters from the connected EHR system.
+ * Retrieves customer encounters from the connected EHR system.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -25,7 +25,7 @@ const encountersSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { patientId: string } }
+  { params }: { params: { customerId: string } }
 ) {
   try {
     // 1. Authenticate user
@@ -37,8 +37,8 @@ export async function GET(
       );
     }
 
-    // 2. Get patientId from URL params
-    const { patientId } = params;
+    // 2. Get customerId from URL params
+    const { customerId } = params;
 
     // 3. Parse and validate query parameters
     const { searchParams } = new URL(request.url);
@@ -68,7 +68,7 @@ export async function GET(
 
     // 5. Get encounters
     const encounters = await ehrService.getEncounters(
-      patientId,
+      customerId,
       ehrPatientId,
       options
     );
@@ -79,9 +79,9 @@ export async function GET(
       eventType: 'EHR_ENCOUNTERS_ACCESS',
       category: 'DATA_ACCESS',
       outcome: 'SUCCESS',
-      description: `Retrieved encounters for patient`,
+      description: `Retrieved encounters for customer`,
       metadata: {
-        patientId,
+        customerId,
         ehrPatientId,
         encountersCount: encounters.length,
         filters: options,

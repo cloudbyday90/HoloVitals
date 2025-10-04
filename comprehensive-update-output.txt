@@ -1,0 +1,148 @@
+================================================================================
+HoloVitals v1.4.1 - Comprehensive Terminology Update
+================================================================================
+Updating: patient → customer (ALL OCCURRENCES)
+This includes: Database Schema, APIs, Services, Components, and UI
+
+
+📁 Processing: HoloVitals/app
+--------------------------------------------------------------------------------
+  ✓ app/(dashboard)/patients/page.tsx (9 replacements)
+  ✓ app/api/ehr/sync/dashboard/route.ts (1 replacements)
+  ✓ app/api/ehr/sync/history/route.ts (1 replacements)
+  ✓ app/api/patient-rights/access/route.ts (1 replacements)
+  ✓ app/api/patient-rights/amendment/route.ts (1 replacements)
+  ✓ app/api/patient-rights/disclosures/route.ts (1 replacements)
+  ✓ app/api/patient-rights/restriction/route.ts (1 replacements)
+  ✓ app/api/patients/[patientId]/route.ts (3 replacements)
+  ✓ app/api/patients/quick-search/route.ts (3 replacements)
+  ✓ app/api/patients/search/route.ts (6 replacements)
+  ✓ app/api/patients/statistics/route.ts (3 replacements)
+
+📁 Processing: HoloVitals/components
+--------------------------------------------------------------------------------
+  ✓ components/patients/PatientCard.tsx (1 replacements)
+  ✓ components/patients/PatientDetailView.tsx (3 replacements)
+  ✓ components/patients/PatientList.tsx (4 replacements)
+  ✓ components/patients/PatientSearch.tsx (1 replacements)
+  ✓ components/patients/PatientSearchBar.tsx (1 replacements)
+  ✓ components/sync/ActiveSyncsList.tsx (1 replacements)
+  ✓ components/sync/SyncHistoryTable.tsx (1 replacements)
+
+📁 Processing: HoloVitals/lib
+--------------------------------------------------------------------------------
+  ✓ lib/hooks/usePatientSearch.ts (2 replacements)
+  ✓ lib/services/DataRetentionService.ts (1 replacements)
+  ✓ lib/services/HIPAAComplianceService.ts (3 replacements)
+  ✓ lib/services/PatientRightsService.ts (8 replacements)
+  ✓ lib/services/PatientSearchService.ts (8 replacements)
+  ✓ lib/services/ai/HealthRiskAssessmentService.ts (57 replacements)
+  ✓ lib/services/ai/PersonalizedRecommendationsService.ts (46 replacements)
+  ✓ lib/types/patient-search.ts (4 replacements)
+  ✓ lib/types/patient.ts (1 replacements)
+  ✓ lib/types/sync.ts (2 replacements)
+
+📁 Processing: HoloVitals/prisma
+--------------------------------------------------------------------------------
+  ✓ prisma/schema.prisma (43 replacements)
+
+📁 Processing: HoloVitals/middleware.ts
+--------------------------------------------------------------------------------
+
+================================================================================
+📊 SUMMARY
+================================================================================
+  Files scanned:     190
+  Files updated:     29
+  Total replacements: 217
+
+================================================================================
+📝 DETAILED CHANGES (Top 20 files)
+================================================================================
+
+HoloVitals/lib/services/ai/HealthRiskAssessmentService.ts: 57 replacements
+  \bpatientData\b → customerData (57x)
+
+HoloVitals/lib/services/ai/PersonalizedRecommendationsService.ts: 46 replacements
+  \bpatientData\b → customerData (46x)
+
+HoloVitals/prisma/schema.prisma: 43 replacements
+  \bPatientAccessRequest\b → CustomerAccessRequest (1x)
+  \bPatientAllergy\b → CustomerAllergy (2x)
+  \bPatientAmendmentRequest\b → CustomerAmendmentRequest (1x)
+  \bPatientCommunicationRequest\b → CustomerCommunicationRequest (1x)
+  \bPatientConsent\b → CustomerConsent (1x)
+  ... and 24 more changes
+
+HoloVitals/app/(dashboard)/patients/page.tsx: 9 replacements
+  \bPatientDetailView\b → CustomerDetailView (3x)
+  \bPatientList\b → CustomerList (3x)
+  \bPatientSearch\b → CustomerSearch (3x)
+
+HoloVitals/lib/services/PatientRightsService.ts: 8 replacements
+  \bPatientRightsService\b → CustomerRightsService (8x)
+
+HoloVitals/lib/services/PatientSearchService.ts: 8 replacements
+  \bPatientSearchService\b → CustomerSearchService (2x)
+  \bPatientDetails\b → CustomerDetails (2x)
+  \bPatientSearchResult\b → CustomerSearchResult (2x)
+  \bPatientSearchParams\b → CustomerSearchParams (2x)
+
+HoloVitals/app/api/patients/search/route.ts: 6 replacements
+  \bPatientSearchService\b → CustomerSearchService (4x)
+  \bPatientSearchParams\b → CustomerSearchParams (2x)
+
+HoloVitals/components/patients/PatientList.tsx: 4 replacements
+  \bPatientCard\b → CustomerCard (3x)
+  \bPatientList\b → CustomerList (1x)
+
+HoloVitals/lib/types/patient-search.ts: 4 replacements
+  \bPatientDetails\b → CustomerDetails (1x)
+  \bPatientSearchResult\b → CustomerSearchResult (1x)
+  \bPatientSearchParams\b → CustomerSearchParams (2x)
+
+HoloVitals/app/api/patients/[patientId]/route.ts: 3 replacements
+  \bPatientSearchService\b → CustomerSearchService (3x)
+
+HoloVitals/app/api/patients/quick-search/route.ts: 3 replacements
+  \bPatientSearchService\b → CustomerSearchService (3x)
+
+HoloVitals/app/api/patients/statistics/route.ts: 3 replacements
+  \bPatientSearchService\b → CustomerSearchService (3x)
+
+HoloVitals/components/patients/PatientDetailView.tsx: 3 replacements
+  \bPatientDetailView\b → CustomerDetailView (1x)
+  \bpatientData\b → customerData (2x)
+
+HoloVitals/lib/services/HIPAAComplianceService.ts: 3 replacements
+  \baffectedPatientIds\b → affectedCustomerIds (3x)
+
+HoloVitals/lib/hooks/usePatientSearch.ts: 2 replacements
+  \bPatientSearchResult\b → CustomerSearchResult (2x)
+
+HoloVitals/lib/types/sync.ts: 2 replacements
+  \bpatientName\b → customerName (2x)
+
+HoloVitals/app/api/ehr/sync/dashboard/route.ts: 1 replacements
+  \bpatientName\b → customerName (1x)
+
+HoloVitals/app/api/ehr/sync/history/route.ts: 1 replacements
+  \bpatientName\b → customerName (1x)
+
+HoloVitals/app/api/patient-rights/access/route.ts: 1 replacements
+  \bPatientRightsService\b → CustomerRightsService (1x)
+
+HoloVitals/app/api/patient-rights/amendment/route.ts: 1 replacements
+  \bPatientRightsService\b → CustomerRightsService (1x)
+
+================================================================================
+✅ Comprehensive terminology update complete!
+================================================================================
+
+⚠️  IMPORTANT NEXT STEPS:
+  1. Review the changes carefully
+  2. Run database migration (Prisma)
+  3. Update API documentation
+  4. Test all functionality
+  5. Create migration guide for users
+

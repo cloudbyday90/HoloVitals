@@ -257,7 +257,7 @@ export class UnifiedEHRService {
       // Store connection in database
       await prisma.eHRConnection.upsert({
         where: {
-          patientId_provider: {
+          customerId_provider: {
             patientId,
             provider: config.provider,
           },

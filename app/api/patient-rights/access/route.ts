@@ -1,19 +1,19 @@
 /**
- * Patient Right to Access API Endpoints
+ * Customer Right to Access API Endpoints
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { patientRights } from '@/lib/services/PatientRightsService';
+import { customerRights } from '@/lib/services/CustomerRightsService';
 
 /**
- * POST /api/patient-rights/access
+ * POST /api/customer-rights/access
  * Request access to PHI
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const {
-      patientId,
+      customerId,
       requestType,
       specificRecords,
       startDate,
@@ -22,18 +22,18 @@ export async function POST(request: NextRequest) {
       deliveryAddress,
     } = body;
 
-    if (!patientId || !requestType || !deliveryMethod) {
+    if (!customerId || !requestType || !deliveryMethod) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Patient ID, request type, and delivery method are required',
+          error: 'Customer ID, request type, and delivery method are required',
         },
         { status: 400 }
       );
     }
 
-    const requestId = await patientRights.requestAccess({
-      patientId,
+    const requestId = await customerRights.requestAccess({
+      customerId,
       requestType,
       specificRecords,
       startDate: startDate ? new Date(startDate) : undefined,
@@ -60,25 +60,25 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * GET /api/patient-rights/access
- * Get access requests for patient
+ * GET /api/customer-rights/access
+ * Get access requests for customer
  */
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const patientId = searchParams.get('patientId');
+    const customerId = searchParams.get('customerId');
 
-    if (!patientId) {
+    if (!customerId) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Patient ID is required',
+          error: 'Customer ID is required',
         },
         { status: 400 }
       );
     }
 
-    const requests = await patientRights.getAccessRequests(patientId);
+    const requests = await customerRights.getAccessRequests(customerId);
 
     return NextResponse.json({
       success: true,

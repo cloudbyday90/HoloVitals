@@ -27,8 +27,8 @@ async function getUserSubscription(userId: string) {
 
 async function getUserUsage(userId: string) {
   // Get current usage statistics
-  const [patientCount, ehrConnectionCount] = await Promise.all([
-    prisma.patient.count({
+  const [customerCount, ehrConnectionCount] = await Promise.all([
+    prisma.customer.count({
       where: { userId },
     }),
     prisma.eHRConnection.count({
@@ -43,9 +43,9 @@ async function getUserUsage(userId: string) {
 
   const aiInsightsCount = await prisma.aIHealthInsight.count({
     where: {
-      patientId: {
+      customerId: {
         in: (
-          await prisma.patient.findMany({
+          await prisma.customer.findMany({
             where: { userId },
             select: { id: true },
           })
@@ -61,9 +61,9 @@ async function getUserUsage(userId: string) {
   // This is a simplified calculation - in production, you'd track actual file sizes
   const documentCount = await prisma.fHIRResource.count({
     where: {
-      patientId: {
+      customerId: {
         in: (
-          await prisma.patient.findMany({
+          await prisma.customer.findMany({
             where: { userId },
             select: { id: true },
           })
@@ -77,7 +77,7 @@ async function getUserUsage(userId: string) {
   const storageUsed = (documentCount * 2) / 1024; // Convert MB to GB
 
   return {
-    patients: patientCount,
+    customers: customerCount,
     storage: Math.round(storageUsed * 100) / 100, // Round to 2 decimal places
     aiInsights: aiInsightsCount,
     ehrConnections: ehrConnectionCount,

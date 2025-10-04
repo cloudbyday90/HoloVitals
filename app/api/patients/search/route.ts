@@ -1,12 +1,12 @@
 /**
- * Patient Search API Endpoint
- * POST /api/patients/search
+ * Customer Search API Endpoint
+ * POST /api/customers/search
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import PatientSearchService from '@/lib/services/PatientSearchService';
-import { PatientSearchParams } from '@/lib/types/patient-search';
+import CustomerSearchService from '@/lib/services/CustomerSearchService';
+import { CustomerSearchParams } from '@/lib/types/customer-search';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,17 +20,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse request body
-    const body: PatientSearchParams = await request.json();
+    const body: CustomerSearchParams = await request.json();
 
-    // Search patients
-    const results = await PatientSearchService.searchPatients(body);
+    // Search customers
+    const results = await CustomerSearchService.searchPatients(body);
 
     return NextResponse.json({
       success: true,
       data: results,
     });
   } catch (error) {
-    console.error('Patient search API error:', error);
+    console.error('Customer search API error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
@@ -57,8 +57,8 @@ export async function GET(request: NextRequest) {
     const sortBy = (searchParams.get('sortBy') || 'lastName') as any;
     const sortOrder = (searchParams.get('sortOrder') || 'asc') as 'asc' | 'desc';
 
-    // Search patients
-    const results = await PatientSearchService.searchPatients({
+    // Search customers
+    const results = await CustomerSearchService.searchPatients({
       query,
       page,
       limit,
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
       data: results,
     });
   } catch (error) {
-    console.error('Patient search API error:', error);
+    console.error('Customer search API error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }

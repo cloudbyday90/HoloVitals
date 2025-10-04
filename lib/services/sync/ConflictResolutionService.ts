@@ -541,7 +541,7 @@ export class ConflictResolutionService {
     }
 
     // Critical fields
-    const criticalFields = ['id', 'patientId', 'mrn', 'ssn'];
+    const criticalFields = ['id', 'customerId', 'mrn', 'ssn'];
     if (criticalFields.some(f => field.toLowerCase().includes(f))) {
       return ConflictSeverity.CRITICAL;
     }
@@ -716,9 +716,9 @@ export class ConflictResolutionService {
    */
   private initializeDefaultStrategies(): void {
     // Default strategies for common fields
-    this.resolutionStrategies.set('Patient-name', ConflictResolutionStrategy.LAST_WRITE_WINS);
-    this.resolutionStrategies.set('Patient-address', ConflictResolutionStrategy.LAST_WRITE_WINS);
-    this.resolutionStrategies.set('Patient-phone', ConflictResolutionStrategy.LAST_WRITE_WINS);
+    this.resolutionStrategies.set('Customer-name', ConflictResolutionStrategy.LAST_WRITE_WINS);
+    this.resolutionStrategies.set('Customer-address', ConflictResolutionStrategy.LAST_WRITE_WINS);
+    this.resolutionStrategies.set('Customer-phone', ConflictResolutionStrategy.LAST_WRITE_WINS);
     this.resolutionStrategies.set('Observation-value', ConflictResolutionStrategy.LAST_WRITE_WINS);
     this.resolutionStrategies.set('Medication-dosage', ConflictResolutionStrategy.MANUAL);
     this.resolutionStrategies.set('Allergy-severity', ConflictResolutionStrategy.MANUAL);

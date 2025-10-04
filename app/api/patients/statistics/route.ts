@@ -1,11 +1,11 @@
 /**
- * Patient Statistics API Endpoint
- * GET /api/patients/statistics
+ * Customer Statistics API Endpoint
+ * GET /api/customers/statistics
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import PatientSearchService from '@/lib/services/PatientSearchService';
+import CustomerSearchService from '@/lib/services/CustomerSearchService';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,14 +19,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Get statistics
-    const statistics = await PatientSearchService.getPatientStatistics();
+    const statistics = await CustomerSearchService.getPatientStatistics();
 
     return NextResponse.json({
       success: true,
       data: statistics,
     });
   } catch (error) {
-    console.error('Patient statistics API error:', error);
+    console.error('Customer statistics API error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }

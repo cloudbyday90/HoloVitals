@@ -72,9 +72,9 @@ export function SubscriptionPlanCard({
 
         <div className="mt-6 pt-6 border-t space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Patients</span>
+            <span className="text-muted-foreground">Customers</span>
             <span className="font-medium">
-              {plan.limits.patients === -1 ? 'Unlimited' : plan.limits.patients.toLocaleString()}
+              {plan.limits.customers === -1 ? 'Unlimited' : plan.limits.customers.toLocaleString()}
             </span>
           </div>
           <div className="flex justify-between text-sm">

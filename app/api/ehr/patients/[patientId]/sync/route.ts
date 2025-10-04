@@ -1,9 +1,9 @@
 /**
- * EHR Patient Data Sync API Endpoint
+ * EHR Customer Data Sync API Endpoint
  * 
- * POST /api/ehr/patients/:patientId/sync
+ * POST /api/ehr/customers/:customerId/sync
  * 
- * Synchronizes all patient data from the connected EHR system.
+ * Synchronizes all customer data from the connected EHR system.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -22,7 +22,7 @@ const syncSchema = z.object({
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { patientId: string } }
+  { params }: { params: { customerId: string } }
 ) {
   try {
     // 1. Authenticate user
@@ -34,8 +34,8 @@ export async function POST(
       );
     }
 
-    // 2. Get patientId from URL params
-    const { patientId } = params;
+    // 2. Get customerId from URL params
+    const { customerId } = params;
 
     // 3. Parse and validate request body
     const body = await request.json();
@@ -57,7 +57,7 @@ export async function POST(
     const ehrService = new UnifiedEHRService();
 
     // 5. Start sync process
-    const syncResult = await ehrService.syncPatientData(patientId, ehrPatientId);
+    const syncResult = await ehrService.syncPatientData(customerId, ehrPatientId);
 
     // 6. Log sync result
     await auditService.log({
@@ -65,9 +65,9 @@ export async function POST(
       eventType: 'EHR_DATA_SYNC',
       category: 'DATA_SYNC',
       outcome: syncResult.success ? 'SUCCESS' : 'FAILURE',
-      description: `Synced patient data from EHR`,
+      description: `Synced customer data from EHR`,
       metadata: {
-        patientId,
+        customerId,
         ehrPatientId,
         recordsProcessed: syncResult.recordsProcessed,
         errors: syncResult.errors,
@@ -79,7 +79,7 @@ export async function POST(
       {
         success: syncResult.success,
         data: {
-          patientId,
+          customerId,
           ehrPatientId,
           ehrProvider: syncResult.ehrProvider,
           recordsProcessed: syncResult.recordsProcessed,
@@ -96,7 +96,7 @@ export async function POST(
       eventType: 'EHR_DATA_SYNC',
       category: 'DATA_SYNC',
       outcome: 'FAILURE',
-      description: `Failed to sync patient data: ${error.message}`,
+      description: `Failed to sync customer data: ${error.message}`,
       metadata: {
         error: error.message,
       },
@@ -106,7 +106,7 @@ export async function POST(
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to sync patient data',
+        error: 'Failed to sync customer data',
         message: error.message,
       },
       { status: 500 }
@@ -117,7 +117,7 @@ export async function POST(
 // GET endpoint to retrieve sync history
 export async function GET(
   request: NextRequest,
-  { params }: { params: { patientId: string } }
+  { params }: { params: { customerId: string } }
 ) {
   try {
     // 1. Authenticate user
@@ -129,8 +129,8 @@ export async function GET(
       );
     }
 
-    // 2. Get patientId from URL params
-    const { patientId } = params;
+    // 2. Get customerId from URL params
+    const { customerId } = params;
 
     // 3. Get query parameters for pagination
     const { searchParams } = new URL(request.url);
@@ -142,14 +142,14 @@ export async function GET(
     const prisma = new PrismaClient();
 
     const syncHistory = await prisma.syncHistory.findMany({
-      where: { patientId },
+      where: { customerId },
       orderBy: { startedAt: 'desc' },
       take: limit,
       skip: offset,
     });
 
     const total = await prisma.syncHistory.count({
-      where: { patientId },
+      where: { customerId },
     });
 
     await prisma.$disconnect();

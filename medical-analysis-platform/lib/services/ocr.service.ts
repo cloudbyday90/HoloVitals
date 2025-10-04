@@ -253,4 +253,15 @@ export class OCRService {
   }
 }
 
+// Lazy initialization to prevent build-time errors
+let ocrServiceInstance: OCRService | null = null;
+
+export function getOCRService(): OCRService {
+  if (!ocrServiceInstance) {
+    ocrServiceInstance = new OCRService();
+  }
+  return ocrServiceInstance;
+}
+
+// For backward compatibility
 export const ocrService = new OCRService();

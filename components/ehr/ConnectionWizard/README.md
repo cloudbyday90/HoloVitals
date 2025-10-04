@@ -26,7 +26,7 @@ The orchestrator component that manages the wizard state and renders the appropr
 ```tsx
 import { ConnectionWizard } from '@/components/ehr/ConnectionWizard';
 
-<ConnectionWizard patientId="user-id" />
+<ConnectionWizard customerId="user-id" />
 ```
 
 ### 2. ProviderSelector
@@ -96,7 +96,7 @@ Shows error message with troubleshooting guidance.
 import { ConnectionWizard } from '@/components/ehr/ConnectionWizard';
 
 export default function ConnectPage() {
-  return <ConnectionWizard patientId="patient-123" />;
+  return <ConnectionWizard customerId="customer-123" />;
 }
 ```
 
@@ -104,7 +104,7 @@ export default function ConnectPage() {
 
 ```tsx
 <div className="container mx-auto py-8">
-  <ConnectionWizard patientId="patient-123" />
+  <ConnectionWizard customerId="customer-123" />
 </div>
 ```
 
@@ -158,7 +158,7 @@ const {
   retry,           // Retry connection
   reset,           // Reset wizard
   goBack,          // Go to previous step
-} = useConnectionWizard(patientId);
+} = useConnectionWizard(customerId);
 ```
 
 ## API Integration
@@ -168,7 +168,7 @@ The wizard integrates with the `/api/ehr/connect` endpoint:
 ```typescript
 POST /api/ehr/connect
 {
-  "patientId": "uuid",
+  "customerId": "uuid",
   "provider": "EPIC",
   "config": {
     "baseUrl": "https://fhir.epic.com",
@@ -309,7 +309,7 @@ CUSTOM: {
 ## Troubleshooting
 
 ### Wizard not loading
-- Check if `patientId` is provided
+- Check if `customerId` is provided
 - Verify authentication
 - Check console for errors
 

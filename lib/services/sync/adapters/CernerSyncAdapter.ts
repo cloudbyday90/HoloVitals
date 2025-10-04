@@ -48,9 +48,9 @@ export class CernerSyncAdapter {
   }
 
   /**
-   * Sync patient data from Cerner to HoloVitals (Inbound)
+   * Sync customer data from Cerner to HoloVitals (Inbound)
    */
-  async syncPatientInbound(patientId: string): Promise<CernerSyncResult> {
+  async syncPatientInbound(customerId: string): Promise<CernerSyncResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
     const conflicts: any[] = [];
@@ -61,12 +61,12 @@ export class CernerSyncAdapter {
     try {
       await this.ensureValidToken();
 
-      const cernerPatient = await this.fetchPatientFromCerner(patientId);
+      const cernerPatient = await this.fetchPatientFromCerner(customerId);
       resourcesProcessed++;
 
       const transformContext: TransformationContext = {
         ehrProvider: 'cerner',
-        resourceType: 'Patient',
+        resourceType: 'Customer',
         direction: 'INBOUND',
         sourceFormat: DataFormat.FHIR_R4,
         targetFormat: DataFormat.CUSTOM_JSON,
@@ -98,10 +98,10 @@ export class CernerSyncAdapter {
 
       warnings.push(...transformResult.warnings.map(w => w.message));
 
-      const existingPatient = await prisma.patient.findFirst({
+      const existingPatient = await prisma.customer.findFirst({
         where: {
           OR: [
-            { cernerId: patientId },
+            { cernerId: customerId },
             { mrn: transformResult.data.mrn },
           ],
         },
@@ -109,7 +109,7 @@ export class CernerSyncAdapter {
 
       if (existingPatient) {
         const conflictResult = await conflictResolutionService.detectConflicts(
-          'Patient',
+          'Customer',
           existingPatient.id,
           existingPatient,
           transformResult.data
@@ -118,7 +118,7 @@ export class CernerSyncAdapter {
         if (conflictResult.hasConflicts) {
           conflicts.push(...conflictResult.conflicts);
           const resolutions = await conflictResolutionService.autoResolveConflicts(
-            'Patient',
+            'Customer',
             existingPatient.id
           );
 
@@ -129,19 +129,19 @@ export class CernerSyncAdapter {
           }
         }
 
-        await prisma.patient.update({
+        await prisma.customer.update({
           where: { id: existingPatient.id },
           data: {
             ...transformResult.data,
-            cernerId: patientId,
+            cernerId: customerId,
             lastSyncedAt: new Date(),
           },
         });
       } else {
-        await prisma.patient.create({
+        await prisma.customer.create({
           data: {
             ...transformResult.data,
-            cernerId: patientId,
+            cernerId: customerId,
             lastSyncedAt: new Date(),
           },
         });
@@ -149,10 +149,10 @@ export class CernerSyncAdapter {
 
       resourcesSucceeded++;
 
-      await this.syncPatientObservations(patientId);
-      await this.syncPatientMedications(patientId);
-      await this.syncPatientAllergies(patientId);
-      await this.syncPatientConditions(patientId);
+      await this.syncPatientObservations(customerId);
+      await this.syncPatientMedications(customerId);
+      await this.syncPatientAllergies(customerId);
+      await this.syncPatientConditions(customerId);
 
       return {
         success: true,
@@ -164,7 +164,7 @@ export class CernerSyncAdapter {
         conflicts,
       };
     } catch (error) {
-      console.error('Error syncing patient from Cerner:', error);
+      console.error('Error syncing customer from Cerner:', error);
       errors.push(error.message);
       resourcesFailed++;
 
@@ -181,9 +181,9 @@ export class CernerSyncAdapter {
   }
 
   /**
-   * Sync patient data from HoloVitals to Cerner (Outbound)
+   * Sync customer data from HoloVitals to Cerner (Outbound)
    */
-  async syncPatientOutbound(patientId: string): Promise<CernerSyncResult> {
+  async syncPatientOutbound(customerId: string): Promise<CernerSyncResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
     const conflicts: any[] = [];
@@ -194,19 +194,19 @@ export class CernerSyncAdapter {
     try {
       await this.ensureValidToken();
 
-      const holoPatient = await prisma.patient.findUnique({
-        where: { id: patientId },
+      const holoPatient = await prisma.customer.findUnique({
+        where: { id: customerId },
       });
 
       if (!holoPatient) {
-        throw new Error('Patient not found in HoloVitals');
+        throw new Error('Customer not found in HoloVitals');
       }
 
       resourcesProcessed++;
 
       const transformContext: TransformationContext = {
         ehrProvider: 'cerner',
-        resourceType: 'Patient',
+        resourceType: 'Customer',
         direction: 'OUTBOUND',
         sourceFormat: DataFormat.CUSTOM_JSON,
         targetFormat: DataFormat.FHIR_R4,
@@ -241,8 +241,8 @@ export class CernerSyncAdapter {
         await this.updatePatientInCerner(holoPatient.cernerId, transformResult.data);
       } else {
         const cernerId = await this.createPatientInCerner(transformResult.data);
-        await prisma.patient.update({
-          where: { id: patientId },
+        await prisma.customer.update({
+          where: { id: customerId },
           data: { cernerId },
         });
       }
@@ -259,7 +259,7 @@ export class CernerSyncAdapter {
         conflicts,
       };
     } catch (error) {
-      console.error('Error syncing patient to Cerner:', error);
+      console.error('Error syncing customer to Cerner:', error);
       errors.push(error.message);
       resourcesFailed++;
 
@@ -275,9 +275,9 @@ export class CernerSyncAdapter {
     }
   }
 
-  private async syncPatientObservations(patientId: string): Promise<void> {
+  private async syncPatientObservations(customerId: string): Promise<void> {
     try {
-      const observations = await this.fetchObservationsFromCerner(patientId);
+      const observations = await this.fetchObservationsFromCerner(customerId);
       for (const observation of observations) {
         const transformContext: TransformationContext = {
           ehrProvider: 'cerner',
@@ -288,7 +288,7 @@ export class CernerSyncAdapter {
         };
         const transformResult = await dataTransformationService.transform(observation, transformContext);
         if (transformResult.success) {
-          await this.saveObservation(patientId, transformResult.data);
+          await this.saveObservation(customerId, transformResult.data);
         }
       }
     } catch (error) {
@@ -296,9 +296,9 @@ export class CernerSyncAdapter {
     }
   }
 
-  private async syncPatientMedications(patientId: string): Promise<void> {
+  private async syncPatientMedications(customerId: string): Promise<void> {
     try {
-      const medications = await this.fetchMedicationsFromCerner(patientId);
+      const medications = await this.fetchMedicationsFromCerner(customerId);
       for (const medication of medications) {
         const transformContext: TransformationContext = {
           ehrProvider: 'cerner',
@@ -309,7 +309,7 @@ export class CernerSyncAdapter {
         };
         const transformResult = await dataTransformationService.transform(medication, transformContext);
         if (transformResult.success) {
-          await this.saveMedication(patientId, transformResult.data);
+          await this.saveMedication(customerId, transformResult.data);
         }
       }
     } catch (error) {
@@ -317,9 +317,9 @@ export class CernerSyncAdapter {
     }
   }
 
-  private async syncPatientAllergies(patientId: string): Promise<void> {
+  private async syncPatientAllergies(customerId: string): Promise<void> {
     try {
-      const allergies = await this.fetchAllergiesFromCerner(patientId);
+      const allergies = await this.fetchAllergiesFromCerner(customerId);
       for (const allergy of allergies) {
         const transformContext: TransformationContext = {
           ehrProvider: 'cerner',
@@ -330,7 +330,7 @@ export class CernerSyncAdapter {
         };
         const transformResult = await dataTransformationService.transform(allergy, transformContext);
         if (transformResult.success) {
-          await this.saveAllergy(patientId, transformResult.data);
+          await this.saveAllergy(customerId, transformResult.data);
         }
       }
     } catch (error) {
@@ -338,9 +338,9 @@ export class CernerSyncAdapter {
     }
   }
 
-  private async syncPatientConditions(patientId: string): Promise<void> {
+  private async syncPatientConditions(customerId: string): Promise<void> {
     try {
-      const conditions = await this.fetchConditionsFromCerner(patientId);
+      const conditions = await this.fetchConditionsFromCerner(customerId);
       for (const condition of conditions) {
         const transformContext: TransformationContext = {
           ehrProvider: 'cerner',
@@ -351,7 +351,7 @@ export class CernerSyncAdapter {
         };
         const transformResult = await dataTransformationService.transform(condition, transformContext);
         if (transformResult.success) {
-          await this.saveCondition(patientId, transformResult.data);
+          await this.saveCondition(customerId, transformResult.data);
         }
       }
     } catch (error) {
@@ -359,9 +359,9 @@ export class CernerSyncAdapter {
     }
   }
 
-  private async fetchPatientFromCerner(patientId: string): Promise<any> {
+  private async fetchPatientFromCerner(customerId: string): Promise<any> {
     const response = await fetch(
-      `${this.config.baseUrl}/Patient/${patientId}`,
+      `${this.config.baseUrl}/Customer/${customerId}`,
       {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
@@ -373,9 +373,9 @@ export class CernerSyncAdapter {
     return await response.json();
   }
 
-  private async fetchObservationsFromCerner(patientId: string): Promise<any[]> {
+  private async fetchObservationsFromCerner(customerId: string): Promise<any[]> {
     const response = await fetch(
-      `${this.config.baseUrl}/Observation?patient=${patientId}`,
+      `${this.config.baseUrl}/Observation?customer=${customerId}`,
       {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
@@ -388,9 +388,9 @@ export class CernerSyncAdapter {
     return bundle.entry?.map((e: any) => e.resource) || [];
   }
 
-  private async fetchMedicationsFromCerner(patientId: string): Promise<any[]> {
+  private async fetchMedicationsFromCerner(customerId: string): Promise<any[]> {
     const response = await fetch(
-      `${this.config.baseUrl}/MedicationRequest?patient=${patientId}`,
+      `${this.config.baseUrl}/MedicationRequest?customer=${customerId}`,
       {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
@@ -403,9 +403,9 @@ export class CernerSyncAdapter {
     return bundle.entry?.map((e: any) => e.resource) || [];
   }
 
-  private async fetchAllergiesFromCerner(patientId: string): Promise<any[]> {
+  private async fetchAllergiesFromCerner(customerId: string): Promise<any[]> {
     const response = await fetch(
-      `${this.config.baseUrl}/AllergyIntolerance?patient=${patientId}`,
+      `${this.config.baseUrl}/AllergyIntolerance?customer=${customerId}`,
       {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
@@ -418,9 +418,9 @@ export class CernerSyncAdapter {
     return bundle.entry?.map((e: any) => e.resource) || [];
   }
 
-  private async fetchConditionsFromCerner(patientId: string): Promise<any[]> {
+  private async fetchConditionsFromCerner(customerId: string): Promise<any[]> {
     const response = await fetch(
-      `${this.config.baseUrl}/Condition?patient=${patientId}`,
+      `${this.config.baseUrl}/Condition?customer=${customerId}`,
       {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
@@ -433,16 +433,16 @@ export class CernerSyncAdapter {
     return bundle.entry?.map((e: any) => e.resource) || [];
   }
 
-  private async createPatientInCerner(patientData: any): Promise<string> {
+  private async createPatientInCerner(customerData: any): Promise<string> {
     const response = await fetch(
-      `${this.config.baseUrl}/Patient`,
+      `${this.config.baseUrl}/Customer`,
       {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
           'Content-Type': 'application/fhir+json',
         },
-        body: JSON.stringify(patientData),
+        body: JSON.stringify(customerData),
       }
     );
     if (!response.ok) throw new Error(`Cerner API error: ${response.statusText}`);
@@ -450,35 +450,35 @@ export class CernerSyncAdapter {
     return result.id;
   }
 
-  private async updatePatientInCerner(patientId: string, patientData: any): Promise<void> {
+  private async updatePatientInCerner(customerId: string, customerData: any): Promise<void> {
     const response = await fetch(
-      `${this.config.baseUrl}/Patient/${patientId}`,
+      `${this.config.baseUrl}/Customer/${customerId}`,
       {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
           'Content-Type': 'application/fhir+json',
         },
-        body: JSON.stringify(patientData),
+        body: JSON.stringify(customerData),
       }
     );
     if (!response.ok) throw new Error(`Cerner API error: ${response.statusText}`);
   }
 
-  private async saveObservation(patientId: string, data: any): Promise<void> {
-    console.log('Saving observation for patient:', patientId);
+  private async saveObservation(customerId: string, data: any): Promise<void> {
+    console.log('Saving observation for customer:', customerId);
   }
 
-  private async saveMedication(patientId: string, data: any): Promise<void> {
-    console.log('Saving medication for patient:', patientId);
+  private async saveMedication(customerId: string, data: any): Promise<void> {
+    console.log('Saving medication for customer:', customerId);
   }
 
-  private async saveAllergy(patientId: string, data: any): Promise<void> {
-    console.log('Saving allergy for patient:', patientId);
+  private async saveAllergy(customerId: string, data: any): Promise<void> {
+    console.log('Saving allergy for customer:', customerId);
   }
 
-  private async saveCondition(patientId: string, data: any): Promise<void> {
-    console.log('Saving condition for patient:', patientId);
+  private async saveCondition(customerId: string, data: any): Promise<void> {
+    console.log('Saving condition for customer:', customerId);
   }
 
   private async ensureValidToken(): Promise<void> {

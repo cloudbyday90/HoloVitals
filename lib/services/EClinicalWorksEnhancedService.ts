@@ -4,7 +4,7 @@
  * Provides enhanced integration with eClinicalWorks EHR system including:
  * - Bulk data export using FHIR $export
  * - Enhanced resource types (DiagnosticReport, CarePlan, Encounter)
- * - Patient portal integration
+ * - Customer portal integration
  * - Clinical documentation
  * - Telehealth integration
  * - Rate limiting (7 requests/second)
@@ -37,7 +37,7 @@ export enum BulkExportStatus {
 
 // Bulk export type
 export enum BulkExportType {
-  PATIENT = 'Patient',
+  CUSTOMER = 'Customer',
   GROUP = 'Group',
   SYSTEM = 'System',
 }
@@ -86,9 +86,9 @@ export class EClinicalWorksEnhancedService {
     const connection = await this.getConnection(connectionId);
     
     const {
-      exportType = BulkExportType.PATIENT,
+      exportType = BulkExportType.CUSTOMER,
       resourceTypes = [
-        'Patient',
+        'Customer',
         'Observation',
         'Condition',
         'MedicationRequest',
@@ -106,8 +106,8 @@ export class EClinicalWorksEnhancedService {
 
     // Construct export URL based on type
     let exportUrl = `${connection.fhirEndpoint}`;
-    if (exportType === BulkExportType.PATIENT) {
-      exportUrl += `/Patient/$export`;
+    if (exportType === BulkExportType.CUSTOMER) {
+      exportUrl += `/Customer/$export`;
     } else if (exportType === BulkExportType.GROUP) {
       exportUrl += `/Group/${connection.userId}/$export`;
     } else {
@@ -323,7 +323,7 @@ export class EClinicalWorksEnhancedService {
   ): Promise<number> {
     const connection = await this.getConnection(connectionId);
     const resourceTypes = [
-      'Patient',
+      'Customer',
       'Observation',
       'Condition',
       'MedicationRequest',
@@ -339,7 +339,7 @@ export class EClinicalWorksEnhancedService {
         connection.accessToken!,
         resourceType,
         {
-          patient: connection.userId,
+          customer: connection.userId,
           _since: since?.toISOString(),
         }
       );
@@ -371,7 +371,7 @@ export class EClinicalWorksEnhancedService {
       connection.accessToken!,
       resourceType,
       {
-        patient: connection.userId,
+        customer: connection.userId,
         _since: since?.toISOString(),
       }
     );

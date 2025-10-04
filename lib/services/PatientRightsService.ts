@@ -1,7 +1,7 @@
 /**
- * Patient Rights Management Service
+ * Customer Rights Management Service
  * 
- * Implements HIPAA patient rights including:
+ * Implements HIPAA customer rights including:
  * - Right to access PHI
  * - Right to amend PHI
  * - Right to accounting of disclosures
@@ -19,7 +19,7 @@ const prisma = new PrismaClient();
 // ============================================================================
 
 export interface AccessRequest {
-  patientId: string;
+  customerId: string;
   requestType: 'FULL_RECORD' | 'SPECIFIC_RECORDS' | 'DATE_RANGE';
   specificRecords?: string[];
   startDate?: Date;
@@ -29,7 +29,7 @@ export interface AccessRequest {
 }
 
 export interface AmendmentRequest {
-  patientId: string;
+  customerId: string;
   recordId: string;
   recordType: string;
   currentValue: string;
@@ -38,13 +38,13 @@ export interface AmendmentRequest {
 }
 
 export interface DisclosureAccountingRequest {
-  patientId: string;
+  customerId: string;
   startDate: Date;
   endDate: Date;
 }
 
 export interface RestrictionRequest {
-  patientId: string;
+  customerId: string;
   restrictionType: 'USE' | 'DISCLOSURE' | 'BOTH';
   dataType: string;
   recipient?: string;
@@ -52,26 +52,26 @@ export interface RestrictionRequest {
 }
 
 export interface ConfidentialCommunicationRequest {
-  patientId: string;
+  customerId: string;
   communicationType: 'EMAIL' | 'PHONE' | 'MAIL';
   alternativeContact: string;
   reason: string;
 }
 
 // ============================================================================
-// PATIENT RIGHTS SERVICE
+// CUSTOMER RIGHTS SERVICE
 // ============================================================================
 
-export class PatientRightsService {
-  private static instance: PatientRightsService;
+export class CustomerRightsService {
+  private static instance: CustomerRightsService;
 
   private constructor() {}
 
-  public static getInstance(): PatientRightsService {
-    if (!PatientRightsService.instance) {
-      PatientRightsService.instance = new PatientRightsService();
+  public static getInstance(): CustomerRightsService {
+    if (!CustomerRightsService.instance) {
+      CustomerRightsService.instance = new CustomerRightsService();
     }
-    return PatientRightsService.instance;
+    return CustomerRightsService.instance;
   }
 
   // ==========================================================================
@@ -85,11 +85,11 @@ export class PatientRightsService {
     try {
       // Create access request
       const accessRequest = await prisma.$queryRaw<any[]>`
-        INSERT INTO patient_access_requests (
-          patient_id, request_type, specific_records, start_date, end_date,
+        INSERT INTO customer_access_requests (
+          customer_id, request_type, specific_records, start_date, end_date,
           delivery_method, delivery_address, status, requested_at
         ) VALUES (
-          ${request.patientId}, ${request.requestType},
+          ${request.customerId}, ${request.requestType},
           ${JSON.stringify(request.specificRecords || [])},
           ${request.startDate}, ${request.endDate},
           ${request.deliveryMethod}, ${request.deliveryAddress},
@@ -103,14 +103,14 @@ export class PatientRightsService {
       // Log request
       await auditLogging.log({
         context: {
-          userId: request.patientId,
-          userRole: 'PATIENT',
+          userId: request.customerId,
+          userRole: 'CUSTOMER',
         },
         eventType: 'DATA_REQUEST',
         eventCategory: 'COMPLIANCE',
         action: 'REQUEST_PHI_ACCESS',
         outcome: 'SUCCESS',
-        patientId: request.patientId,
+        customerId: request.customerId,
         metadata: {
           requestId,
           requestType: request.requestType,
@@ -135,7 +135,7 @@ export class PatientRightsService {
     try {
       // Update request status
       await prisma.$executeRaw`
-        UPDATE patient_access_requests 
+        UPDATE customer_access_requests 
         SET status = 'FULFILLED', fulfilled_at = NOW(), 
             fulfilled_by = ${fulfilledBy}, notes = ${notes}
         WHERE id = ${requestId}
@@ -143,7 +143,7 @@ export class PatientRightsService {
 
       // Get request details
       const request = await prisma.$queryRaw<any[]>`
-        SELECT patient_id FROM patient_access_requests WHERE id = ${requestId}
+        SELECT customer_id FROM customer_access_requests WHERE id = ${requestId}
       `;
 
       if (request.length > 0) {
@@ -157,7 +157,7 @@ export class PatientRightsService {
           eventCategory: 'COMPLIANCE',
           action: 'FULFILL_ACCESS_REQUEST',
           outcome: 'SUCCESS',
-          patientId: request[0].patient_id,
+          customerId: request[0].customer_id,
           metadata: {
             requestId,
           },
@@ -170,12 +170,12 @@ export class PatientRightsService {
   }
 
   /**
-   * Get access requests for patient
+   * Get access requests for customer
    */
-  async getAccessRequests(patientId: string): Promise<any[]> {
+  async getAccessRequests(customerId: string): Promise<any[]> {
     return prisma.$queryRaw<any[]>`
-      SELECT * FROM patient_access_requests 
-      WHERE patient_id = ${patientId}
+      SELECT * FROM customer_access_requests 
+      WHERE customer_id = ${customerId}
       ORDER BY requested_at DESC
     `;
   }
@@ -191,11 +191,11 @@ export class PatientRightsService {
     try {
       // Create amendment request
       const amendmentRequest = await prisma.$queryRaw<any[]>`
-        INSERT INTO patient_amendment_requests (
-          patient_id, record_id, record_type, current_value,
+        INSERT INTO customer_amendment_requests (
+          customer_id, record_id, record_type, current_value,
           proposed_value, reason, status, requested_at
         ) VALUES (
-          ${request.patientId}, ${request.recordId}, ${request.recordType},
+          ${request.customerId}, ${request.recordId}, ${request.recordType},
           ${request.currentValue}, ${request.proposedValue}, ${request.reason},
           'PENDING', NOW()
         )
@@ -207,14 +207,14 @@ export class PatientRightsService {
       // Log request
       await auditLogging.log({
         context: {
-          userId: request.patientId,
-          userRole: 'PATIENT',
+          userId: request.customerId,
+          userRole: 'CUSTOMER',
         },
         eventType: 'DATA_REQUEST',
         eventCategory: 'COMPLIANCE',
         action: 'REQUEST_AMENDMENT',
         outcome: 'SUCCESS',
-        patientId: request.patientId,
+        customerId: request.customerId,
         metadata: {
           requestId,
           recordId: request.recordId,
@@ -239,7 +239,7 @@ export class PatientRightsService {
     try {
       // Update request status
       await prisma.$executeRaw`
-        UPDATE patient_amendment_requests 
+        UPDATE customer_amendment_requests 
         SET status = 'APPROVED', reviewed_at = NOW(), 
             reviewed_by = ${approvedBy}, review_notes = ${notes}
         WHERE id = ${requestId}
@@ -247,8 +247,8 @@ export class PatientRightsService {
 
       // Get request details
       const request = await prisma.$queryRaw<any[]>`
-        SELECT patient_id, record_id, proposed_value 
-        FROM patient_amendment_requests WHERE id = ${requestId}
+        SELECT customer_id, record_id, proposed_value 
+        FROM customer_amendment_requests WHERE id = ${requestId}
       `;
 
       if (request.length > 0) {
@@ -262,7 +262,7 @@ export class PatientRightsService {
           eventCategory: 'DATA_MODIFICATION',
           action: 'APPROVE_AMENDMENT',
           outcome: 'SUCCESS',
-          patientId: request[0].patient_id,
+          customerId: request[0].customer_id,
           metadata: {
             requestId,
             recordId: request[0].record_id,
@@ -286,7 +286,7 @@ export class PatientRightsService {
     try {
       // Update request status
       await prisma.$executeRaw`
-        UPDATE patient_amendment_requests 
+        UPDATE customer_amendment_requests 
         SET status = 'DENIED', reviewed_at = NOW(), 
             reviewed_by = ${deniedBy}, review_notes = ${reason}
         WHERE id = ${requestId}
@@ -294,7 +294,7 @@ export class PatientRightsService {
 
       // Get request details
       const request = await prisma.$queryRaw<any[]>`
-        SELECT patient_id FROM patient_amendment_requests WHERE id = ${requestId}
+        SELECT customer_id FROM customer_amendment_requests WHERE id = ${requestId}
       `;
 
       if (request.length > 0) {
@@ -308,7 +308,7 @@ export class PatientRightsService {
           eventCategory: 'COMPLIANCE',
           action: 'DENY_AMENDMENT',
           outcome: 'SUCCESS',
-          patientId: request[0].patient_id,
+          customerId: request[0].customer_id,
           metadata: {
             requestId,
             reason,
@@ -335,7 +335,7 @@ export class PatientRightsService {
       // Get disclosures from audit logs
       const disclosures = await prisma.auditLog.findMany({
         where: {
-          patientId: request.patientId,
+          customerId: request.customerId,
           eventType: {
             in: ['PHI_EXPORTED', 'PHI_PRINTED', 'DATA_DISCLOSURE'],
           },
@@ -352,14 +352,14 @@ export class PatientRightsService {
       // Log accounting request
       await auditLogging.log({
         context: {
-          userId: request.patientId,
-          userRole: 'PATIENT',
+          userId: request.customerId,
+          userRole: 'CUSTOMER',
         },
         eventType: 'DATA_REQUEST',
         eventCategory: 'COMPLIANCE',
         action: 'REQUEST_DISCLOSURE_ACCOUNTING',
         outcome: 'SUCCESS',
-        patientId: request.patientId,
+        customerId: request.customerId,
         metadata: {
           startDate: request.startDate,
           endDate: request.endDate,
@@ -391,11 +391,11 @@ export class PatientRightsService {
     try {
       // Create restriction request
       const restrictionRequest = await prisma.$queryRaw<any[]>`
-        INSERT INTO patient_restriction_requests (
-          patient_id, restriction_type, data_type, recipient,
+        INSERT INTO customer_restriction_requests (
+          customer_id, restriction_type, data_type, recipient,
           reason, status, requested_at
         ) VALUES (
-          ${request.patientId}, ${request.restrictionType}, ${request.dataType},
+          ${request.customerId}, ${request.restrictionType}, ${request.dataType},
           ${request.recipient}, ${request.reason}, 'PENDING', NOW()
         )
         RETURNING id
@@ -406,14 +406,14 @@ export class PatientRightsService {
       // Log request
       await auditLogging.log({
         context: {
-          userId: request.patientId,
-          userRole: 'PATIENT',
+          userId: request.customerId,
+          userRole: 'CUSTOMER',
         },
         eventType: 'DATA_REQUEST',
         eventCategory: 'COMPLIANCE',
         action: 'REQUEST_RESTRICTION',
         outcome: 'SUCCESS',
-        patientId: request.patientId,
+        customerId: request.customerId,
         metadata: {
           requestId,
           restrictionType: request.restrictionType,
@@ -438,7 +438,7 @@ export class PatientRightsService {
     try {
       // Update request status
       await prisma.$executeRaw`
-        UPDATE patient_restriction_requests 
+        UPDATE customer_restriction_requests 
         SET status = 'APPROVED', reviewed_at = NOW(), 
             reviewed_by = ${approvedBy}, review_notes = ${notes}
         WHERE id = ${requestId}
@@ -446,7 +446,7 @@ export class PatientRightsService {
 
       // Get request details
       const request = await prisma.$queryRaw<any[]>`
-        SELECT patient_id FROM patient_restriction_requests WHERE id = ${requestId}
+        SELECT customer_id FROM customer_restriction_requests WHERE id = ${requestId}
       `;
 
       if (request.length > 0) {
@@ -460,7 +460,7 @@ export class PatientRightsService {
           eventCategory: 'COMPLIANCE',
           action: 'APPROVE_RESTRICTION',
           outcome: 'SUCCESS',
-          patientId: request[0].patient_id,
+          customerId: request[0].customer_id,
           metadata: {
             requestId,
           },
@@ -485,11 +485,11 @@ export class PatientRightsService {
     try {
       // Create communication request
       const commRequest = await prisma.$queryRaw<any[]>`
-        INSERT INTO patient_communication_requests (
-          patient_id, communication_type, alternative_contact,
+        INSERT INTO customer_communication_requests (
+          customer_id, communication_type, alternative_contact,
           reason, status, requested_at
         ) VALUES (
-          ${request.patientId}, ${request.communicationType},
+          ${request.customerId}, ${request.communicationType},
           ${request.alternativeContact}, ${request.reason},
           'PENDING', NOW()
         )
@@ -501,14 +501,14 @@ export class PatientRightsService {
       // Log request
       await auditLogging.log({
         context: {
-          userId: request.patientId,
-          userRole: 'PATIENT',
+          userId: request.customerId,
+          userRole: 'CUSTOMER',
         },
         eventType: 'DATA_REQUEST',
         eventCategory: 'COMPLIANCE',
         action: 'REQUEST_CONFIDENTIAL_COMMUNICATION',
         outcome: 'SUCCESS',
-        patientId: request.patientId,
+        customerId: request.customerId,
         metadata: {
           requestId,
           communicationType: request.communicationType,
@@ -532,14 +532,14 @@ export class PatientRightsService {
     try {
       // Update request status
       await prisma.$executeRaw`
-        UPDATE patient_communication_requests 
+        UPDATE customer_communication_requests 
         SET status = 'APPROVED', reviewed_at = NOW(), reviewed_by = ${approvedBy}
         WHERE id = ${requestId}
       `;
 
       // Get request details
       const request = await prisma.$queryRaw<any[]>`
-        SELECT patient_id FROM patient_communication_requests WHERE id = ${requestId}
+        SELECT customer_id FROM customer_communication_requests WHERE id = ${requestId}
       `;
 
       if (request.length > 0) {
@@ -553,7 +553,7 @@ export class PatientRightsService {
           eventCategory: 'COMPLIANCE',
           action: 'APPROVE_CONFIDENTIAL_COMMUNICATION',
           outcome: 'SUCCESS',
-          patientId: request[0].patient_id,
+          customerId: request[0].customer_id,
           metadata: {
             requestId,
           },
@@ -570,7 +570,7 @@ export class PatientRightsService {
   // ==========================================================================
 
   /**
-   * Get patient rights statistics
+   * Get customer rights statistics
    */
   async getStatistics(startDate: Date, endDate: Date): Promise<any> {
     const [
@@ -581,25 +581,25 @@ export class PatientRightsService {
     ] = await Promise.all([
       prisma.$queryRaw<any[]>`
         SELECT status, COUNT(*) as count
-        FROM patient_access_requests
+        FROM customer_access_requests
         WHERE requested_at BETWEEN ${startDate} AND ${endDate}
         GROUP BY status
       `,
       prisma.$queryRaw<any[]>`
         SELECT status, COUNT(*) as count
-        FROM patient_amendment_requests
+        FROM customer_amendment_requests
         WHERE requested_at BETWEEN ${startDate} AND ${endDate}
         GROUP BY status
       `,
       prisma.$queryRaw<any[]>`
         SELECT status, COUNT(*) as count
-        FROM patient_restriction_requests
+        FROM customer_restriction_requests
         WHERE requested_at BETWEEN ${startDate} AND ${endDate}
         GROUP BY status
       `,
       prisma.$queryRaw<any[]>`
         SELECT status, COUNT(*) as count
-        FROM patient_communication_requests
+        FROM customer_communication_requests
         WHERE requested_at BETWEEN ${startDate} AND ${endDate}
         GROUP BY status
       `,
@@ -626,4 +626,4 @@ export class PatientRightsService {
 }
 
 // Export singleton instance
-export const patientRights = PatientRightsService.getInstance();
+export const customerRights = CustomerRightsService.getInstance();

@@ -1,7 +1,7 @@
 /**
- * Patient Detail View Component
+ * Customer Detail View Component
  * 
- * Displays comprehensive patient information and sync history
+ * Displays comprehensive customer information and sync history
  */
 
 'use client';
@@ -33,14 +33,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Patient, PatientSyncHistory, SyncStatus } from '@/lib/types/patient';
+import { Customer, PatientSyncHistory, SyncStatus } from '@/lib/types/customer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
 interface PatientDetailViewProps {
-  patientId: string;
+  customerId: string;
   onClose?: () => void;
-  onSync?: (patientId: string) => void;
+  onSync?: (customerId: string) => void;
 }
 
 const syncStatusConfig: Record<SyncStatus, {
@@ -75,12 +75,12 @@ const syncStatusConfig: Record<SyncStatus, {
   },
 };
 
-export function PatientDetailView({
-  patientId,
+export function CustomerDetailView({
+  customerId,
   onClose,
   onSync,
 }: PatientDetailViewProps) {
-  const [patient, setPatient] = useState<Patient | null>(null);
+  const [customer, setPatient] = useState<Customer | null>(null);
   const [syncHistory, setSyncHistory] = useState<PatientSyncHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -88,27 +88,27 @@ export function PatientDetailView({
 
   useEffect(() => {
     loadPatientData();
-  }, [patientId]);
+  }, [customerId]);
 
   const loadPatientData = async () => {
     try {
       setIsLoading(true);
       
-      // Load patient details
-      const patientResponse = await fetch(`/api/ehr/patients/${patientId}`);
-      if (patientResponse.ok) {
-        const patientData = await patientResponse.json();
-        setPatient(patientData.data);
+      // Load customer details
+      const customerResponse = await fetch(`/api/ehr/customers/${customerId}`);
+      if (customerResponse.ok) {
+        const customerData = await customerResponse.json();
+        setPatient(customerData.data);
       }
 
       // Load sync history
-      const historyResponse = await fetch(`/api/ehr/patients/${patientId}/sync`);
+      const historyResponse = await fetch(`/api/ehr/customers/${customerId}/sync`);
       if (historyResponse.ok) {
         const historyData = await historyResponse.json();
         setSyncHistory(historyData.data || []);
       }
     } catch (error) {
-      console.error('Failed to load patient data:', error);
+      console.error('Failed to load customer data:', error);
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +118,7 @@ export function PatientDetailView({
     if (onSync && !isSyncing) {
       setIsSyncing(true);
       try {
-        await onSync(patientId);
+        await onSync(customerId);
         await loadPatientData(); // Reload data after sync
       } finally {
         setIsSyncing(false);
@@ -164,19 +164,19 @@ export function PatientDetailView({
     );
   }
 
-  if (!patient) {
+  if (!customer) {
     return (
       <div className="text-center py-12">
         <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h3 className="text-lg font-semibold mb-2">Patient not found</h3>
+        <h3 className="text-lg font-semibold mb-2">Customer not found</h3>
         <p className="text-muted-foreground">
-          Unable to load patient details
+          Unable to load customer details
         </p>
       </div>
     );
   }
 
-  const syncStatus = patient.syncStatus || 'NEVER_SYNCED';
+  const syncStatus = customer.syncStatus || 'NEVER_SYNCED';
   const statusConfig = syncStatusConfig[syncStatus];
 
   return (
@@ -189,19 +189,19 @@ export function PatientDetailView({
           </div>
           <div>
             <h2 className="text-2xl font-bold">
-              {patient.lastName}, {patient.firstName}
-              {patient.middleName && ` ${patient.middleName}`}
+              {customer.lastName}, {customer.firstName}
+              {customer.middleName && ` ${customer.middleName}`}
             </h2>
             <div className="flex items-center gap-2 mt-2">
               <Badge variant="outline">
-                {patient.gender}
+                {customer.gender}
               </Badge>
               <Badge variant="outline">
-                {getAge(patient.dateOfBirth)} years old
+                {getAge(customer.dateOfBirth)} years old
               </Badge>
-              {patient.provider && (
+              {customer.provider && (
                 <Badge variant="secondary">
-                  {patient.provider}
+                  {customer.provider}
                 </Badge>
               )}
             </div>
@@ -245,9 +245,9 @@ export function PatientDetailView({
                 <p className="font-medium">
                   Sync Status: {syncStatus.replace('_', ' ')}
                 </p>
-                {patient.lastSyncedAt && (
+                {customer.lastSyncedAt && (
                   <p className="text-sm text-muted-foreground">
-                    Last synced: {formatDateTime(patient.lastSyncedAt)}
+                    Last synced: {formatDateTime(customer.lastSyncedAt)}
                   </p>
                 )}
               </div>
@@ -292,7 +292,7 @@ export function PatientDetailView({
                   <div>
                     <p className="text-sm font-medium">Date of Birth</p>
                     <p className="text-sm text-muted-foreground">
-                      {formatDate(patient.dateOfBirth)}
+                      {formatDate(customer.dateOfBirth)}
                     </p>
                   </div>
                 </div>
@@ -300,14 +300,14 @@ export function PatientDetailView({
                   <Hash className="h-4 w-4 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="text-sm font-medium">Medical Record Number</p>
-                    <p className="text-sm text-muted-foreground">{patient.mrn}</p>
+                    <p className="text-sm text-muted-foreground">{customer.mrn}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Hash className="h-4 w-4 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="text-sm font-medium">EHR ID</p>
-                    <p className="text-sm text-muted-foreground">{patient.ehrId}</p>
+                    <p className="text-sm text-muted-foreground">{customer.ehrId}</p>
                   </div>
                 </div>
               </CardContent>
@@ -322,35 +322,35 @@ export function PatientDetailView({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {patient.phone && (
+                {customer.phone && (
                   <div className="flex items-start gap-3">
                     <Phone className="h-4 w-4 text-muted-foreground mt-0.5" />
                     <div>
                       <p className="text-sm font-medium">Phone</p>
-                      <p className="text-sm text-muted-foreground">{patient.phone}</p>
+                      <p className="text-sm text-muted-foreground">{customer.phone}</p>
                     </div>
                   </div>
                 )}
-                {patient.email && (
+                {customer.email && (
                   <div className="flex items-start gap-3">
                     <Mail className="h-4 w-4 text-muted-foreground mt-0.5" />
                     <div>
                       <p className="text-sm font-medium">Email</p>
-                      <p className="text-sm text-muted-foreground">{patient.email}</p>
+                      <p className="text-sm text-muted-foreground">{customer.email}</p>
                     </div>
                   </div>
                 )}
-                {patient.address && (
+                {customer.address && (
                   <div className="flex items-start gap-3">
                     <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
                     <div>
                       <p className="text-sm font-medium">Address</p>
                       <p className="text-sm text-muted-foreground">
-                        {patient.address.street && <>{patient.address.street}<br /></>}
+                        {customer.address.street && <>{customer.address.street}<br /></>}
                         {[
-                          patient.address.city,
-                          patient.address.state,
-                          patient.address.zipCode,
+                          customer.address.city,
+                          customer.address.state,
+                          customer.address.zipCode,
                         ]
                           .filter(Boolean)
                           .join(', ')}

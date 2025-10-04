@@ -6,7 +6,7 @@
  * 
  * Features:
  * - FHIR R4 API integration
- * - Patient demographics and medical records
+ * - Customer demographics and medical records
  * - Lab results and vital signs
  * - Medications and allergies
  * - Appointments and encounters
@@ -78,7 +78,7 @@ export interface NextGenPatient {
 
 export interface NextGenEncounter {
   id: string;
-  patientId: string;
+  customerId: string;
   visitNumber?: string;
   type: string;
   status: string;
@@ -106,7 +106,7 @@ export interface NextGenEncounter {
 
 export interface NextGenObservation {
   id: string;
-  patientId: string;
+  customerId: string;
   encounterId?: string;
   code: string;
   display: string;
@@ -127,7 +127,7 @@ export interface NextGenObservation {
 
 export interface NextGenMedication {
   id: string;
-  patientId: string;
+  customerId: string;
   encounterId?: string;
   medicationCode: string;
   medicationName: string;
@@ -154,7 +154,7 @@ export interface NextGenMedication {
 
 export interface NextGenCondition {
   id: string;
-  patientId: string;
+  customerId: string;
   code: string;
   display: string;
   clinicalStatus: string;
@@ -168,7 +168,7 @@ export interface NextGenCondition {
 
 export interface NextGenAllergy {
   id: string;
-  patientId: string;
+  customerId: string;
   allergen: string;
   allergenType: string;
   reaction?: string;
@@ -183,7 +183,7 @@ export interface NextGenAllergy {
 
 export interface NextGenAppointment {
   id: string;
-  patientId: string;
+  customerId: string;
   status: string;
   appointmentType: string;
   startTime: string;
@@ -201,7 +201,7 @@ export interface NextGenAppointment {
 
 export interface NextGenImmunization {
   id: string;
-  patientId: string;
+  customerId: string;
   vaccineCode: string;
   vaccineName: string;
   administeredDate: string;
@@ -217,7 +217,7 @@ export interface NextGenImmunization {
 
 export interface NextGenSyncResult {
   success: boolean;
-  patientId: string;
+  customerId: string;
   recordsProcessed: {
     encounters: number;
     observations: number;
@@ -318,11 +318,11 @@ export class NextGenEnhancedService {
   }
 
   // ==========================================================================
-  // PATIENT OPERATIONS
+  // CUSTOMER OPERATIONS
   // ==========================================================================
 
   /**
-   * Search for patients by various criteria
+   * Search for customers by various criteria
    */
   async searchPatients(criteria: {
     firstName?: string;
@@ -342,9 +342,9 @@ export class NextGenEnhancedService {
       if (criteria.mrn) params.identifier = `MRN|${criteria.mrn}`;
       if (criteria.chartNumber) params.identifier = `CHART|${criteria.chartNumber}`;
 
-      const response = await this.client.get('/fhir/Patient', { params });
+      const response = await this.client.get('/fhir/Customer', { params });
 
-      const patients = response.data.entry?.map((entry: any) => 
+      const customers = response.data.entry?.map((entry: any) => 
         this.mapFHIRPatientToNextGen(entry.resource)
       ) || [];
 
@@ -352,21 +352,21 @@ export class NextGenEnhancedService {
         eventType: 'EHR_PATIENT_SEARCH',
         category: 'DATA_ACCESS',
         outcome: 'SUCCESS',
-        description: `Searched for patients in NextGen`,
+        description: `Searched for customers in NextGen`,
         metadata: {
           provider: 'NextGen',
           criteria,
-          resultsCount: patients.length,
+          resultsCount: customers.length,
         },
       });
 
-      return patients;
+      return customers;
     } catch (error: any) {
       await auditService.log({
         eventType: 'EHR_PATIENT_SEARCH',
         category: 'DATA_ACCESS',
         outcome: 'FAILURE',
-        description: 'Failed to search patients in NextGen',
+        description: 'Failed to search customers in NextGen',
         metadata: {
           provider: 'NextGen',
           error: error.message,
@@ -377,36 +377,36 @@ export class NextGenEnhancedService {
   }
 
   /**
-   * Get patient by ID
+   * Get customer by ID
    */
-  async getPatient(patientId: string): Promise<NextGenPatient> {
+  async getPatient(customerId: string): Promise<NextGenPatient> {
     await this.authenticate();
 
     try {
-      const response = await this.client.get(`/fhir/Patient/${patientId}`);
-      const patient = this.mapFHIRPatientToNextGen(response.data);
+      const response = await this.client.get(`/fhir/Customer/${customerId}`);
+      const customer = this.mapFHIRPatientToNextGen(response.data);
 
       await auditService.log({
         eventType: 'EHR_PATIENT_READ',
         category: 'DATA_ACCESS',
         outcome: 'SUCCESS',
-        description: `Retrieved patient from NextGen`,
+        description: `Retrieved customer from NextGen`,
         metadata: {
           provider: 'NextGen',
-          patientId,
+          customerId,
         },
       });
 
-      return patient;
+      return customer;
     } catch (error: any) {
       await auditService.log({
         eventType: 'EHR_PATIENT_READ',
         category: 'DATA_ACCESS',
         outcome: 'FAILURE',
-        description: 'Failed to retrieve patient from NextGen',
+        description: 'Failed to retrieve customer from NextGen',
         metadata: {
           provider: 'NextGen',
-          patientId,
+          customerId,
           error: error.message,
         },
       });
@@ -419,9 +419,9 @@ export class NextGenEnhancedService {
   // ==========================================================================
 
   /**
-   * Get patient encounters
+   * Get customer encounters
    */
-  async getEncounters(patientId: string, options?: {
+  async getEncounters(customerId: string, options?: {
     startDate?: string;
     endDate?: string;
     status?: string;
@@ -430,7 +430,7 @@ export class NextGenEnhancedService {
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -451,9 +451,9 @@ export class NextGenEnhancedService {
   }
 
   /**
-   * Get patient observations (lab results, vitals)
+   * Get customer observations (lab results, vitals)
    */
-  async getObservations(patientId: string, options?: {
+  async getObservations(customerId: string, options?: {
     category?: string;
     code?: string;
     startDate?: string;
@@ -463,7 +463,7 @@ export class NextGenEnhancedService {
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -485,16 +485,16 @@ export class NextGenEnhancedService {
   }
 
   /**
-   * Get patient medications
+   * Get customer medications
    */
-  async getMedications(patientId: string, options?: {
+  async getMedications(customerId: string, options?: {
     status?: string;
   }): Promise<NextGenMedication[]> {
     await this.authenticate();
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -513,14 +513,14 @@ export class NextGenEnhancedService {
   }
 
   /**
-   * Get patient conditions/diagnoses
+   * Get customer conditions/diagnoses
    */
-  async getConditions(patientId: string): Promise<NextGenCondition[]> {
+  async getConditions(customerId: string): Promise<NextGenCondition[]> {
     await this.authenticate();
 
     try {
       const params = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -537,14 +537,14 @@ export class NextGenEnhancedService {
   }
 
   /**
-   * Get patient allergies
+   * Get customer allergies
    */
-  async getAllergies(patientId: string): Promise<NextGenAllergy[]> {
+  async getAllergies(customerId: string): Promise<NextGenAllergy[]> {
     await this.authenticate();
 
     try {
       const params = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -561,9 +561,9 @@ export class NextGenEnhancedService {
   }
 
   /**
-   * Get patient appointments
+   * Get customer appointments
    */
-  async getAppointments(patientId: string, options?: {
+  async getAppointments(customerId: string, options?: {
     startDate?: string;
     endDate?: string;
     status?: string;
@@ -572,7 +572,7 @@ export class NextGenEnhancedService {
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -593,14 +593,14 @@ export class NextGenEnhancedService {
   }
 
   /**
-   * Get patient immunizations
+   * Get customer immunizations
    */
-  async getImmunizations(patientId: string): Promise<NextGenImmunization[]> {
+  async getImmunizations(customerId: string): Promise<NextGenImmunization[]> {
     await this.authenticate();
 
     try {
       const params = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -621,15 +621,15 @@ export class NextGenEnhancedService {
   // ==========================================================================
 
   /**
-   * Sync all patient data from NextGen
+   * Sync all customer data from NextGen
    */
   async syncPatientData(
-    patientId: string,
+    customerId: string,
     nextGenPatientId: string
   ): Promise<NextGenSyncResult> {
     const result: NextGenSyncResult = {
       success: false,
-      patientId,
+      customerId,
       recordsProcessed: {
         encounters: 0,
         observations: 0,
@@ -675,7 +675,7 @@ export class NextGenEnhancedService {
       // Store sync history
       await prisma.syncHistory.create({
         data: {
-          patientId,
+          customerId,
           provider: 'NEXTGEN',
           status: 'SUCCESS',
           recordsProcessed: Object.values(result.recordsProcessed).reduce((a, b) => a + b, 0),
@@ -690,10 +690,10 @@ export class NextGenEnhancedService {
         eventType: 'EHR_SYNC',
         category: 'DATA_SYNC',
         outcome: 'SUCCESS',
-        description: 'Successfully synced patient data from NextGen',
+        description: 'Successfully synced customer data from NextGen',
         metadata: {
           provider: 'NextGen',
-          patientId,
+          customerId,
           recordsProcessed: result.recordsProcessed,
         },
       });
@@ -702,7 +702,7 @@ export class NextGenEnhancedService {
 
       await prisma.syncHistory.create({
         data: {
-          patientId,
+          customerId,
           provider: 'NEXTGEN',
           status: 'FAILED',
           errorMessage: error.message,
@@ -715,10 +715,10 @@ export class NextGenEnhancedService {
         eventType: 'EHR_SYNC',
         category: 'DATA_SYNC',
         outcome: 'FAILURE',
-        description: 'Failed to sync patient data from NextGen',
+        description: 'Failed to sync customer data from NextGen',
         metadata: {
           provider: 'NextGen',
-          patientId,
+          customerId,
           error: error.message,
         },
       });
@@ -777,7 +777,7 @@ export class NextGenEnhancedService {
   private mapFHIREncounterToNextGen(fhirEncounter: any): NextGenEncounter {
     return {
       id: fhirEncounter.id,
-      patientId: fhirEncounter.subject?.reference?.split('/')[1] || '',
+      customerId: fhirEncounter.subject?.reference?.split('/')[1] || '',
       visitNumber: fhirEncounter.identifier?.find((id: any) => id.type?.coding?.[0]?.code === 'VN')?.value,
       type: fhirEncounter.type?.[0]?.coding?.[0]?.display || '',
       status: fhirEncounter.status || '',
@@ -807,7 +807,7 @@ export class NextGenEnhancedService {
   private mapFHIRObservationToNextGen(fhirObservation: any): NextGenObservation {
     return {
       id: fhirObservation.id,
-      patientId: fhirObservation.subject?.reference?.split('/')[1] || '',
+      customerId: fhirObservation.subject?.reference?.split('/')[1] || '',
       encounterId: fhirObservation.encounter?.reference?.split('/')[1],
       code: fhirObservation.code?.coding?.[0]?.code || '',
       display: fhirObservation.code?.coding?.[0]?.display || '',
@@ -830,7 +830,7 @@ export class NextGenEnhancedService {
   private mapFHIRMedicationToNextGen(fhirMedication: any): NextGenMedication {
     return {
       id: fhirMedication.id,
-      patientId: fhirMedication.subject?.reference?.split('/')[1] || '',
+      customerId: fhirMedication.subject?.reference?.split('/')[1] || '',
       encounterId: fhirMedication.encounter?.reference?.split('/')[1],
       medicationCode: fhirMedication.medicationCodeableConcept?.coding?.[0]?.code || '',
       medicationName: fhirMedication.medicationCodeableConcept?.coding?.[0]?.display || '',
@@ -859,7 +859,7 @@ export class NextGenEnhancedService {
   private mapFHIRConditionToNextGen(fhirCondition: any): NextGenCondition {
     return {
       id: fhirCondition.id,
-      patientId: fhirCondition.subject?.reference?.split('/')[1] || '',
+      customerId: fhirCondition.subject?.reference?.split('/')[1] || '',
       code: fhirCondition.code?.coding?.[0]?.code || '',
       display: fhirCondition.code?.coding?.[0]?.display || '',
       clinicalStatus: fhirCondition.clinicalStatus?.coding?.[0]?.code || '',
@@ -875,7 +875,7 @@ export class NextGenEnhancedService {
   private mapFHIRAllergyToNextGen(fhirAllergy: any): NextGenAllergy {
     return {
       id: fhirAllergy.id,
-      patientId: fhirAllergy.patient?.reference?.split('/')[1] || '',
+      customerId: fhirAllergy.customer?.reference?.split('/')[1] || '',
       allergen: fhirAllergy.code?.coding?.[0]?.display || '',
       allergenType: fhirAllergy.type || '',
       reaction: fhirAllergy.reaction?.[0]?.manifestation?.[0]?.coding?.[0]?.display,
@@ -892,7 +892,7 @@ export class NextGenEnhancedService {
   private mapFHIRAppointmentToNextGen(fhirAppointment: any): NextGenAppointment {
     return {
       id: fhirAppointment.id,
-      patientId: fhirAppointment.participant?.find((p: any) => p.actor?.reference?.includes('Patient'))?.actor?.reference?.split('/')[1] || '',
+      customerId: fhirAppointment.participant?.find((p: any) => p.actor?.reference?.includes('Customer'))?.actor?.reference?.split('/')[1] || '',
       status: fhirAppointment.status || '',
       appointmentType: fhirAppointment.appointmentType?.coding?.[0]?.display || '',
       startTime: fhirAppointment.start || '',
@@ -905,14 +905,14 @@ export class NextGenEnhancedService {
       location: fhirAppointment.participant?.find((p: any) => p.actor?.reference?.includes('Location'))?.actor?.display,
       reasonForVisit: fhirAppointment.reasonCode?.[0]?.text,
       notes: fhirAppointment.comment,
-      confirmationStatus: fhirAppointment.participant?.find((p: any) => p.actor?.reference?.includes('Patient'))?.status,
+      confirmationStatus: fhirAppointment.participant?.find((p: any) => p.actor?.reference?.includes('Customer'))?.status,
     };
   }
 
   private mapFHIRImmunizationToNextGen(fhirImmunization: any): NextGenImmunization {
     return {
       id: fhirImmunization.id,
-      patientId: fhirImmunization.patient?.reference?.split('/')[1] || '',
+      customerId: fhirImmunization.customer?.reference?.split('/')[1] || '',
       vaccineCode: fhirImmunization.vaccineCode?.coding?.[0]?.code || '',
       vaccineName: fhirImmunization.vaccineCode?.coding?.[0]?.display || '',
       administeredDate: fhirImmunization.occurrenceDateTime || '',

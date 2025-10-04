@@ -1,10 +1,10 @@
 /**
- * Patient Types and Interfaces
+ * Customer Types and Interfaces
  * 
- * Shared types for patient search and management components
+ * Shared types for customer search and management components
  */
 
-export interface Patient {
+export interface Customer {
   id: string;
   ehrId: string;
   mrn: string;
@@ -49,8 +49,8 @@ export interface PatientSearchFilters extends PatientSearchCriteria {
   lastSyncedBefore?: string;
 }
 
-export interface PatientSearchResult {
-  patients: Patient[];
+export interface CustomerSearchResult {
+  customers: Customer[];
   count: number;
   page: number;
   pageSize: number;
@@ -60,7 +60,7 @@ export interface PatientSearchResult {
 
 export interface PatientSyncHistory {
   id: string;
-  patientId: string;
+  customerId: string;
   syncedAt: string;
   status: SyncStatus;
   recordsSynced: number;
@@ -70,7 +70,7 @@ export interface PatientSyncHistory {
 }
 
 export interface PatientSyncRequest {
-  patientId: string;
+  customerId: string;
   syncTypes?: Array<'demographics' | 'encounters' | 'medications' | 'labs' | 'allergies' | 'vitals'>;
   force?: boolean;
 }
@@ -79,7 +79,7 @@ export interface PatientSyncResponse {
   success: boolean;
   message: string;
   data?: {
-    patientId: string;
+    customerId: string;
     syncedAt: string;
     recordsSynced: number;
     status: SyncStatus;
@@ -88,7 +88,7 @@ export interface PatientSyncResponse {
 }
 
 export interface BulkSyncRequest {
-  patientIds: string[];
+  customerIds: string[];
   syncTypes?: Array<'demographics' | 'encounters' | 'medications' | 'labs' | 'allergies' | 'vitals'>;
   force?: boolean;
 }
@@ -101,7 +101,7 @@ export interface BulkSyncResponse {
     successCount: number;
     failureCount: number;
     results: Array<{
-      patientId: string;
+      customerId: string;
       status: 'success' | 'failed';
       error?: string;
     }>;

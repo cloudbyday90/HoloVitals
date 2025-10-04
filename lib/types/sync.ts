@@ -31,8 +31,8 @@ export type DataType =
 
 export interface SyncOperation {
   id: string;
-  patientId: string;
-  patientName?: string;
+  customerId: string;
+  customerName?: string;
   ehrProvider: string;
   status: SyncStatus;
   syncType: SyncType;
@@ -92,7 +92,7 @@ export interface SyncTrend {
 
 export interface SyncSchedule {
   id: string;
-  patientId?: string;
+  customerId?: string;
   providerId?: string;
   frequency: 'HOURLY' | 'DAILY' | 'WEEKLY' | 'MONTHLY';
   interval: number;
@@ -111,7 +111,7 @@ export interface SyncFilters {
   dataType?: DataType[];
   dateFrom?: string;
   dateTo?: string;
-  patientId?: string;
+  customerId?: string;
   initiatedBy?: string;
 }
 
@@ -133,7 +133,7 @@ export interface SyncHistoryResponse {
 }
 
 export interface ManualSyncRequest {
-  patientIds: string[];
+  customerIds: string[];
   dataTypes?: DataType[];
   priority?: 'LOW' | 'NORMAL' | 'HIGH';
 }
@@ -147,8 +147,8 @@ export interface ManualSyncResponse {
 
 export interface SyncQueueItem {
   id: string;
-  patientId: string;
-  patientName?: string;
+  customerId: string;
+  customerName?: string;
   dataTypes: DataType[];
   priority: 'LOW' | 'NORMAL' | 'HIGH';
   queuedAt: string;

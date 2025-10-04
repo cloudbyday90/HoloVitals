@@ -1,15 +1,15 @@
 /**
- * Patient Details API Endpoint
- * GET /api/patients/[patientId]
+ * Customer Details API Endpoint
+ * GET /api/customers/[customerId]
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import PatientSearchService from '@/lib/services/PatientSearchService';
+import CustomerSearchService from '@/lib/services/CustomerSearchService';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { patientId: string } }
+  { params }: { params: { customerId: string } }
 ) {
   try {
     // Check authentication
@@ -21,24 +21,24 @@ export async function GET(
       );
     }
 
-    const { patientId } = params;
+    const { customerId } = params;
 
-    // Get patient details
-    const patient = await PatientSearchService.getPatientById(patientId);
+    // Get customer details
+    const customer = await CustomerSearchService.getPatientById(customerId);
 
-    if (!patient) {
+    if (!customer) {
       return NextResponse.json(
-        { error: 'Patient not found' },
+        { error: 'Customer not found' },
         { status: 404 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      data: patient,
+      data: customer,
     });
   } catch (error) {
-    console.error('Patient details API error:', error);
+    console.error('Customer details API error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }

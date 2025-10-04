@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { PatientSummary } from '@/lib/types/patient-search';
+import { PatientSummary } from '@/lib/types/customer-search';
 import { useRouter } from 'next/navigation';
 
 interface PatientSearchBarProps {
@@ -13,9 +13,9 @@ interface PatientSearchBarProps {
   autoFocus?: boolean;
 }
 
-export function PatientSearchBar({
+export function CustomerSearchBar({
   onSearch,
-  placeholder = 'Search patients by name, MRN, email, or phone...',
+  placeholder = 'Search customers by name, MRN, email, or phone...',
   autoFocus = false,
 }: PatientSearchBarProps) {
   const [query, setQuery] = useState('');
@@ -36,7 +36,7 @@ export function PatientSearchBar({
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
-        const response = await fetch(`/api/patients/quick-search?query=${encodeURIComponent(query)}`);
+        const response = await fetch(`/api/customers/quick-search?query=${encodeURIComponent(query)}`);
         const data = await response.json();
         if (data.success) {
           setResults(data.data);
@@ -79,8 +79,8 @@ export function PatientSearchBar({
     }
   };
 
-  const handleSelectPatient = (patientId: string) => {
-    router.push(`/patients/${patientId}`);
+  const handleSelectPatient = (customerId: string) => {
+    router.push(`/customers/${customerId}`);
     setShowResults(false);
     setQuery('');
   };
@@ -131,29 +131,29 @@ export function PatientSearchBar({
       {/* Autocomplete Results */}
       {showResults && results.length > 0 && (
         <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-96 overflow-y-auto">
-          {results.map((patient) => (
+          {results.map((customer) => (
             <button
-              key={patient.id}
-              onClick={() => handleSelectPatient(patient.id)}
+              key={customer.id}
+              onClick={() => handleSelectPatient(customer.id)}
               className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="font-medium text-gray-900">
-                    {patient.fullName}
+                    {customer.fullName}
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
-                    <span>MRN: {patient.medicalRecordNumber}</span>
+                    <span>MRN: {customer.medicalRecordNumber}</span>
                     <span className="mx-2">•</span>
-                    <span>Age: {patient.age}</span>
+                    <span>Age: {customer.age}</span>
                     <span className="mx-2">•</span>
-                    <span className="capitalize">{patient.gender}</span>
+                    <span className="capitalize">{customer.gender}</span>
                   </div>
-                  {(patient.email || patient.phone) && (
+                  {(customer.email || customer.phone) && (
                     <div className="text-xs text-gray-500 mt-1">
-                      {patient.email && <span>{patient.email}</span>}
-                      {patient.email && patient.phone && <span className="mx-2">•</span>}
-                      {patient.phone && <span>{patient.phone}</span>}
+                      {customer.email && <span>{customer.email}</span>}
+                      {customer.email && customer.phone && <span className="mx-2">•</span>}
+                      {customer.phone && <span>{customer.phone}</span>}
                     </div>
                   )}
                 </div>
@@ -166,7 +166,7 @@ export function PatientSearchBar({
       {/* No Results */}
       {showResults && query.length >= 2 && results.length === 0 && !loading && (
         <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-4 text-center text-gray-600">
-          No patients found matching "{query}"
+          No customers found matching "{query}"
         </div>
       )}
     </div>

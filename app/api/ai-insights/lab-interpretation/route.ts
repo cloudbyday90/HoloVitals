@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     // Get query params
     const searchParams = request.nextUrl.searchParams;
     const testId = searchParams.get('testId');
-    const patientId = searchParams.get('patientId');
+    const customerId = searchParams.get('customerId');
     const panelType = searchParams.get('panelType');
 
     // Single test interpretation
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Panel interpretation
-    if (patientId && panelType) {
+    if (customerId && panelType) {
       const validPanels = ['metabolic', 'lipid', 'cbc', 'thyroid', 'liver', 'kidney'];
       if (!validPanels.includes(panelType)) {
         return NextResponse.json(
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       }
 
       const panelInterpretation = await LabResultInterpreterService.interpretLabPanel(
-        patientId,
+        customerId,
         panelType as any
       );
 
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Either testId or (patientId and panelType) are required' },
+      { error: 'Either testId or (customerId and panelType) are required' },
       { status: 400 }
     );
   } catch (error) {

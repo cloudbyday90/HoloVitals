@@ -6,7 +6,7 @@
  * 
  * Features:
  * - FHIR R4 API integration
- * - Patient demographics and medical records
+ * - Customer demographics and medical records
  * - Lab results and vital signs
  * - Medications and allergies
  * - Appointments and encounters
@@ -73,7 +73,7 @@ export interface AllscriptsPatient {
 
 export interface AllscriptsEncounter {
   id: string;
-  patientId: string;
+  customerId: string;
   type: string;
   status: string;
   class: string;
@@ -95,7 +95,7 @@ export interface AllscriptsEncounter {
 
 export interface AllscriptsObservation {
   id: string;
-  patientId: string;
+  customerId: string;
   encounterId?: string;
   code: string;
   display: string;
@@ -115,7 +115,7 @@ export interface AllscriptsObservation {
 
 export interface AllscriptsMedication {
   id: string;
-  patientId: string;
+  customerId: string;
   medicationCode: string;
   medicationName: string;
   dosage?: string;
@@ -134,7 +134,7 @@ export interface AllscriptsMedication {
 
 export interface AllscriptsCondition {
   id: string;
-  patientId: string;
+  customerId: string;
   code: string;
   display: string;
   clinicalStatus: string;
@@ -147,7 +147,7 @@ export interface AllscriptsCondition {
 
 export interface AllscriptsAllergy {
   id: string;
-  patientId: string;
+  customerId: string;
   substance: string;
   reaction?: string;
   severity?: string;
@@ -159,7 +159,7 @@ export interface AllscriptsAllergy {
 
 export interface AllscriptsAppointment {
   id: string;
-  patientId: string;
+  customerId: string;
   status: string;
   appointmentType: string;
   startTime: string;
@@ -175,7 +175,7 @@ export interface AllscriptsAppointment {
 
 export interface AllscriptsSyncResult {
   success: boolean;
-  patientId: string;
+  customerId: string;
   recordsProcessed: {
     encounters: number;
     observations: number;
@@ -275,11 +275,11 @@ export class AllscriptsEnhancedService {
   }
 
   // ==========================================================================
-  // PATIENT OPERATIONS
+  // CUSTOMER OPERATIONS
   // ==========================================================================
 
   /**
-   * Search for patients by various criteria
+   * Search for customers by various criteria
    */
   async searchPatients(criteria: {
     firstName?: string;
@@ -299,9 +299,9 @@ export class AllscriptsEnhancedService {
       if (criteria.mrn) params.identifier = `MRN|${criteria.mrn}`;
       if (criteria.identifier) params.identifier = criteria.identifier;
 
-      const response = await this.client.get('/fhir/Patient', { params });
+      const response = await this.client.get('/fhir/Customer', { params });
 
-      const patients = response.data.entry?.map((entry: any) => 
+      const customers = response.data.entry?.map((entry: any) => 
         this.mapFHIRPatientToAllscripts(entry.resource)
       ) || [];
 
@@ -309,21 +309,21 @@ export class AllscriptsEnhancedService {
         eventType: 'EHR_PATIENT_SEARCH',
         category: 'DATA_ACCESS',
         outcome: 'SUCCESS',
-        description: `Searched for patients in Allscripts`,
+        description: `Searched for customers in Allscripts`,
         metadata: {
           provider: 'Allscripts',
           criteria,
-          resultsCount: patients.length,
+          resultsCount: customers.length,
         },
       });
 
-      return patients;
+      return customers;
     } catch (error: any) {
       await auditService.log({
         eventType: 'EHR_PATIENT_SEARCH',
         category: 'DATA_ACCESS',
         outcome: 'FAILURE',
-        description: 'Failed to search patients in Allscripts',
+        description: 'Failed to search customers in Allscripts',
         metadata: {
           provider: 'Allscripts',
           error: error.message,
@@ -334,36 +334,36 @@ export class AllscriptsEnhancedService {
   }
 
   /**
-   * Get patient by ID
+   * Get customer by ID
    */
-  async getPatient(patientId: string): Promise<AllscriptsPatient> {
+  async getPatient(customerId: string): Promise<AllscriptsPatient> {
     await this.authenticate();
 
     try {
-      const response = await this.client.get(`/fhir/Patient/${patientId}`);
-      const patient = this.mapFHIRPatientToAllscripts(response.data);
+      const response = await this.client.get(`/fhir/Customer/${customerId}`);
+      const customer = this.mapFHIRPatientToAllscripts(response.data);
 
       await auditService.log({
         eventType: 'EHR_PATIENT_READ',
         category: 'DATA_ACCESS',
         outcome: 'SUCCESS',
-        description: `Retrieved patient from Allscripts`,
+        description: `Retrieved customer from Allscripts`,
         metadata: {
           provider: 'Allscripts',
-          patientId,
+          customerId,
         },
       });
 
-      return patient;
+      return customer;
     } catch (error: any) {
       await auditService.log({
         eventType: 'EHR_PATIENT_READ',
         category: 'DATA_ACCESS',
         outcome: 'FAILURE',
-        description: 'Failed to retrieve patient from Allscripts',
+        description: 'Failed to retrieve customer from Allscripts',
         metadata: {
           provider: 'Allscripts',
-          patientId,
+          customerId,
           error: error.message,
         },
       });
@@ -376,9 +376,9 @@ export class AllscriptsEnhancedService {
   // ==========================================================================
 
   /**
-   * Get patient encounters
+   * Get customer encounters
    */
-  async getEncounters(patientId: string, options?: {
+  async getEncounters(customerId: string, options?: {
     startDate?: string;
     endDate?: string;
     status?: string;
@@ -387,7 +387,7 @@ export class AllscriptsEnhancedService {
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -408,9 +408,9 @@ export class AllscriptsEnhancedService {
   }
 
   /**
-   * Get patient observations (lab results, vitals)
+   * Get customer observations (lab results, vitals)
    */
-  async getObservations(patientId: string, options?: {
+  async getObservations(customerId: string, options?: {
     category?: string;
     code?: string;
     startDate?: string;
@@ -420,7 +420,7 @@ export class AllscriptsEnhancedService {
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -442,16 +442,16 @@ export class AllscriptsEnhancedService {
   }
 
   /**
-   * Get patient medications
+   * Get customer medications
    */
-  async getMedications(patientId: string, options?: {
+  async getMedications(customerId: string, options?: {
     status?: string;
   }): Promise<AllscriptsMedication[]> {
     await this.authenticate();
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -470,14 +470,14 @@ export class AllscriptsEnhancedService {
   }
 
   /**
-   * Get patient conditions/diagnoses
+   * Get customer conditions/diagnoses
    */
-  async getConditions(patientId: string): Promise<AllscriptsCondition[]> {
+  async getConditions(customerId: string): Promise<AllscriptsCondition[]> {
     await this.authenticate();
 
     try {
       const params = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -494,14 +494,14 @@ export class AllscriptsEnhancedService {
   }
 
   /**
-   * Get patient allergies
+   * Get customer allergies
    */
-  async getAllergies(patientId: string): Promise<AllscriptsAllergy[]> {
+  async getAllergies(customerId: string): Promise<AllscriptsAllergy[]> {
     await this.authenticate();
 
     try {
       const params = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -518,9 +518,9 @@ export class AllscriptsEnhancedService {
   }
 
   /**
-   * Get patient appointments
+   * Get customer appointments
    */
-  async getAppointments(patientId: string, options?: {
+  async getAppointments(customerId: string, options?: {
     startDate?: string;
     endDate?: string;
     status?: string;
@@ -529,7 +529,7 @@ export class AllscriptsEnhancedService {
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -554,15 +554,15 @@ export class AllscriptsEnhancedService {
   // ==========================================================================
 
   /**
-   * Sync all patient data from Allscripts
+   * Sync all customer data from Allscripts
    */
   async syncPatientData(
-    patientId: string,
+    customerId: string,
     allscriptsPatientId: string
   ): Promise<AllscriptsSyncResult> {
     const result: AllscriptsSyncResult = {
       success: false,
-      patientId,
+      customerId,
       recordsProcessed: {
         encounters: 0,
         observations: 0,
@@ -603,7 +603,7 @@ export class AllscriptsEnhancedService {
       // Store sync history
       await prisma.syncHistory.create({
         data: {
-          patientId,
+          customerId,
           provider: 'ALLSCRIPTS',
           status: 'SUCCESS',
           recordsProcessed: Object.values(result.recordsProcessed).reduce((a, b) => a + b, 0),
@@ -618,10 +618,10 @@ export class AllscriptsEnhancedService {
         eventType: 'EHR_SYNC',
         category: 'DATA_SYNC',
         outcome: 'SUCCESS',
-        description: 'Successfully synced patient data from Allscripts',
+        description: 'Successfully synced customer data from Allscripts',
         metadata: {
           provider: 'Allscripts',
-          patientId,
+          customerId,
           recordsProcessed: result.recordsProcessed,
         },
       });
@@ -630,7 +630,7 @@ export class AllscriptsEnhancedService {
 
       await prisma.syncHistory.create({
         data: {
-          patientId,
+          customerId,
           provider: 'ALLSCRIPTS',
           status: 'FAILED',
           errorMessage: error.message,
@@ -643,10 +643,10 @@ export class AllscriptsEnhancedService {
         eventType: 'EHR_SYNC',
         category: 'DATA_SYNC',
         outcome: 'FAILURE',
-        description: 'Failed to sync patient data from Allscripts',
+        description: 'Failed to sync customer data from Allscripts',
         metadata: {
           provider: 'Allscripts',
-          patientId,
+          customerId,
           error: error.message,
         },
       });
@@ -698,7 +698,7 @@ export class AllscriptsEnhancedService {
   private mapFHIREncounterToAllscripts(fhirEncounter: any): AllscriptsEncounter {
     return {
       id: fhirEncounter.id,
-      patientId: fhirEncounter.subject?.reference?.split('/')[1] || '',
+      customerId: fhirEncounter.subject?.reference?.split('/')[1] || '',
       type: fhirEncounter.type?.[0]?.coding?.[0]?.display || '',
       status: fhirEncounter.status || '',
       class: fhirEncounter.class?.code || '',
@@ -722,7 +722,7 @@ export class AllscriptsEnhancedService {
   private mapFHIRObservationToAllscripts(fhirObservation: any): AllscriptsObservation {
     return {
       id: fhirObservation.id,
-      patientId: fhirObservation.subject?.reference?.split('/')[1] || '',
+      customerId: fhirObservation.subject?.reference?.split('/')[1] || '',
       encounterId: fhirObservation.encounter?.reference?.split('/')[1],
       code: fhirObservation.code?.coding?.[0]?.code || '',
       display: fhirObservation.code?.coding?.[0]?.display || '',
@@ -744,7 +744,7 @@ export class AllscriptsEnhancedService {
   private mapFHIRMedicationToAllscripts(fhirMedication: any): AllscriptsMedication {
     return {
       id: fhirMedication.id,
-      patientId: fhirMedication.subject?.reference?.split('/')[1] || '',
+      customerId: fhirMedication.subject?.reference?.split('/')[1] || '',
       medicationCode: fhirMedication.medicationCodeableConcept?.coding?.[0]?.code || '',
       medicationName: fhirMedication.medicationCodeableConcept?.coding?.[0]?.display || '',
       dosage: fhirMedication.dosageInstruction?.[0]?.text,
@@ -765,7 +765,7 @@ export class AllscriptsEnhancedService {
   private mapFHIRConditionToAllscripts(fhirCondition: any): AllscriptsCondition {
     return {
       id: fhirCondition.id,
-      patientId: fhirCondition.subject?.reference?.split('/')[1] || '',
+      customerId: fhirCondition.subject?.reference?.split('/')[1] || '',
       code: fhirCondition.code?.coding?.[0]?.code || '',
       display: fhirCondition.code?.coding?.[0]?.display || '',
       clinicalStatus: fhirCondition.clinicalStatus?.coding?.[0]?.code || '',
@@ -780,7 +780,7 @@ export class AllscriptsEnhancedService {
   private mapFHIRAllergyToAllscripts(fhirAllergy: any): AllscriptsAllergy {
     return {
       id: fhirAllergy.id,
-      patientId: fhirAllergy.patient?.reference?.split('/')[1] || '',
+      customerId: fhirAllergy.customer?.reference?.split('/')[1] || '',
       substance: fhirAllergy.code?.coding?.[0]?.display || '',
       reaction: fhirAllergy.reaction?.[0]?.manifestation?.[0]?.coding?.[0]?.display,
       severity: fhirAllergy.reaction?.[0]?.severity,
@@ -794,7 +794,7 @@ export class AllscriptsEnhancedService {
   private mapFHIRAppointmentToAllscripts(fhirAppointment: any): AllscriptsAppointment {
     return {
       id: fhirAppointment.id,
-      patientId: fhirAppointment.participant?.find((p: any) => p.actor?.reference?.includes('Patient'))?.actor?.reference?.split('/')[1] || '',
+      customerId: fhirAppointment.participant?.find((p: any) => p.actor?.reference?.includes('Customer'))?.actor?.reference?.split('/')[1] || '',
       status: fhirAppointment.status || '',
       appointmentType: fhirAppointment.appointmentType?.coding?.[0]?.display || '',
       startTime: fhirAppointment.start || '',

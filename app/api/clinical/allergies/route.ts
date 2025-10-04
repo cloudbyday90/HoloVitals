@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 
 /**
  * GET /api/clinical/allergies
- * Fetch allergies for the authenticated patient
+ * Fetch allergies for the authenticated customer
  */
 export async function GET(request: NextRequest) {
   try {
@@ -18,13 +18,13 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const patientId = searchParams.get('patientId') || session.user.id;
+    const customerId = searchParams.get('customerId') || session.user.id;
 
     // Fetch allergies
-    const allergies = await prisma.patientAllergy.findMany({
+    const allergies = await prisma.customerAllergy.findMany({
       where: {
         repository: {
-          userId: patientId,
+          userId: customerId,
         },
       },
       include: {
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     // Transform to API format
     const transformedAllergies = allergies.map((allergy) => ({
       id: allergy.id,
-      patientId,
+      customerId,
       allergen: allergy.allergen,
       type: allergy.type,
       category: allergy.type,

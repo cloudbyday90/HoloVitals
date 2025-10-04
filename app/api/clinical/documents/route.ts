@@ -5,7 +5,7 @@ import { DocumentType, DocumentStatus } from '@/lib/types/clinical-data';
 
 /**
  * GET /api/clinical/documents
- * Fetch clinical documents for the authenticated patient
+ * Fetch clinical documents for the authenticated customer
  */
 export async function GET(request: NextRequest) {
   try {
@@ -20,16 +20,16 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     
-    const patientId = searchParams.get('patientId') || session.user.id;
+    const customerId = searchParams.get('customerId') || session.user.id;
     const type = searchParams.get('type');
     const category = searchParams.get('category');
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    // Get EHR connection for this patient
+    // Get EHR connection for this customer
     const connection = await prisma.eHRConnection.findFirst({
       where: {
-        userId: patientId,
+        userId: customerId,
         status: 'ACTIVE',
       },
     });
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     // Transform to API format
     const transformedDocuments = documents.map((doc) => ({
       id: doc.id,
-      patientId,
+      customerId,
       title: doc.title || 'Untitled Document',
       type: mapDocumentType(doc.category),
       category: doc.category || 'other',

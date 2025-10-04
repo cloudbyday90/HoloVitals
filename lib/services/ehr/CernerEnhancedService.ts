@@ -8,7 +8,7 @@
  * 
  * Features:
  * - FHIR R4 API integration
- * - Patient demographics and medical records
+ * - Customer demographics and medical records
  * - Lab results and vital signs
  * - Medications and allergies
  * - Appointments and encounters
@@ -67,7 +67,7 @@ export interface CernerPatient {
 
 export interface CernerEncounter {
   id: string;
-  patientId: string;
+  customerId: string;
   type: string;
   status: string;
   class: string;
@@ -87,7 +87,7 @@ export interface CernerEncounter {
 
 export interface CernerObservation {
   id: string;
-  patientId: string;
+  customerId: string;
   encounterId?: string;
   code: string;
   display: string;
@@ -106,7 +106,7 @@ export interface CernerObservation {
 
 export interface CernerMedication {
   id: string;
-  patientId: string;
+  customerId: string;
   medicationCode: string;
   medicationName: string;
   dosage?: string;
@@ -123,7 +123,7 @@ export interface CernerMedication {
 
 export interface CernerCondition {
   id: string;
-  patientId: string;
+  customerId: string;
   code: string;
   display: string;
   clinicalStatus: string;
@@ -136,7 +136,7 @@ export interface CernerCondition {
 
 export interface CernerAllergy {
   id: string;
-  patientId: string;
+  customerId: string;
   substance: string;
   reaction?: string;
   severity?: string;
@@ -148,7 +148,7 @@ export interface CernerAllergy {
 
 export interface CernerDocument {
   id: string;
-  patientId: string;
+  customerId: string;
   type: string;
   category: string;
   date: string;
@@ -160,7 +160,7 @@ export interface CernerDocument {
 
 export interface CernerSyncResult {
   success: boolean;
-  patientId: string;
+  customerId: string;
   recordsProcessed: {
     encounters: number;
     observations: number;
@@ -259,11 +259,11 @@ export class CernerEnhancedService {
   }
 
   // ==========================================================================
-  // PATIENT OPERATIONS
+  // CUSTOMER OPERATIONS
   // ==========================================================================
 
   /**
-   * Search for patients by various criteria
+   * Search for customers by various criteria
    */
   async searchPatients(criteria: {
     firstName?: string;
@@ -283,9 +283,9 @@ export class CernerEnhancedService {
       if (criteria.mrn) params.identifier = `MRN|${criteria.mrn}`;
       if (criteria.identifier) params.identifier = criteria.identifier;
 
-      const response = await this.client.get('/Patient', { params });
+      const response = await this.client.get('/Customer', { params });
 
-      const patients = response.data.entry?.map((entry: any) => 
+      const customers = response.data.entry?.map((entry: any) => 
         this.mapFHIRPatientToCerner(entry.resource)
       ) || [];
 
@@ -293,21 +293,21 @@ export class CernerEnhancedService {
         eventType: 'EHR_PATIENT_SEARCH',
         category: 'DATA_ACCESS',
         outcome: 'SUCCESS',
-        description: `Searched for patients in Cerner`,
+        description: `Searched for customers in Cerner`,
         metadata: {
           provider: 'Cerner',
           criteria,
-          resultsCount: patients.length,
+          resultsCount: customers.length,
         },
       });
 
-      return patients;
+      return customers;
     } catch (error: any) {
       await auditService.log({
         eventType: 'EHR_PATIENT_SEARCH',
         category: 'DATA_ACCESS',
         outcome: 'FAILURE',
-        description: 'Failed to search patients in Cerner',
+        description: 'Failed to search customers in Cerner',
         metadata: {
           provider: 'Cerner',
           error: error.message,
@@ -318,36 +318,36 @@ export class CernerEnhancedService {
   }
 
   /**
-   * Get patient by ID
+   * Get customer by ID
    */
-  async getPatient(patientId: string): Promise<CernerPatient> {
+  async getPatient(customerId: string): Promise<CernerPatient> {
     await this.authenticate();
 
     try {
-      const response = await this.client.get(`/Patient/${patientId}`);
-      const patient = this.mapFHIRPatientToCerner(response.data);
+      const response = await this.client.get(`/Customer/${customerId}`);
+      const customer = this.mapFHIRPatientToCerner(response.data);
 
       await auditService.log({
         eventType: 'EHR_PATIENT_READ',
         category: 'DATA_ACCESS',
         outcome: 'SUCCESS',
-        description: `Retrieved patient from Cerner`,
+        description: `Retrieved customer from Cerner`,
         metadata: {
           provider: 'Cerner',
-          patientId,
+          customerId,
         },
       });
 
-      return patient;
+      return customer;
     } catch (error: any) {
       await auditService.log({
         eventType: 'EHR_PATIENT_READ',
         category: 'DATA_ACCESS',
         outcome: 'FAILURE',
-        description: 'Failed to retrieve patient from Cerner',
+        description: 'Failed to retrieve customer from Cerner',
         metadata: {
           provider: 'Cerner',
-          patientId,
+          customerId,
           error: error.message,
         },
       });
@@ -360,9 +360,9 @@ export class CernerEnhancedService {
   // ==========================================================================
 
   /**
-   * Get patient encounters
+   * Get customer encounters
    */
-  async getEncounters(patientId: string, options?: {
+  async getEncounters(customerId: string, options?: {
     startDate?: string;
     endDate?: string;
     status?: string;
@@ -371,7 +371,7 @@ export class CernerEnhancedService {
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -392,9 +392,9 @@ export class CernerEnhancedService {
   }
 
   /**
-   * Get patient observations (lab results, vitals)
+   * Get customer observations (lab results, vitals)
    */
-  async getObservations(patientId: string, options?: {
+  async getObservations(customerId: string, options?: {
     category?: string;
     code?: string;
     startDate?: string;
@@ -404,7 +404,7 @@ export class CernerEnhancedService {
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -426,16 +426,16 @@ export class CernerEnhancedService {
   }
 
   /**
-   * Get patient medications
+   * Get customer medications
    */
-  async getMedications(patientId: string, options?: {
+  async getMedications(customerId: string, options?: {
     status?: string;
   }): Promise<CernerMedication[]> {
     await this.authenticate();
 
     try {
       const params: any = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -454,14 +454,14 @@ export class CernerEnhancedService {
   }
 
   /**
-   * Get patient conditions/diagnoses
+   * Get customer conditions/diagnoses
    */
-  async getConditions(patientId: string): Promise<CernerCondition[]> {
+  async getConditions(customerId: string): Promise<CernerCondition[]> {
     await this.authenticate();
 
     try {
       const params = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -478,14 +478,14 @@ export class CernerEnhancedService {
   }
 
   /**
-   * Get patient allergies
+   * Get customer allergies
    */
-  async getAllergies(patientId: string): Promise<CernerAllergy[]> {
+  async getAllergies(customerId: string): Promise<CernerAllergy[]> {
     await this.authenticate();
 
     try {
       const params = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -502,14 +502,14 @@ export class CernerEnhancedService {
   }
 
   /**
-   * Get patient documents
+   * Get customer documents
    */
-  async getDocuments(patientId: string): Promise<CernerDocument[]> {
+  async getDocuments(customerId: string): Promise<CernerDocument[]> {
     await this.authenticate();
 
     try {
       const params = {
-        patient: patientId,
+        customer: customerId,
         _count: 100,
       };
 
@@ -530,15 +530,15 @@ export class CernerEnhancedService {
   // ==========================================================================
 
   /**
-   * Sync all patient data from Cerner
+   * Sync all customer data from Cerner
    */
   async syncPatientData(
-    patientId: string,
+    customerId: string,
     cernerPatientId: string
   ): Promise<CernerSyncResult> {
     const result: CernerSyncResult = {
       success: false,
-      patientId,
+      customerId,
       recordsProcessed: {
         encounters: 0,
         observations: 0,
@@ -579,7 +579,7 @@ export class CernerEnhancedService {
       // Store sync history
       await prisma.syncHistory.create({
         data: {
-          patientId,
+          customerId,
           provider: 'CERNER',
           status: 'SUCCESS',
           recordsProcessed: Object.values(result.recordsProcessed).reduce((a, b) => a + b, 0),
@@ -594,10 +594,10 @@ export class CernerEnhancedService {
         eventType: 'EHR_SYNC',
         category: 'DATA_SYNC',
         outcome: 'SUCCESS',
-        description: 'Successfully synced patient data from Cerner',
+        description: 'Successfully synced customer data from Cerner',
         metadata: {
           provider: 'Cerner',
-          patientId,
+          customerId,
           recordsProcessed: result.recordsProcessed,
         },
       });
@@ -606,7 +606,7 @@ export class CernerEnhancedService {
 
       await prisma.syncHistory.create({
         data: {
-          patientId,
+          customerId,
           provider: 'CERNER',
           status: 'FAILED',
           errorMessage: error.message,
@@ -619,10 +619,10 @@ export class CernerEnhancedService {
         eventType: 'EHR_SYNC',
         category: 'DATA_SYNC',
         outcome: 'FAILURE',
-        description: 'Failed to sync patient data from Cerner',
+        description: 'Failed to sync customer data from Cerner',
         metadata: {
           provider: 'Cerner',
-          patientId,
+          customerId,
           error: error.message,
         },
       });
@@ -668,7 +668,7 @@ export class CernerEnhancedService {
   private mapFHIREncounterToCerner(fhirEncounter: any): CernerEncounter {
     return {
       id: fhirEncounter.id,
-      patientId: fhirEncounter.subject?.reference?.split('/')[1] || '',
+      customerId: fhirEncounter.subject?.reference?.split('/')[1] || '',
       type: fhirEncounter.type?.[0]?.coding?.[0]?.display || '',
       status: fhirEncounter.status || '',
       class: fhirEncounter.class?.code || '',
@@ -690,7 +690,7 @@ export class CernerEnhancedService {
   private mapFHIRObservationToCerner(fhirObservation: any): CernerObservation {
     return {
       id: fhirObservation.id,
-      patientId: fhirObservation.subject?.reference?.split('/')[1] || '',
+      customerId: fhirObservation.subject?.reference?.split('/')[1] || '',
       encounterId: fhirObservation.encounter?.reference?.split('/')[1],
       code: fhirObservation.code?.coding?.[0]?.code || '',
       display: fhirObservation.code?.coding?.[0]?.display || '',
@@ -711,7 +711,7 @@ export class CernerEnhancedService {
   private mapFHIRMedicationToCerner(fhirMedication: any): CernerMedication {
     return {
       id: fhirMedication.id,
-      patientId: fhirMedication.subject?.reference?.split('/')[1] || '',
+      customerId: fhirMedication.subject?.reference?.split('/')[1] || '',
       medicationCode: fhirMedication.medicationCodeableConcept?.coding?.[0]?.code || '',
       medicationName: fhirMedication.medicationCodeableConcept?.coding?.[0]?.display || '',
       dosage: fhirMedication.dosageInstruction?.[0]?.text,
@@ -730,7 +730,7 @@ export class CernerEnhancedService {
   private mapFHIRConditionToCerner(fhirCondition: any): CernerCondition {
     return {
       id: fhirCondition.id,
-      patientId: fhirCondition.subject?.reference?.split('/')[1] || '',
+      customerId: fhirCondition.subject?.reference?.split('/')[1] || '',
       code: fhirCondition.code?.coding?.[0]?.code || '',
       display: fhirCondition.code?.coding?.[0]?.display || '',
       clinicalStatus: fhirCondition.clinicalStatus?.coding?.[0]?.code || '',
@@ -745,7 +745,7 @@ export class CernerEnhancedService {
   private mapFHIRAllergyToCerner(fhirAllergy: any): CernerAllergy {
     return {
       id: fhirAllergy.id,
-      patientId: fhirAllergy.patient?.reference?.split('/')[1] || '',
+      customerId: fhirAllergy.customer?.reference?.split('/')[1] || '',
       substance: fhirAllergy.code?.coding?.[0]?.display || '',
       reaction: fhirAllergy.reaction?.[0]?.manifestation?.[0]?.coding?.[0]?.display,
       severity: fhirAllergy.reaction?.[0]?.severity,
@@ -759,7 +759,7 @@ export class CernerEnhancedService {
   private mapFHIRDocumentToCerner(fhirDocument: any): CernerDocument {
     return {
       id: fhirDocument.id,
-      patientId: fhirDocument.subject?.reference?.split('/')[1] || '',
+      customerId: fhirDocument.subject?.reference?.split('/')[1] || '',
       type: fhirDocument.type?.coding?.[0]?.display || '',
       category: fhirDocument.category?.[0]?.coding?.[0]?.display || '',
       date: fhirDocument.date || '',

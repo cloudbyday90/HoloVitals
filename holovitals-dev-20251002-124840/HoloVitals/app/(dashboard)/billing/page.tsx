@@ -27,7 +27,7 @@ async function getUserSubscription(userId: string) {
 
 async function getUserUsage(userId: string) {
   // Get current usage statistics
-  const [patientCount, ehrConnectionCount] = await Promise.all([
+  const [customerCount, ehrConnectionCount] = await Promise.all([
     prisma.patient.count({
       where: { userId },
     }),
@@ -77,7 +77,7 @@ async function getUserUsage(userId: string) {
   const storageUsed = (documentCount * 2) / 1024; // Convert MB to GB
 
   return {
-    patients: patientCount,
+    patients: customerCount,
     storage: Math.round(storageUsed * 100) / 100, // Round to 2 decimal places
     aiInsights: aiInsightsCount,
     ehrConnections: ehrConnectionCount,

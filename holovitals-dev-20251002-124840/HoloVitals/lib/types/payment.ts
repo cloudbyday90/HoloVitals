@@ -214,7 +214,7 @@ export interface UsageRecord {
 
 export type UsageMetric =
   | 'ai_insights_generated'
-  | 'patients_added'
+  | 'customers_added'
   | 'storage_used'
   | 'api_calls'
   | 'ehr_syncs';

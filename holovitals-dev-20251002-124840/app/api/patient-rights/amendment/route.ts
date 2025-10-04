@@ -3,7 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { patientRights } from '@/lib/services/PatientRightsService';
+import { customerRights } from '@/lib/services/PatientRightsService';
 
 /**
  * POST /api/patient-rights/amendment
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const requestId = await patientRights.requestAmendment({
+    const requestId = await customerRights.requestAmendment({
       patientId,
       recordId,
       recordType,

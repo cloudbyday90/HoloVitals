@@ -3,7 +3,7 @@
  * 
  * POST /api/ehr/connect
  * 
- * Establishes a connection to an EHR system for a patient.
+ * Establishes a connection to an EHR system for a customer.
  * Supports all 7 EHR providers (Epic, Cerner, MEDITECH, athenahealth, 
  * eClinicalWorks, Allscripts, NextGen).
  */
@@ -19,7 +19,7 @@ const auditService = new AuditLoggingService();
 
 // Request validation schema
 const connectSchema = z.object({
-  patientId: z.string().uuid(),
+  customerId: z.string().uuid(),
   provider: z.enum([
     'EPIC',
     'CERNER',
@@ -62,9 +62,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { patientId, provider, config } = validationResult.data;
+    const { customerId, provider, config } = validationResult.data;
 
-    // 3. Verify user has permission to connect EHR for this patient
+    // 3. Verify user has permission to connect EHR for this customer
     // TODO: Add proper authorization check
     // For now, we'll assume the user is authorized
 
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     const ehrService = new UnifiedEHRService();
 
     // 5. Attempt to connect
-    await ehrService.initializeConnection(patientId, {
+    await ehrService.initializeConnection(customerId, {
       provider: provider as EHRProvider,
       baseUrl: config.baseUrl,
       clientId: config.clientId,
@@ -86,9 +86,9 @@ export async function POST(request: NextRequest) {
       eventType: 'EHR_CONNECTION_ESTABLISHED',
       category: 'INTEGRATION',
       outcome: 'SUCCESS',
-      description: `Successfully connected to ${provider} for patient ${patientId}`,
+      description: `Successfully connected to ${provider} for customer ${customerId}`,
       metadata: {
-        patientId,
+        customerId,
         provider,
         baseUrl: config.baseUrl,
       },
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
         success: true,
         message: `Successfully connected to ${provider}`,
         data: {
-          patientId,
+          customerId,
           provider,
           connectedAt: new Date().toISOString(),
         },
@@ -145,20 +145,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 2. Get patientId from query params
+    // 2. Get customerId from query params
     const { searchParams } = new URL(request.url);
-    const patientId = searchParams.get('patientId');
+    const customerId = searchParams.get('customerId');
 
-    if (!patientId) {
+    if (!customerId) {
       return NextResponse.json(
-        { error: 'patientId is required' },
+        { error: 'customerId is required' },
         { status: 400 }
       );
     }
 
     // 3. Get connection status
     const ehrService = new UnifiedEHRService();
-    const status = await ehrService.getConnectionStatus(patientId);
+    const status = await ehrService.getConnectionStatus(customerId);
 
     // 4. Return connection info (without sensitive data)
     return NextResponse.json(

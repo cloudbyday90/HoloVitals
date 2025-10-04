@@ -5,12 +5,12 @@
  * - Bulk data export using FHIR $export
  * - Enhanced resource types (DiagnosticReport, CarePlan, Encounter)
  * - Appointment scheduling integration
- * - Patient portal (athenaPatient) features
+ * - Customer portal (athenaPatient) features
  * - Clinical documentation
  * - Rate limiting (8 requests/second)
  * 
  * Market Share: 6% of US healthcare
- * Patient Portal: athenaPatient
+ * Customer Portal: athenaPatient
  * FHIR Version: R4
  */
 
@@ -38,7 +38,7 @@ export enum BulkExportStatus {
 
 // Bulk export type
 export enum BulkExportType {
-  PATIENT = 'Patient',
+  CUSTOMER = 'Customer',
   GROUP = 'Group',
   SYSTEM = 'System',
 }
@@ -87,9 +87,9 @@ export class AthenaHealthEnhancedService {
     const connection = await this.getConnection(connectionId);
     
     const {
-      exportType = BulkExportType.PATIENT,
+      exportType = BulkExportType.CUSTOMER,
       resourceTypes = [
-        'Patient',
+        'Customer',
         'Observation',
         'Condition',
         'MedicationRequest',
@@ -107,8 +107,8 @@ export class AthenaHealthEnhancedService {
 
     // Construct export URL based on type
     let exportUrl = `${connection.fhirEndpoint}`;
-    if (exportType === BulkExportType.PATIENT) {
-      exportUrl += `/Patient/$export`;
+    if (exportType === BulkExportType.CUSTOMER) {
+      exportUrl += `/Customer/$export`;
     } else if (exportType === BulkExportType.GROUP) {
       exportUrl += `/Group/${connection.userId}/$export`;
     } else {
@@ -325,7 +325,7 @@ export class AthenaHealthEnhancedService {
   ): Promise<number> {
     const connection = await this.getConnection(connectionId);
     const resourceTypes = [
-      'Patient',
+      'Customer',
       'Observation',
       'Condition',
       'MedicationRequest',
@@ -341,7 +341,7 @@ export class AthenaHealthEnhancedService {
         connection.accessToken!,
         resourceType,
         {
-          patient: connection.userId,
+          customer: connection.userId,
           _since: since?.toISOString(),
         }
       );
@@ -373,7 +373,7 @@ export class AthenaHealthEnhancedService {
       connection.accessToken!,
       resourceType,
       {
-        patient: connection.userId,
+        customer: connection.userId,
         _since: since?.toISOString(),
       }
     );

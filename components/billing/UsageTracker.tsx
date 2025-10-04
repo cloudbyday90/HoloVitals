@@ -18,13 +18,13 @@ interface UsageMetric {
 
 interface UsageTrackerProps {
   usage: {
-    patients: number;
+    customers: number;
     storage: number;
     aiInsights: number;
     ehrConnections: number;
   };
   limits: {
-    patients: number;
+    customers: number;
     storage: number;
     aiInsights: number;
     ehrConnections: number;
@@ -34,10 +34,10 @@ interface UsageTrackerProps {
 export function UsageTracker({ usage, limits }: UsageTrackerProps) {
   const metrics: UsageMetric[] = [
     {
-      label: 'Patients',
-      current: usage.patients,
-      limit: limits.patients,
-      unit: 'patients',
+      label: 'Customers',
+      current: usage.customers,
+      limit: limits.customers,
+      unit: 'customers',
       icon: <Users className="h-5 w-5" />,
       color: 'text-blue-500',
     },

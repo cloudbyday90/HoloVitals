@@ -22,13 +22,13 @@ export default async function EHRConnectPage() {
     redirect('/login');
   }
 
-  // In a real app, you would get the patient ID from the session or database
-  // For now, we'll use the user ID as the patient ID
-  const patientId = session.user.id;
+  // In a real app, you would get the customer ID from the session or database
+  // For now, we'll use the user ID as the customer ID
+  const customerId = session.user.id;
 
   return (
     <div className="min-h-screen bg-background">
-      <ConnectionWizard patientId={patientId} />
+      <ConnectionWizard customerId={customerId} />
     </div>
   );
 }

@@ -42,7 +42,7 @@ export class AllscriptsSyncAdapter {
     this.accessToken = config.accessToken;
   }
 
-  async syncPatientInbound(patientId: string): Promise<AllscriptsSyncResult> {
+  async syncPatientInbound(customerId: string): Promise<AllscriptsSyncResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
     const conflicts: any[] = [];
@@ -52,12 +52,12 @@ export class AllscriptsSyncAdapter {
 
     try {
       await this.ensureValidToken();
-      const allscriptsPatient = await this.fetchPatientFromAllscripts(patientId);
+      const allscriptsPatient = await this.fetchPatientFromAllscripts(customerId);
       resourcesProcessed++;
 
       const transformContext: TransformationContext = {
         ehrProvider: 'allscripts',
-        resourceType: 'Patient',
+        resourceType: 'Customer',
         direction: 'INBOUND',
         sourceFormat: this.config.useFHIR ? DataFormat.FHIR_R4 : DataFormat.CUSTOM_JSON,
         targetFormat: DataFormat.CUSTOM_JSON,
@@ -74,46 +74,46 @@ export class AllscriptsSyncAdapter {
 
       warnings.push(...transformResult.warnings.map(w => w.message));
 
-      const existingPatient = await prisma.patient.findFirst({
-        where: { OR: [{ allscriptsId: patientId }, { mrn: transformResult.data.mrn }] },
+      const existingPatient = await prisma.customer.findFirst({
+        where: { OR: [{ allscriptsId: customerId }, { mrn: transformResult.data.mrn }] },
       });
 
       if (existingPatient) {
         const conflictResult = await conflictResolutionService.detectConflicts(
-          'Patient', existingPatient.id, existingPatient, transformResult.data
+          'Customer', existingPatient.id, existingPatient, transformResult.data
         );
         if (conflictResult.hasConflicts) {
           conflicts.push(...conflictResult.conflicts);
-          const resolutions = await conflictResolutionService.autoResolveConflicts('Patient', existingPatient.id);
+          const resolutions = await conflictResolutionService.autoResolveConflicts('Customer', existingPatient.id);
           for (const resolution of resolutions) {
             if (resolution.success) {
               transformResult.data[resolution.conflictId.split('-')[1]] = resolution.resolvedValue;
             }
           }
         }
-        await prisma.patient.update({
+        await prisma.customer.update({
           where: { id: existingPatient.id },
-          data: { ...transformResult.data, allscriptsId: patientId, lastSyncedAt: new Date() },
+          data: { ...transformResult.data, allscriptsId: customerId, lastSyncedAt: new Date() },
         });
       } else {
-        await prisma.patient.create({
-          data: { ...transformResult.data, allscriptsId: patientId, lastSyncedAt: new Date() },
+        await prisma.customer.create({
+          data: { ...transformResult.data, allscriptsId: customerId, lastSyncedAt: new Date() },
         });
       }
 
       resourcesSucceeded++;
-      await this.syncPatientClinicalData(patientId);
+      await this.syncPatientClinicalData(customerId);
 
       return { success: true, resourcesProcessed, resourcesSucceeded, resourcesFailed, errors, warnings, conflicts };
     } catch (error) {
-      console.error('Error syncing patient from Allscripts:', error);
+      console.error('Error syncing customer from Allscripts:', error);
       errors.push(error.message);
       resourcesFailed++;
       return { success: false, resourcesProcessed, resourcesSucceeded, resourcesFailed, errors, warnings, conflicts };
     }
   }
 
-  async syncPatientOutbound(patientId: string): Promise<AllscriptsSyncResult> {
+  async syncPatientOutbound(customerId: string): Promise<AllscriptsSyncResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
     const conflicts: any[] = [];
@@ -123,14 +123,14 @@ export class AllscriptsSyncAdapter {
 
     try {
       await this.ensureValidToken();
-      const holoPatient = await prisma.patient.findUnique({ where: { id: patientId } });
-      if (!holoPatient) throw new Error('Patient not found in HoloVitals');
+      const holoPatient = await prisma.customer.findUnique({ where: { id: customerId } });
+      if (!holoPatient) throw new Error('Customer not found in HoloVitals');
 
       resourcesProcessed++;
 
       const transformContext: TransformationContext = {
         ehrProvider: 'allscripts',
-        resourceType: 'Patient',
+        resourceType: 'Customer',
         direction: 'OUTBOUND',
         sourceFormat: DataFormat.CUSTOM_JSON,
         targetFormat: this.config.useFHIR ? DataFormat.FHIR_R4 : DataFormat.CUSTOM_JSON,
@@ -151,26 +151,26 @@ export class AllscriptsSyncAdapter {
         await this.updatePatientInAllscripts(holoPatient.allscriptsId, transformResult.data);
       } else {
         const allscriptsId = await this.createPatientInAllscripts(transformResult.data);
-        await prisma.patient.update({ where: { id: patientId }, data: { allscriptsId } });
+        await prisma.customer.update({ where: { id: customerId }, data: { allscriptsId } });
       }
 
       resourcesSucceeded++;
       return { success: true, resourcesProcessed, resourcesSucceeded, resourcesFailed, errors, warnings, conflicts };
     } catch (error) {
-      console.error('Error syncing patient to Allscripts:', error);
+      console.error('Error syncing customer to Allscripts:', error);
       errors.push(error.message);
       resourcesFailed++;
       return { success: false, resourcesProcessed, resourcesSucceeded, resourcesFailed, errors, warnings, conflicts };
     }
   }
 
-  private async syncPatientClinicalData(patientId: string): Promise<void> {
-    console.log('Syncing clinical data for patient:', patientId);
+  private async syncPatientClinicalData(customerId: string): Promise<void> {
+    console.log('Syncing clinical data for customer:', customerId);
   }
 
-  private async fetchPatientFromAllscripts(patientId: string): Promise<any> {
+  private async fetchPatientFromAllscripts(customerId: string): Promise<any> {
     const endpoint = this.config.useFHIR 
-      ? `${this.config.baseUrl}/fhir/Patient/${patientId}`
+      ? `${this.config.baseUrl}/fhir/Customer/${customerId}`
       : `${this.config.baseUrl}/Unity/GetPatient`;
     
     const response = await fetch(endpoint, {
@@ -179,15 +179,15 @@ export class AllscriptsSyncAdapter {
         'Authorization': `Bearer ${this.accessToken}`,
         'Content-Type': 'application/json',
       },
-      body: this.config.useFHIR ? undefined : JSON.stringify({ PatientID: patientId }),
+      body: this.config.useFHIR ? undefined : JSON.stringify({ PatientID: customerId }),
     });
     if (!response.ok) throw new Error(`Allscripts API error: ${response.statusText}`);
     return await response.json();
   }
 
-  private async createPatientInAllscripts(patientData: any): Promise<string> {
+  private async createPatientInAllscripts(customerData: any): Promise<string> {
     const endpoint = this.config.useFHIR 
-      ? `${this.config.baseUrl}/fhir/Patient`
+      ? `${this.config.baseUrl}/fhir/Customer`
       : `${this.config.baseUrl}/Unity/SavePatient`;
     
     const response = await fetch(endpoint, {
@@ -196,16 +196,16 @@ export class AllscriptsSyncAdapter {
         'Authorization': `Bearer ${this.accessToken}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(patientData),
+      body: JSON.stringify(customerData),
     });
     if (!response.ok) throw new Error(`Allscripts API error: ${response.statusText}`);
     const result = await response.json();
     return result.id || result.PatientID;
   }
 
-  private async updatePatientInAllscripts(patientId: string, patientData: any): Promise<void> {
+  private async updatePatientInAllscripts(customerId: string, customerData: any): Promise<void> {
     const endpoint = this.config.useFHIR 
-      ? `${this.config.baseUrl}/fhir/Patient/${patientId}`
+      ? `${this.config.baseUrl}/fhir/Customer/${customerId}`
       : `${this.config.baseUrl}/Unity/SavePatient`;
     
     const response = await fetch(endpoint, {
@@ -214,7 +214,7 @@ export class AllscriptsSyncAdapter {
         'Authorization': `Bearer ${this.accessToken}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(patientData),
+      body: JSON.stringify(customerData),
     });
     if (!response.ok) throw new Error(`Allscripts API error: ${response.statusText}`);
   }

@@ -23,14 +23,14 @@ const prisma = new PrismaClient();
 
 export class AIHealthInsightsService {
   /**
-   * Generate comprehensive health insights for a patient
+   * Generate comprehensive health insights for a customer
    */
   async generateComprehensiveInsights(
     request: GenerateInsightsRequest
   ): Promise<GenerateInsightsResponse> {
     const startTime = Date.now();
     const {
-      patientId,
+      customerId,
       includeRiskAssessment = true,
       includeTrendAnalysis = true,
       includeMedicationInteraction = true,
@@ -40,9 +40,9 @@ export class AIHealthInsightsService {
     } = request;
 
     try {
-      // Fetch patient data for health score calculation
-      const patient = await prisma.patient.findUnique({
-        where: { id: patientId },
+      // Fetch customer data for health score calculation
+      const customer = await prisma.customer.findUnique({
+        where: { id: customerId },
         include: {
           vitalSigns: {
             orderBy: { recordedAt: 'desc' },
@@ -61,12 +61,12 @@ export class AIHealthInsightsService {
         },
       });
 
-      if (!patient) {
-        throw new Error('Patient not found');
+      if (!customer) {
+        throw new Error('Customer not found');
       }
 
       // Calculate health score
-      const healthScore = await this.calculateHealthScore(patient);
+      const healthScore = await this.calculateHealthScore(customer);
 
       // Generate insights in parallel for better performance
       const [
@@ -77,19 +77,19 @@ export class AIHealthInsightsService {
         recommendations,
       ] = await Promise.all([
         includeRiskAssessment
-          ? HealthRiskAssessmentService.generateRiskAssessment(patientId)
+          ? HealthRiskAssessmentService.generateRiskAssessment(customerId)
           : Promise.resolve(undefined),
         includeTrendAnalysis
-          ? TrendAnalysisService.getTrendingMetrics(patientId, timeframe)
+          ? TrendAnalysisService.getTrendingMetrics(customerId, timeframe)
           : Promise.resolve(undefined),
         includeMedicationInteraction
-          ? MedicationInteractionService.analyzeMedicationInteractions(patientId)
+          ? MedicationInteractionService.analyzeMedicationInteractions(customerId)
           : Promise.resolve(undefined),
         includeLabInterpretation
-          ? this.getRecentLabInterpretations(patientId)
+          ? this.getRecentLabInterpretations(customerId)
           : Promise.resolve(undefined),
         includeRecommendations
-          ? PersonalizedRecommendationsService.generateRecommendations(patientId)
+          ? PersonalizedRecommendationsService.generateRecommendations(customerId)
           : Promise.resolve(undefined),
       ]);
 
@@ -97,7 +97,7 @@ export class AIHealthInsightsService {
 
       // Calculate total data points analyzed
       const dataPoints = this.calculateDataPoints(
-        patient,
+        customer,
         trends,
         labInterpretations
       );
@@ -145,13 +145,13 @@ export class AIHealthInsightsService {
   /**
    * Calculate overall health score
    */
-  private async calculateHealthScore(patient: any): Promise<HealthScore> {
+  private async calculateHealthScore(customer: any): Promise<HealthScore> {
     // Calculate category scores
-    const cardiovascular = await this.calculateCardiovascularScore(patient);
-    const metabolic = await this.calculateMetabolicScore(patient);
-    const respiratory = await this.calculateRespiratoryScore(patient);
-    const mental = await this.calculateMentalScore(patient);
-    const lifestyle = await this.calculateLifestyleScore(patient);
+    const cardiovascular = await this.calculateCardiovascularScore(customer);
+    const metabolic = await this.calculateMetabolicScore(customer);
+    const respiratory = await this.calculateRespiratoryScore(customer);
+    const mental = await this.calculateMentalScore(customer);
+    const lifestyle = await this.calculateLifestyleScore(customer);
 
     // Calculate overall score (weighted average)
     const overall = Math.round(
@@ -163,7 +163,7 @@ export class AIHealthInsightsService {
     );
 
     // Determine trend
-    const trend = await this.determineHealthTrend(patient);
+    const trend = await this.determineHealthTrend(customer);
 
     // Identify key factors
     const factors = this.identifyHealthFactors(
@@ -192,12 +192,12 @@ export class AIHealthInsightsService {
   /**
    * Calculate cardiovascular health score
    */
-  private async calculateCardiovascularScore(patient: any): Promise<CategoryScore> {
+  private async calculateCardiovascularScore(customer: any): Promise<CategoryScore> {
     let score = 100;
     const contributors: string[] = [];
     const recommendations: string[] = [];
 
-    const latestVitals = patient.vitalSigns[0];
+    const latestVitals = customer.vitalSigns[0];
 
     // Blood pressure
     if (latestVitals?.bloodPressureSystolic) {
@@ -215,7 +215,7 @@ export class AIHealthInsightsService {
     }
 
     // Cholesterol
-    const cholesterol = this.getLatestLabValue(patient.labResults, 'cholesterol');
+    const cholesterol = this.getLatestLabValue(customer.labResults, 'cholesterol');
     if (cholesterol) {
       if (cholesterol >= 240) {
         score -= 20;
@@ -239,14 +239,14 @@ export class AIHealthInsightsService {
     }
 
     // Smoking
-    if (patient.smokingStatus === 'current') {
+    if (customer.smokingStatus === 'current') {
       score -= 25;
       contributors.push('Current smoker');
       recommendations.push('Smoking cessation');
     }
 
     // Exercise
-    if (patient.physicalActivity === 'sedentary') {
+    if (customer.physicalActivity === 'sedentary') {
       score -= 15;
       contributors.push('Sedentary lifestyle');
       recommendations.push('Increase physical activity');
@@ -267,12 +267,12 @@ export class AIHealthInsightsService {
   /**
    * Calculate metabolic health score
    */
-  private async calculateMetabolicScore(patient: any): Promise<CategoryScore> {
+  private async calculateMetabolicScore(customer: any): Promise<CategoryScore> {
     let score = 100;
     const contributors: string[] = [];
     const recommendations: string[] = [];
 
-    const latestVitals = patient.vitalSigns[0];
+    const latestVitals = customer.vitalSigns[0];
 
     // BMI
     if (latestVitals?.bmi) {
@@ -294,7 +294,7 @@ export class AIHealthInsightsService {
     }
 
     // Glucose
-    const glucose = this.getLatestLabValue(patient.labResults, 'glucose');
+    const glucose = this.getLatestLabValue(customer.labResults, 'glucose');
     if (glucose) {
       if (glucose >= 126) {
         score -= 30;
@@ -310,7 +310,7 @@ export class AIHealthInsightsService {
     }
 
     // HbA1c
-    const hba1c = this.getLatestLabValue(patient.labResults, 'hba1c');
+    const hba1c = this.getLatestLabValue(customer.labResults, 'hba1c');
     if (hba1c) {
       if (hba1c >= 6.5) {
         score -= 30;
@@ -338,17 +338,17 @@ export class AIHealthInsightsService {
   /**
    * Calculate respiratory health score
    */
-  private async calculateRespiratoryScore(patient: any): Promise<CategoryScore> {
+  private async calculateRespiratoryScore(customer: any): Promise<CategoryScore> {
     let score = 100;
     const contributors: string[] = [];
     const recommendations: string[] = [];
 
     // Smoking
-    if (patient.smokingStatus === 'current') {
+    if (customer.smokingStatus === 'current') {
       score -= 40;
       contributors.push('Active smoking');
       recommendations.push('Immediate smoking cessation');
-    } else if (patient.smokingStatus === 'former') {
+    } else if (customer.smokingStatus === 'former') {
       score -= 10;
       contributors.push('Former smoker');
     } else {
@@ -356,8 +356,8 @@ export class AIHealthInsightsService {
     }
 
     // Respiratory conditions
-    const hasAsthma = patient.conditions.some((c: any) => c.code?.includes('J45'));
-    const hasCOPD = patient.conditions.some((c: any) => c.code?.includes('J44'));
+    const hasAsthma = customer.conditions.some((c: any) => c.code?.includes('J45'));
+    const hasCOPD = customer.conditions.some((c: any) => c.code?.includes('J44'));
 
     if (hasCOPD) {
       score -= 30;
@@ -370,7 +370,7 @@ export class AIHealthInsightsService {
     }
 
     // Oxygen saturation
-    const latestVitals = patient.vitalSigns[0];
+    const latestVitals = customer.vitalSigns[0];
     if (latestVitals?.oxygenSaturation) {
       const o2 = latestVitals.oxygenSaturation;
       if (o2 < 90) {
@@ -399,17 +399,17 @@ export class AIHealthInsightsService {
   /**
    * Calculate mental health score
    */
-  private async calculateMentalScore(patient: any): Promise<CategoryScore> {
+  private async calculateMentalScore(customer: any): Promise<CategoryScore> {
     let score = 100;
     const contributors: string[] = [];
     const recommendations: string[] = [];
 
     // Stress level
-    if (patient.stressLevel === 'high') {
+    if (customer.stressLevel === 'high') {
       score -= 25;
       contributors.push('High stress level');
       recommendations.push('Stress management techniques');
-    } else if (patient.stressLevel === 'moderate') {
+    } else if (customer.stressLevel === 'moderate') {
       score -= 10;
       contributors.push('Moderate stress level');
     } else {
@@ -417,11 +417,11 @@ export class AIHealthInsightsService {
     }
 
     // Sleep quality
-    if (patient.sleepQuality === 'poor') {
+    if (customer.sleepQuality === 'poor') {
       score -= 20;
       contributors.push('Poor sleep quality');
       recommendations.push('Sleep hygiene improvement');
-    } else if (patient.sleepQuality === 'fair') {
+    } else if (customer.sleepQuality === 'fair') {
       score -= 10;
       contributors.push('Fair sleep quality');
     } else {
@@ -429,8 +429,8 @@ export class AIHealthInsightsService {
     }
 
     // Mental health conditions
-    const hasDepression = patient.conditions.some((c: any) => c.code?.includes('F32') || c.code?.includes('F33'));
-    const hasAnxiety = patient.conditions.some((c: any) => c.code?.includes('F41'));
+    const hasDepression = customer.conditions.some((c: any) => c.code?.includes('F32') || c.code?.includes('F33'));
+    const hasAnxiety = customer.conditions.some((c: any) => c.code?.includes('F41'));
 
     if (hasDepression) {
       score -= 20;
@@ -459,21 +459,21 @@ export class AIHealthInsightsService {
   /**
    * Calculate lifestyle score
    */
-  private async calculateLifestyleScore(patient: any): Promise<CategoryScore> {
+  private async calculateLifestyleScore(customer: any): Promise<CategoryScore> {
     let score = 100;
     const contributors: string[] = [];
     const recommendations: string[] = [];
 
     // Physical activity
-    if (patient.physicalActivity === 'sedentary') {
+    if (customer.physicalActivity === 'sedentary') {
       score -= 30;
       contributors.push('Sedentary lifestyle');
       recommendations.push('Increase physical activity');
-    } else if (patient.physicalActivity === 'light') {
+    } else if (customer.physicalActivity === 'light') {
       score -= 15;
       contributors.push('Light physical activity');
       recommendations.push('Increase exercise intensity');
-    } else if (patient.physicalActivity === 'moderate') {
+    } else if (customer.physicalActivity === 'moderate') {
       score -= 5;
       contributors.push('Moderate physical activity');
     } else {
@@ -481,24 +481,24 @@ export class AIHealthInsightsService {
     }
 
     // Smoking
-    if (patient.smokingStatus === 'current') {
+    if (customer.smokingStatus === 'current') {
       score -= 30;
       contributors.push('Current smoker');
       recommendations.push('Smoking cessation');
     }
 
     // Alcohol
-    if (patient.alcoholConsumption === 'heavy') {
+    if (customer.alcoholConsumption === 'heavy') {
       score -= 20;
       contributors.push('Heavy alcohol use');
       recommendations.push('Reduce alcohol consumption');
-    } else if (patient.alcoholConsumption === 'moderate') {
+    } else if (customer.alcoholConsumption === 'moderate') {
       score -= 5;
       contributors.push('Moderate alcohol use');
     }
 
     // Diet quality (simplified - would need more data in production)
-    const latestVitals = patient.vitalSigns[0];
+    const latestVitals = customer.vitalSigns[0];
     if (latestVitals?.bmi >= 30) {
       score -= 15;
       contributors.push('Poor diet quality (inferred from BMI)');
@@ -544,7 +544,7 @@ export class AIHealthInsightsService {
     return 'critical';
   }
 
-  private async determineHealthTrend(patient: any): Promise<HealthScore['trend']> {
+  private async determineHealthTrend(customer: any): Promise<HealthScore['trend']> {
     // Compare recent health scores (simplified - would need historical data)
     // For now, return stable
     return 'stable';
@@ -610,9 +610,9 @@ export class AIHealthInsightsService {
     return 'Health';
   }
 
-  private async getRecentLabInterpretations(patientId: string) {
+  private async getRecentLabInterpretations(customerId: string) {
     const recentLabs = await prisma.labResult.findMany({
-      where: { patientId },
+      where: { customerId },
       orderBy: { resultDate: 'desc' },
       take: 10,
     });
@@ -627,15 +627,15 @@ export class AIHealthInsightsService {
   }
 
   private calculateDataPoints(
-    patient: any,
+    customer: any,
     trends: any,
     labInterpretations: any
   ): number {
     let count = 0;
-    count += patient.vitalSigns?.length || 0;
-    count += patient.labResults?.length || 0;
-    count += patient.medications?.length || 0;
-    count += patient.conditions?.length || 0;
+    count += customer.vitalSigns?.length || 0;
+    count += customer.labResults?.length || 0;
+    count += customer.medications?.length || 0;
+    count += customer.conditions?.length || 0;
     count += trends?.length || 0;
     count += labInterpretations?.length || 0;
     return count;

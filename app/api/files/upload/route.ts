@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const userId = formData.get('userId') as string;
-    const patientId = formData.get('patientId') as string | undefined;
+    const customerId = formData.get('customerId') as string | undefined;
     const category = formData.get('category') as string;
     const description = formData.get('description') as string | undefined;
     const tags = formData.get('tags') as string | undefined;
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     // Upload file
     const metadata = await secureFileStorage.uploadFile(buffer, {
       userId,
-      patientId,
+      customerId,
       fileName: file.name,
       fileType: file.type,
       fileSize: file.size,

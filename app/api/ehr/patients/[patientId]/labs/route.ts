@@ -1,9 +1,9 @@
 /**
- * EHR Patient Lab Results API Endpoint
+ * EHR Customer Lab Results API Endpoint
  * 
- * GET /api/ehr/patients/:patientId/labs
+ * GET /api/ehr/customers/:customerId/labs
  * 
- * Retrieves patient lab results (observations) from the connected EHR system.
+ * Retrieves customer lab results (observations) from the connected EHR system.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -25,7 +25,7 @@ const labsSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { patientId: string } }
+  { params }: { params: { customerId: string } }
 ) {
   try {
     // 1. Authenticate user
@@ -37,8 +37,8 @@ export async function GET(
       );
     }
 
-    // 2. Get patientId from URL params
-    const { patientId } = params;
+    // 2. Get customerId from URL params
+    const { customerId } = params;
 
     // 3. Parse and validate query parameters
     const { searchParams } = new URL(request.url);
@@ -68,7 +68,7 @@ export async function GET(
 
     // 5. Get lab results (observations)
     const labResults = await ehrService.getObservations(
-      patientId,
+      customerId,
       ehrPatientId,
       options
     );
@@ -79,9 +79,9 @@ export async function GET(
       eventType: 'EHR_LAB_RESULTS_ACCESS',
       category: 'DATA_ACCESS',
       outcome: 'SUCCESS',
-      description: `Retrieved lab results for patient`,
+      description: `Retrieved lab results for customer`,
       metadata: {
-        patientId,
+        customerId,
         ehrPatientId,
         labResultsCount: labResults.length,
         filters: options,

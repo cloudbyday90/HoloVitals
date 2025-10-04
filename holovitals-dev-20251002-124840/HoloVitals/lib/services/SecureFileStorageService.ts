@@ -385,7 +385,7 @@ export class SecureFileStorageService {
       if (metadata.patient_id) {
         const accessResult = await accessControlService.checkAccess({
           userId,
-          resource: 'patient_file',
+          resource: 'customer_file',
           action: 'read',
           context: {
             patientId: metadata.patient_id,

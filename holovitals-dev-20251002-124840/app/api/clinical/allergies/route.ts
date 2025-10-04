@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const patientId = searchParams.get('patientId') || session.user.id;
 
     // Fetch allergies
-    const allergies = await prisma.patientAllergy.findMany({
+    const allergies = await prisma.customerAllergy.findMany({
       where: {
         repository: {
           userId: patientId,

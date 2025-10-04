@@ -16,7 +16,7 @@ const repository = getMedicalStandardizationRepository();
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { loincNumber, testName, value, unit, patientAge, patientGender } = body;
+    const { loincNumber, testName, value, unit, customerAge, customerGender } = body;
 
     if (!loincNumber && !testName) {
       return NextResponse.json(
@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
       testName,
       value,
       unit,
-      patientAge,
-      patientGender,
+      customerAge,
+      customerGender,
     });
 
     return NextResponse.json({

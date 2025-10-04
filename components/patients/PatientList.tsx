@@ -1,7 +1,7 @@
 /**
- * Patient List Component
+ * Customer List Component
  * 
- * Displays a list of patients with pagination and sorting
+ * Displays a list of customers with pagination and sorting
  */
 
 'use client';
@@ -27,12 +27,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { PatientCard } from './PatientCard';
-import { Patient, PatientSortOptions, PatientSortField, SortDirection } from '@/lib/types/patient';
+import { CustomerCard } from './CustomerCard';
+import { Customer, PatientSortOptions, PatientSortField, SortDirection } from '@/lib/types/customer';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface PatientListProps {
-  patients: Patient[];
+  customers: Customer[];
   totalCount: number;
   currentPage: number;
   pageSize: number;
@@ -44,12 +44,12 @@ interface PatientListProps {
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onSortChange: (sort: PatientSortOptions) => void;
-  onSelectPatient: (patientId: string) => void;
+  onSelectPatient: (customerId: string) => void;
   onSelectAll: () => void;
   onDeselectAll: () => void;
-  onSyncPatient: (patientId: string) => void;
+  onSyncPatient: (customerId: string) => void;
   onBulkSync?: () => void;
-  onViewDetails: (patientId: string) => void;
+  onViewDetails: (customerId: string) => void;
 }
 
 const sortFieldLabels: Record<PatientSortField, string> = {
@@ -60,8 +60,8 @@ const sortFieldLabels: Record<PatientSortField, string> = {
   lastSyncedAt: 'Last Synced',
 };
 
-export function PatientList({
-  patients,
+export function CustomerList({
+  customers,
   totalCount,
   currentPage,
   pageSize,
@@ -80,8 +80,8 @@ export function PatientList({
   onBulkSync,
   onViewDetails,
 }: PatientListProps) {
-  const allSelected = patients.length > 0 && patients.every((p) => selectedPatients.has(p.id));
-  const someSelected = patients.some((p) => selectedPatients.has(p.id)) && !allSelected;
+  const allSelected = customers.length > 0 && customers.every((p) => selectedPatients.has(p.id));
+  const someSelected = customers.some((p) => selectedPatients.has(p.id)) && !allSelected;
 
   const handleSelectAll = () => {
     if (allSelected) {
@@ -190,32 +190,32 @@ export function PatientList({
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Users className="h-4 w-4" />
         <span>
-          Showing {startIndex}-{endIndex} of {totalCount} patients
+          Showing {startIndex}-{endIndex} of {totalCount} customers
         </span>
       </div>
 
-      {/* Patient List */}
+      {/* Customer List */}
       {isLoading ? (
         <div className="space-y-4">
           {Array.from({ length: pageSize }).map((_, i) => (
             <Skeleton key={i} className="h-48 w-full" />
           ))}
         </div>
-      ) : patients.length === 0 ? (
+      ) : customers.length === 0 ? (
         <div className="text-center py-12 border rounded-lg bg-muted/50">
           <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No patients found</h3>
+          <h3 className="text-lg font-semibold mb-2">No customers found</h3>
           <p className="text-muted-foreground">
             Try adjusting your search criteria or filters
           </p>
         </div>
       ) : (
         <div className="space-y-4">
-          {patients.map((patient) => (
-            <PatientCard
-              key={patient.id}
-              patient={patient}
-              isSelected={selectedPatients.has(patient.id)}
+          {customers.map((customer) => (
+            <CustomerCard
+              key={customer.id}
+              customer={customer}
+              isSelected={selectedPatients.has(customer.id)}
               onSelect={onSelectPatient}
               onSync={onSyncPatient}
               onViewDetails={onViewDetails}

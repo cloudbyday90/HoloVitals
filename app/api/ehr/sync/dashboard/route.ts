@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
       const activeSyncsData = await prisma.syncHistory.findMany({
         where: { status: 'IN_PROGRESS' },
         include: {
-          patient: {
+          customer: {
             select: {
               firstName: true,
               lastName: true,
@@ -251,9 +251,9 @@ export async function GET(request: NextRequest) {
         },
         activeSyncs: activeSyncsData.map((sync) => ({
           id: sync.id,
-          patientId: sync.patientId,
-          patientName: sync.patient
-            ? `${sync.patient.firstName} ${sync.patient.lastName}`
+          customerId: sync.customerId,
+          customerName: sync.customer
+            ? `${sync.customer.firstName} ${sync.customer.lastName}`
             : undefined,
           ehrProvider: sync.ehrProvider,
           status: sync.status,

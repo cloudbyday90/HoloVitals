@@ -21,15 +21,15 @@ export default function AIInsightsDashboard() {
   const [selectedPatientId, setSelectedPatientId] = useState<string>('');
 
   useEffect(() => {
-    // In production, get patient ID from session or route params
+    // In production, get customer ID from session or route params
     // For now, using a placeholder
     if (session?.user) {
-      setSelectedPatientId('patient-123');
-      loadInsights('patient-123');
+      setSelectedPatientId('customer-123');
+      loadInsights('customer-123');
     }
   }, [session]);
 
-  const loadInsights = async (patientId: string) => {
+  const loadInsights = async (customerId: string) => {
     try {
       setLoading(true);
       const response = await fetch('/api/ai-insights/generate', {
@@ -38,7 +38,7 @@ export default function AIInsightsDashboard() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          patientId,
+          customerId,
           includeRiskAssessment: true,
           includeTrendAnalysis: true,
           includeMedicationInteraction: true,

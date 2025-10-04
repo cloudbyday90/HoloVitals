@@ -231,7 +231,7 @@ export function useRoleGuard() {
     isOwner: userRole === UserRole.OWNER,
     isAdmin: userRole === UserRole.ADMIN || userRole === UserRole.OWNER,
     isDoctor: userRole === UserRole.DOCTOR || userRole === UserRole.ADMIN || userRole === UserRole.OWNER,
-    isPatient: userRole === UserRole.PATIENT,
+    isPatient: userRole === UserRole.CUSTOMER,
     role: userRole,
     hasRole: (requiredRole: UserRole) => {
       if (!userRole) return false;

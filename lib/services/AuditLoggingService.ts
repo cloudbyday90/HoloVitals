@@ -38,7 +38,7 @@ export interface AuditLogOptions {
   outcomeReason?: string;
   errorMessage?: string;
   phiAccessed?: boolean;
-  patientId?: string;
+  customerId?: string;
   accessReason?: string;
   dataAccessed?: string[];
   requestDetails?: {
@@ -101,7 +101,7 @@ export class AuditLoggingService {
           outcomeReason: options.outcomeReason,
           errorMessage: options.errorMessage,
           phiAccessed: options.phiAccessed || false,
-          patientId: options.patientId,
+          customerId: options.customerId,
           accessReason: options.accessReason,
           dataAccessed: options.dataAccessed,
           requestId: options.requestDetails?.requestId,
@@ -214,7 +214,7 @@ export class AuditLoggingService {
   async logPHIAccess(
     context: AuditContext,
     details: {
-      patientId: string;
+      customerId: string;
       dataAccessed: string[];
       accessReason: string;
       action: 'VIEW' | 'CREATE' | 'UPDATE' | 'DELETE' | 'EXPORT' | 'PRINT';
@@ -236,11 +236,11 @@ export class AuditLoggingService {
       action: `${details.action}_PHI`,
       outcome: 'SUCCESS',
       phiAccessed: true,
-      patientId: details.patientId,
+      customerId: details.customerId,
       accessReason: details.accessReason,
       dataAccessed: details.dataAccessed,
       resourceType: 'PATIENT_RECORD',
-      resourceId: details.patientId,
+      resourceId: details.customerId,
       riskLevel: details.action === 'EXPORT' || details.action === 'DELETE' ? 'HIGH' : 'MEDIUM',
       tags: ['phi', 'data-access'],
     });
@@ -258,7 +258,7 @@ export class AuditLoggingService {
       resourceName?: string;
       changes?: any;
       phiInvolved?: boolean;
-      patientId?: string;
+      customerId?: string;
     }
   ): Promise<string> {
     return this.log({
@@ -271,7 +271,7 @@ export class AuditLoggingService {
       resourceName: details.resourceName,
       outcome: 'SUCCESS',
       phiAccessed: details.phiInvolved || false,
-      patientId: details.patientId,
+      customerId: details.customerId,
       metadata: {
         changes: details.changes,
       },
@@ -376,7 +376,7 @@ export class AuditLoggingService {
    */
   async query(filters: {
     userId?: string;
-    patientId?: string;
+    customerId?: string;
     eventType?: string;
     eventCategory?: string;
     startDate?: Date;
@@ -391,7 +391,7 @@ export class AuditLoggingService {
     const where: any = {};
 
     if (filters.userId) where.userId = filters.userId;
-    if (filters.patientId) where.patientId = filters.patientId;
+    if (filters.customerId) where.customerId = filters.customerId;
     if (filters.eventType) where.eventType = filters.eventType;
     if (filters.eventCategory) where.eventCategory = filters.eventCategory;
     if (filters.outcome) where.outcome = filters.outcome;
@@ -427,12 +427,12 @@ export class AuditLoggingService {
   }
 
   /**
-   * Get patient access history
+   * Get customer access history
    */
-  async getPatientAccessHistory(patientId: string, limit: number = 100) {
+  async getPatientAccessHistory(customerId: string, limit: number = 100) {
     return prisma.auditLog.findMany({
       where: {
-        patientId,
+        customerId,
         phiAccessed: true,
       },
       orderBy: { timestamp: 'desc' },
@@ -524,8 +524,8 @@ export class AuditLoggingService {
           timestamp: { gte: startDate, lte: endDate },
           phiAccessed: true,
         },
-        select: { patientId: true },
-        distinct: ['patientId'],
+        select: { customerId: true },
+        distinct: ['customerId'],
       }),
       prisma.auditLog.count({
         where: {
@@ -565,7 +565,7 @@ export class AuditLoggingService {
       totalLogs,
       phiAccessCount,
       uniqueUsers: uniqueUsers.length,
-      uniquePatients: uniquePatients.filter(p => p.patientId).length,
+      uniquePatients: uniquePatients.filter(p => p.customerId).length,
       failedAttempts,
       securityEvents,
       eventsByCategory: eventsByCategory.map(e => ({

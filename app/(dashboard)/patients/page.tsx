@@ -1,7 +1,7 @@
 /**
- * Patient Search and Management Page
+ * Customer Search and Management Page
  * 
- * Main page for searching and managing patients from connected EHR systems
+ * Main page for searching and managing customers from connected EHR systems
  */
 
 'use client';
@@ -10,9 +10,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Users, Download, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { PatientSearch } from '@/components/patients/PatientSearch';
-import { PatientList } from '@/components/patients/PatientList';
-import { PatientDetailView } from '@/components/patients/PatientDetailView';
+import { CustomerSearch } from '@/components/customers/CustomerSearch';
+import { CustomerList } from '@/components/customers/CustomerList';
+import { CustomerDetailView } from '@/components/customers/CustomerDetailView';
 import { usePatientSearch } from '@/lib/hooks/usePatientSearch';
 import {
   Dialog,
@@ -29,7 +29,7 @@ export default function PatientsPage() {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   const {
-    patients,
+    customers,
     filters,
     sort,
     pagination,
@@ -61,32 +61,32 @@ export default function PatientsPage() {
     autoSearch: false,
   });
 
-  const handleViewDetails = (patientId: string) => {
-    setSelectedPatientId(patientId);
+  const handleViewDetails = (customerId: string) => {
+    setSelectedPatientId(customerId);
     setDetailDialogOpen(true);
   };
 
-  const handleSyncPatient = async (patientId: string) => {
+  const handleSyncPatient = async (customerId: string) => {
     try {
-      const response = await fetch(`/api/ehr/patients/${patientId}/sync`, {
+      const response = await fetch(`/api/ehr/customers/${customerId}/sync`, {
         method: 'POST',
       });
 
       if (!response.ok) {
-        throw new Error('Failed to sync patient');
+        throw new Error('Failed to sync customer');
       }
 
       toast({
         title: 'Sync Started',
-        description: 'Patient data synchronization has been initiated.',
+        description: 'Customer data synchronization has been initiated.',
       });
 
-      // Refresh the patient list
+      // Refresh the customer list
       await search();
     } catch (error: any) {
       toast({
         title: 'Sync Failed',
-        description: error.message || 'Failed to sync patient data',
+        description: error.message || 'Failed to sync customer data',
         variant: 'destructive',
       });
     }
@@ -94,25 +94,25 @@ export default function PatientsPage() {
 
   const handleBulkSync = async () => {
     try {
-      const patientIds = Array.from(selectedPatients);
+      const customerIds = Array.from(selectedPatients);
       
-      const response = await fetch('/api/ehr/patients/bulk-sync', {
+      const response = await fetch('/api/ehr/customers/bulk-sync', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ patientIds }),
+        body: JSON.stringify({ customerIds }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to sync patients');
+        throw new Error('Failed to sync customers');
       }
 
       const result = await response.json();
 
       toast({
         title: 'Bulk Sync Started',
-        description: `Syncing ${patientIds.length} patients...`,
+        description: `Syncing ${customerIds.length} customers...`,
       });
 
       // Clear selection and refresh
@@ -121,7 +121,7 @@ export default function PatientsPage() {
     } catch (error: any) {
       toast({
         title: 'Bulk Sync Failed',
-        description: error.message || 'Failed to sync patients',
+        description: error.message || 'Failed to sync customers',
         variant: 'destructive',
       });
     }
@@ -129,19 +129,19 @@ export default function PatientsPage() {
 
   const handleExport = async () => {
     try {
-      const patientIds = selectedPatients.size > 0 
+      const customerIds = selectedPatients.size > 0 
         ? Array.from(selectedPatients)
-        : patients.map(p => p.id);
+        : customers.map(p => p.id);
 
       // TODO: Implement export functionality
       toast({
         title: 'Export Started',
-        description: `Exporting ${patientIds.length} patients...`,
+        description: `Exporting ${customerIds.length} customers...`,
       });
     } catch (error: any) {
       toast({
         title: 'Export Failed',
-        description: error.message || 'Failed to export patients',
+        description: error.message || 'Failed to export customers',
         variant: 'destructive',
       });
     }
@@ -154,10 +154,10 @@ export default function PatientsPage() {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <Users className="h-8 w-8" />
-            Patient Management
+            Customer Management
           </h1>
           <p className="text-muted-foreground mt-2">
-            Search and manage patients from connected EHR systems
+            Search and manage customers from connected EHR systems
           </p>
         </div>
         <div className="flex gap-2">
@@ -181,7 +181,7 @@ export default function PatientsPage() {
       )}
 
       {/* Search Component */}
-      <PatientSearch
+      <CustomerSearch
         filters={filters}
         onFiltersChange={updateFilters}
         onSearch={search}
@@ -194,9 +194,9 @@ export default function PatientsPage() {
         onDeleteSavedSearch={deleteSavedSearch}
       />
 
-      {/* Patient List */}
-      <PatientList
-        patients={patients}
+      {/* Customer List */}
+      <CustomerList
+        customers={customers}
         totalCount={totalCount}
         currentPage={pagination.page}
         pageSize={pagination.pageSize}
@@ -216,15 +216,15 @@ export default function PatientsPage() {
         onViewDetails={handleViewDetails}
       />
 
-      {/* Patient Detail Dialog */}
+      {/* Customer Detail Dialog */}
       <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Patient Details</DialogTitle>
+            <DialogTitle>Customer Details</DialogTitle>
           </DialogHeader>
           {selectedPatientId && (
-            <PatientDetailView
-              patientId={selectedPatientId}
+            <CustomerDetailView
+              customerId={selectedPatientId}
               onClose={() => setDetailDialogOpen(false)}
               onSync={handleSyncPatient}
             />

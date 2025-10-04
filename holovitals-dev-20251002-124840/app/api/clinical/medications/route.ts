@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch medications
-    const medications = await prisma.patientMedication.findMany({
+    const medications = await prisma.customerMedication.findMany({
       where,
       include: {
         repository: {
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Get total count
-    const total = await prisma.patientMedication.count({ where });
+    const total = await prisma.customerMedication.count({ where });
 
     // Transform to API format
     const transformedMedications = medications.map((med) => ({

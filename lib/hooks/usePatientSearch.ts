@@ -1,19 +1,19 @@
 /**
- * Patient Search Hook
+ * Customer Search Hook
  * 
- * Custom hook for managing patient search state and operations
+ * Custom hook for managing customer search state and operations
  */
 
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Patient,
+  Customer,
   PatientSearchFilters,
-  PatientSearchResult,
+  CustomerSearchResult,
   PatientSortOptions,
   PaginationOptions,
   SavedSearch,
   SearchHistory,
-} from '@/lib/types/patient';
+} from '@/lib/types/customer';
 
 interface UsePatientSearchOptions {
   initialFilters?: PatientSearchFilters;
@@ -24,7 +24,7 @@ interface UsePatientSearchOptions {
 
 interface UsePatientSearchReturn {
   // State
-  patients: Patient[];
+  customers: Customer[];
   filters: PatientSearchFilters;
   sort: PatientSortOptions;
   pagination: PaginationOptions;
@@ -44,11 +44,11 @@ interface UsePatientSearchReturn {
   updateSort: (sort: PatientSortOptions) => void;
   goToPage: (page: number) => void;
   changePageSize: (pageSize: number) => void;
-  selectPatient: (patientId: string) => void;
-  deselectPatient: (patientId: string) => void;
+  selectPatient: (customerId: string) => void;
+  deselectPatient: (customerId: string) => void;
   selectAll: () => void;
   deselectAll: () => void;
-  togglePatientSelection: (patientId: string) => void;
+  togglePatientSelection: (customerId: string) => void;
   saveSearch: (name: string) => Promise<void>;
   loadSavedSearch: (searchId: string) => void;
   deleteSavedSearch: (searchId: string) => Promise<void>;
@@ -72,7 +72,7 @@ export function usePatientSearch(
   } = options;
 
   // State
-  const [patients, setPatients] = useState<Patient[]>([]);
+  const [customers, setPatients] = useState<Customer[]>([]);
   const [filters, setFilters] = useState<PatientSearchFilters>(initialFilters);
   const [sort, setSort] = useState<PatientSortOptions>(initialSort);
   const [pagination, setPagination] = useState<PaginationOptions>({
@@ -115,16 +115,16 @@ export function usePatientSearch(
       params.append('pageSize', pagination.pageSize.toString());
 
       // Make API call
-      const response = await fetch(`/api/ehr/patients/search?${params.toString()}`);
+      const response = await fetch(`/api/ehr/customers/search?${params.toString()}`);
       
       if (!response.ok) {
-        throw new Error('Failed to search patients');
+        throw new Error('Failed to search customers');
       }
 
-      const result: PatientSearchResult = await response.json();
+      const result: CustomerSearchResult = await response.json();
 
       // Update state
-      setPatients(result.patients);
+      setPatients(result.customers);
       setTotalCount(result.count);
       setTotalPages(result.totalPages);
       setHasMore(result.hasMore);
@@ -183,33 +183,33 @@ export function usePatientSearch(
   }, []);
 
   // Selection actions
-  const selectPatient = useCallback((patientId: string) => {
-    setSelectedPatients((prev) => new Set(prev).add(patientId));
+  const selectPatient = useCallback((customerId: string) => {
+    setSelectedPatients((prev) => new Set(prev).add(customerId));
   }, []);
 
-  const deselectPatient = useCallback((patientId: string) => {
+  const deselectPatient = useCallback((customerId: string) => {
     setSelectedPatients((prev) => {
       const newSet = new Set(prev);
-      newSet.delete(patientId);
+      newSet.delete(customerId);
       return newSet;
     });
   }, []);
 
   const selectAll = useCallback(() => {
-    setSelectedPatients(new Set(patients.map((p) => p.id)));
-  }, [patients]);
+    setSelectedPatients(new Set(customers.map((p) => p.id)));
+  }, [customers]);
 
   const deselectAll = useCallback(() => {
     setSelectedPatients(new Set());
   }, []);
 
-  const togglePatientSelection = useCallback((patientId: string) => {
+  const togglePatientSelection = useCallback((customerId: string) => {
     setSelectedPatients((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(patientId)) {
-        newSet.delete(patientId);
+      if (newSet.has(customerId)) {
+        newSet.delete(customerId);
       } else {
-        newSet.add(patientId);
+        newSet.add(customerId);
       }
       return newSet;
     });
@@ -257,7 +257,7 @@ export function usePatientSearch(
 
   return {
     // State
-    patients,
+    customers,
     filters,
     sort,
     pagination,

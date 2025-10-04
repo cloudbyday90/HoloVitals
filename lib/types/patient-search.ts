@@ -1,13 +1,13 @@
 /**
- * Patient Search Types
- * Comprehensive type definitions for patient search and management
+ * Customer Search Types
+ * Comprehensive type definitions for customer search and management
  */
 
 // ============================================================================
-// PATIENT TYPES
+// CUSTOMER TYPES
 // ============================================================================
 
-export interface Patient {
+export interface Customer {
   id: string;
   firstName: string;
   lastName: string;
@@ -59,7 +59,7 @@ export interface EmergencyContact {
 // SEARCH TYPES
 // ============================================================================
 
-export interface PatientSearchParams {
+export interface CustomerSearchParams {
   query?: string;
   firstName?: string;
   lastName?: string;
@@ -67,8 +67,8 @@ export interface PatientSearchParams {
   medicalRecordNumber?: string;
   email?: string;
   phone?: string;
-  status?: Patient['status'];
-  gender?: Patient['gender'];
+  status?: Customer['status'];
+  gender?: Customer['gender'];
   ageMin?: number;
   ageMax?: number;
   hasCondition?: string;
@@ -92,8 +92,8 @@ export type PatientSortField =
   | 'createdAt'
   | 'updatedAt';
 
-export interface PatientSearchResult {
-  patients: PatientSummary[];
+export interface CustomerSearchResult {
+  customers: PatientSummary[];
   total: number;
   page: number;
   limit: number;
@@ -108,11 +108,11 @@ export interface PatientSummary {
   fullName: string;
   dateOfBirth: Date;
   age: number;
-  gender: Patient['gender'];
+  gender: Customer['gender'];
   medicalRecordNumber: string;
   email?: string;
   phone?: string;
-  status: Patient['status'];
+  status: Customer['status'];
   lastVisit?: Date;
   nextAppointment?: Date;
   conditionsCount: number;
@@ -170,10 +170,10 @@ export interface SavedSearch {
 }
 
 // ============================================================================
-// PATIENT DETAILS TYPES
+// CUSTOMER DETAILS TYPES
 // ============================================================================
 
-export interface PatientDetails extends Patient {
+export interface CustomerDetails extends Customer {
   vitalSigns: VitalSign[];
   labResults: LabResult[];
   medications: Medication[];
@@ -186,7 +186,7 @@ export interface PatientDetails extends Patient {
 
 export interface VitalSign {
   id: string;
-  patientId: string;
+  customerId: string;
   recordedAt: Date;
   bloodPressureSystolic?: number;
   bloodPressureDiastolic?: number;
@@ -202,7 +202,7 @@ export interface VitalSign {
 
 export interface LabResult {
   id: string;
-  patientId: string;
+  customerId: string;
   testName: string;
   loincCode?: string;
   value: string;
@@ -217,7 +217,7 @@ export interface LabResult {
 
 export interface Medication {
   id: string;
-  patientId: string;
+  customerId: string;
   name: string;
   genericName?: string;
   dosage: string;
@@ -233,7 +233,7 @@ export interface Medication {
 
 export interface Condition {
   id: string;
-  patientId: string;
+  customerId: string;
   code?: string;
   codeSystem?: 'ICD-10' | 'SNOMED-CT';
   description: string;
@@ -247,7 +247,7 @@ export interface Condition {
 
 export interface Allergy {
   id: string;
-  patientId: string;
+  customerId: string;
   allergen: string;
   allergenType: 'medication' | 'food' | 'environmental' | 'other';
   reaction: string;
@@ -259,7 +259,7 @@ export interface Allergy {
 
 export interface Appointment {
   id: string;
-  patientId: string;
+  customerId: string;
   providerId: string;
   providerName: string;
   appointmentType: string;
@@ -273,7 +273,7 @@ export interface Appointment {
 
 export interface Document {
   id: string;
-  patientId: string;
+  customerId: string;
   title: string;
   type: string;
   mimeType: string;
@@ -287,7 +287,7 @@ export interface Document {
 
 export interface ClinicalNote {
   id: string;
-  patientId: string;
+  customerId: string;
   encounterId?: string;
   noteType: 'progress' | 'consultation' | 'discharge' | 'procedure' | 'other';
   subject: string;
@@ -300,14 +300,14 @@ export interface ClinicalNote {
 }
 
 // ============================================================================
-// PATIENT ACTIONS TYPES
+// CUSTOMER ACTIONS TYPES
 // ============================================================================
 
 export interface CreatePatientRequest {
   firstName: string;
   lastName: string;
   dateOfBirth: Date;
-  gender: Patient['gender'];
+  gender: Customer['gender'];
   email?: string;
   phone?: string;
   address?: Address;
@@ -320,24 +320,24 @@ export interface UpdatePatientRequest {
   firstName?: string;
   lastName?: string;
   dateOfBirth?: Date;
-  gender?: Patient['gender'];
+  gender?: Customer['gender'];
   email?: string;
   phone?: string;
   address?: Address;
   insuranceInfo?: InsuranceInfo;
   emergencyContact?: EmergencyContact;
   primaryCareProvider?: string;
-  status?: Patient['status'];
+  status?: Customer['status'];
 }
 
 export interface PatientActionResponse {
   success: boolean;
-  patient?: Patient;
+  customer?: Customer;
   error?: string;
 }
 
 // ============================================================================
-// PATIENT STATISTICS TYPES
+// CUSTOMER STATISTICS TYPES
 // ============================================================================
 
 export interface PatientStatistics {
@@ -379,8 +379,8 @@ export interface PatientStatistics {
 // ============================================================================
 
 export interface PatientExportRequest {
-  patientIds?: string[];
-  filters?: PatientSearchParams;
+  customerIds?: string[];
+  filters?: CustomerSearchParams;
   format: 'csv' | 'excel' | 'pdf' | 'json';
   includeFields: string[];
 }

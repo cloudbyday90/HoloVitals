@@ -44,7 +44,7 @@ export interface SubscriptionPlanDetails {
   currency: string;
   features: string[];
   limits: {
-    patients: number;
+    customers: number;
     storage: number; // in GB
     aiInsights: number; // per month
     users: number;
@@ -214,7 +214,7 @@ export interface UsageRecord {
 
 export type UsageMetric =
   | 'ai_insights_generated'
-  | 'patients_added'
+  | 'customers_added'
   | 'storage_used'
   | 'api_calls'
   | 'ehr_syncs';
@@ -231,7 +231,7 @@ export interface UsageSummary {
       limit: number;
       percentage: number;
     };
-    patients: {
+    customers: {
       used: number;
       limit: number;
       percentage: number;

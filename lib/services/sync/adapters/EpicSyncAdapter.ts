@@ -48,9 +48,9 @@ export class EpicSyncAdapter {
   }
 
   /**
-   * Sync patient data from Epic to HoloVitals (Inbound)
+   * Sync customer data from Epic to HoloVitals (Inbound)
    */
-  async syncPatientInbound(patientId: string): Promise<EpicSyncResult> {
+  async syncPatientInbound(customerId: string): Promise<EpicSyncResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
     const conflicts: any[] = [];
@@ -62,14 +62,14 @@ export class EpicSyncAdapter {
       // Ensure we have a valid access token
       await this.ensureValidToken();
 
-      // Fetch patient data from Epic
-      const epicPatient = await this.fetchPatientFromEpic(patientId);
+      // Fetch customer data from Epic
+      const epicPatient = await this.fetchPatientFromEpic(customerId);
       resourcesProcessed++;
 
       // Transform Epic FHIR data to HoloVitals format
       const transformContext: TransformationContext = {
         ehrProvider: 'epic',
-        resourceType: 'Patient',
+        resourceType: 'Customer',
         direction: 'INBOUND',
         sourceFormat: DataFormat.FHIR_R4,
         targetFormat: DataFormat.CUSTOM_JSON,
@@ -101,11 +101,11 @@ export class EpicSyncAdapter {
 
       warnings.push(...transformResult.warnings.map(w => w.message));
 
-      // Check for existing patient in HoloVitals
-      const existingPatient = await prisma.patient.findFirst({
+      // Check for existing customer in HoloVitals
+      const existingPatient = await prisma.customer.findFirst({
         where: {
           OR: [
-            { epicId: patientId },
+            { epicId: customerId },
             { mrn: transformResult.data.mrn },
           ],
         },
@@ -114,7 +114,7 @@ export class EpicSyncAdapter {
       if (existingPatient) {
         // Detect conflicts
         const conflictResult = await conflictResolutionService.detectConflicts(
-          'Patient',
+          'Customer',
           existingPatient.id,
           existingPatient,
           transformResult.data
@@ -125,7 +125,7 @@ export class EpicSyncAdapter {
 
           // Auto-resolve conflicts
           const resolutions = await conflictResolutionService.autoResolveConflicts(
-            'Patient',
+            'Customer',
             existingPatient.id
           );
 
@@ -137,21 +137,21 @@ export class EpicSyncAdapter {
           }
         }
 
-        // Update existing patient
-        await prisma.patient.update({
+        // Update existing customer
+        await prisma.customer.update({
           where: { id: existingPatient.id },
           data: {
             ...transformResult.data,
-            epicId: patientId,
+            epicId: customerId,
             lastSyncedAt: new Date(),
           },
         });
       } else {
-        // Create new patient
-        await prisma.patient.create({
+        // Create new customer
+        await prisma.customer.create({
           data: {
             ...transformResult.data,
-            epicId: patientId,
+            epicId: customerId,
             lastSyncedAt: new Date(),
           },
         });
@@ -160,10 +160,10 @@ export class EpicSyncAdapter {
       resourcesSucceeded++;
 
       // Sync related resources
-      await this.syncPatientObservations(patientId);
-      await this.syncPatientMedications(patientId);
-      await this.syncPatientAllergies(patientId);
-      await this.syncPatientConditions(patientId);
+      await this.syncPatientObservations(customerId);
+      await this.syncPatientMedications(customerId);
+      await this.syncPatientAllergies(customerId);
+      await this.syncPatientConditions(customerId);
 
       return {
         success: true,
@@ -175,7 +175,7 @@ export class EpicSyncAdapter {
         conflicts,
       };
     } catch (error) {
-      console.error('Error syncing patient from Epic:', error);
+      console.error('Error syncing customer from Epic:', error);
       errors.push(error.message);
       resourcesFailed++;
 
@@ -192,9 +192,9 @@ export class EpicSyncAdapter {
   }
 
   /**
-   * Sync patient data from HoloVitals to Epic (Outbound)
+   * Sync customer data from HoloVitals to Epic (Outbound)
    */
-  async syncPatientOutbound(patientId: string): Promise<EpicSyncResult> {
+  async syncPatientOutbound(customerId: string): Promise<EpicSyncResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
     const conflicts: any[] = [];
@@ -206,13 +206,13 @@ export class EpicSyncAdapter {
       // Ensure we have a valid access token
       await this.ensureValidToken();
 
-      // Fetch patient from HoloVitals
-      const holoPatient = await prisma.patient.findUnique({
-        where: { id: patientId },
+      // Fetch customer from HoloVitals
+      const holoPatient = await prisma.customer.findUnique({
+        where: { id: customerId },
       });
 
       if (!holoPatient) {
-        throw new Error('Patient not found in HoloVitals');
+        throw new Error('Customer not found in HoloVitals');
       }
 
       resourcesProcessed++;
@@ -220,7 +220,7 @@ export class EpicSyncAdapter {
       // Transform HoloVitals data to Epic FHIR format
       const transformContext: TransformationContext = {
         ehrProvider: 'epic',
-        resourceType: 'Patient',
+        resourceType: 'Customer',
         direction: 'OUTBOUND',
         sourceFormat: DataFormat.CUSTOM_JSON,
         targetFormat: DataFormat.FHIR_R4,
@@ -253,15 +253,15 @@ export class EpicSyncAdapter {
 
       // Send to Epic
       if (holoPatient.epicId) {
-        // Update existing patient in Epic
+        // Update existing customer in Epic
         await this.updatePatientInEpic(holoPatient.epicId, transformResult.data);
       } else {
-        // Create new patient in Epic
+        // Create new customer in Epic
         const epicId = await this.createPatientInEpic(transformResult.data);
         
-        // Update HoloVitals patient with Epic ID
-        await prisma.patient.update({
-          where: { id: patientId },
+        // Update HoloVitals customer with Epic ID
+        await prisma.customer.update({
+          where: { id: customerId },
           data: { epicId },
         });
       }
@@ -278,7 +278,7 @@ export class EpicSyncAdapter {
         conflicts,
       };
     } catch (error) {
-      console.error('Error syncing patient to Epic:', error);
+      console.error('Error syncing customer to Epic:', error);
       errors.push(error.message);
       resourcesFailed++;
 
@@ -295,11 +295,11 @@ export class EpicSyncAdapter {
   }
 
   /**
-   * Sync patient observations
+   * Sync customer observations
    */
-  private async syncPatientObservations(patientId: string): Promise<void> {
+  private async syncPatientObservations(customerId: string): Promise<void> {
     try {
-      const observations = await this.fetchObservationsFromEpic(patientId);
+      const observations = await this.fetchObservationsFromEpic(customerId);
       
       for (const observation of observations) {
         const transformContext: TransformationContext = {
@@ -317,7 +317,7 @@ export class EpicSyncAdapter {
 
         if (transformResult.success) {
           // Save observation to database
-          await this.saveObservation(patientId, transformResult.data);
+          await this.saveObservation(customerId, transformResult.data);
         }
       }
     } catch (error) {
@@ -326,11 +326,11 @@ export class EpicSyncAdapter {
   }
 
   /**
-   * Sync patient medications
+   * Sync customer medications
    */
-  private async syncPatientMedications(patientId: string): Promise<void> {
+  private async syncPatientMedications(customerId: string): Promise<void> {
     try {
-      const medications = await this.fetchMedicationsFromEpic(patientId);
+      const medications = await this.fetchMedicationsFromEpic(customerId);
       
       for (const medication of medications) {
         const transformContext: TransformationContext = {
@@ -347,7 +347,7 @@ export class EpicSyncAdapter {
         );
 
         if (transformResult.success) {
-          await this.saveMedication(patientId, transformResult.data);
+          await this.saveMedication(customerId, transformResult.data);
         }
       }
     } catch (error) {
@@ -356,11 +356,11 @@ export class EpicSyncAdapter {
   }
 
   /**
-   * Sync patient allergies
+   * Sync customer allergies
    */
-  private async syncPatientAllergies(patientId: string): Promise<void> {
+  private async syncPatientAllergies(customerId: string): Promise<void> {
     try {
-      const allergies = await this.fetchAllergiesFromEpic(patientId);
+      const allergies = await this.fetchAllergiesFromEpic(customerId);
       
       for (const allergy of allergies) {
         const transformContext: TransformationContext = {
@@ -377,7 +377,7 @@ export class EpicSyncAdapter {
         );
 
         if (transformResult.success) {
-          await this.saveAllergy(patientId, transformResult.data);
+          await this.saveAllergy(customerId, transformResult.data);
         }
       }
     } catch (error) {
@@ -386,11 +386,11 @@ export class EpicSyncAdapter {
   }
 
   /**
-   * Sync patient conditions
+   * Sync customer conditions
    */
-  private async syncPatientConditions(patientId: string): Promise<void> {
+  private async syncPatientConditions(customerId: string): Promise<void> {
     try {
-      const conditions = await this.fetchConditionsFromEpic(patientId);
+      const conditions = await this.fetchConditionsFromEpic(customerId);
       
       for (const condition of conditions) {
         const transformContext: TransformationContext = {
@@ -407,7 +407,7 @@ export class EpicSyncAdapter {
         );
 
         if (transformResult.success) {
-          await this.saveCondition(patientId, transformResult.data);
+          await this.saveCondition(customerId, transformResult.data);
         }
       }
     } catch (error) {
@@ -416,11 +416,11 @@ export class EpicSyncAdapter {
   }
 
   /**
-   * Fetch patient from Epic FHIR API
+   * Fetch customer from Epic FHIR API
    */
-  private async fetchPatientFromEpic(patientId: string): Promise<any> {
+  private async fetchPatientFromEpic(customerId: string): Promise<any> {
     const response = await fetch(
-      `${this.config.baseUrl}/api/FHIR/R4/Patient/${patientId}`,
+      `${this.config.baseUrl}/api/FHIR/R4/Customer/${customerId}`,
       {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
@@ -439,9 +439,9 @@ export class EpicSyncAdapter {
   /**
    * Fetch observations from Epic
    */
-  private async fetchObservationsFromEpic(patientId: string): Promise<any[]> {
+  private async fetchObservationsFromEpic(customerId: string): Promise<any[]> {
     const response = await fetch(
-      `${this.config.baseUrl}/api/FHIR/R4/Observation?patient=${patientId}`,
+      `${this.config.baseUrl}/api/FHIR/R4/Observation?customer=${customerId}`,
       {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
@@ -461,9 +461,9 @@ export class EpicSyncAdapter {
   /**
    * Fetch medications from Epic
    */
-  private async fetchMedicationsFromEpic(patientId: string): Promise<any[]> {
+  private async fetchMedicationsFromEpic(customerId: string): Promise<any[]> {
     const response = await fetch(
-      `${this.config.baseUrl}/api/FHIR/R4/MedicationRequest?patient=${patientId}`,
+      `${this.config.baseUrl}/api/FHIR/R4/MedicationRequest?customer=${customerId}`,
       {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
@@ -483,9 +483,9 @@ export class EpicSyncAdapter {
   /**
    * Fetch allergies from Epic
    */
-  private async fetchAllergiesFromEpic(patientId: string): Promise<any[]> {
+  private async fetchAllergiesFromEpic(customerId: string): Promise<any[]> {
     const response = await fetch(
-      `${this.config.baseUrl}/api/FHIR/R4/AllergyIntolerance?patient=${patientId}`,
+      `${this.config.baseUrl}/api/FHIR/R4/AllergyIntolerance?customer=${customerId}`,
       {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
@@ -505,9 +505,9 @@ export class EpicSyncAdapter {
   /**
    * Fetch conditions from Epic
    */
-  private async fetchConditionsFromEpic(patientId: string): Promise<any[]> {
+  private async fetchConditionsFromEpic(customerId: string): Promise<any[]> {
     const response = await fetch(
-      `${this.config.baseUrl}/api/FHIR/R4/Condition?patient=${patientId}`,
+      `${this.config.baseUrl}/api/FHIR/R4/Condition?customer=${customerId}`,
       {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
@@ -525,18 +525,18 @@ export class EpicSyncAdapter {
   }
 
   /**
-   * Create patient in Epic
+   * Create customer in Epic
    */
-  private async createPatientInEpic(patientData: any): Promise<string> {
+  private async createPatientInEpic(customerData: any): Promise<string> {
     const response = await fetch(
-      `${this.config.baseUrl}/api/FHIR/R4/Patient`,
+      `${this.config.baseUrl}/api/FHIR/R4/Customer`,
       {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
           'Content-Type': 'application/fhir+json',
         },
-        body: JSON.stringify(patientData),
+        body: JSON.stringify(customerData),
       }
     );
 
@@ -549,18 +549,18 @@ export class EpicSyncAdapter {
   }
 
   /**
-   * Update patient in Epic
+   * Update customer in Epic
    */
-  private async updatePatientInEpic(patientId: string, patientData: any): Promise<void> {
+  private async updatePatientInEpic(customerId: string, customerData: any): Promise<void> {
     const response = await fetch(
-      `${this.config.baseUrl}/api/FHIR/R4/Patient/${patientId}`,
+      `${this.config.baseUrl}/api/FHIR/R4/Customer/${customerId}`,
       {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
           'Content-Type': 'application/fhir+json',
         },
-        body: JSON.stringify(patientData),
+        body: JSON.stringify(customerData),
       }
     );
 
@@ -572,33 +572,33 @@ export class EpicSyncAdapter {
   /**
    * Save observation to database
    */
-  private async saveObservation(patientId: string, data: any): Promise<void> {
+  private async saveObservation(customerId: string, data: any): Promise<void> {
     // Implementation would save to appropriate database table
-    console.log('Saving observation for patient:', patientId);
+    console.log('Saving observation for customer:', customerId);
   }
 
   /**
    * Save medication to database
    */
-  private async saveMedication(patientId: string, data: any): Promise<void> {
+  private async saveMedication(customerId: string, data: any): Promise<void> {
     // Implementation would save to appropriate database table
-    console.log('Saving medication for patient:', patientId);
+    console.log('Saving medication for customer:', customerId);
   }
 
   /**
    * Save allergy to database
    */
-  private async saveAllergy(patientId: string, data: any): Promise<void> {
+  private async saveAllergy(customerId: string, data: any): Promise<void> {
     // Implementation would save to appropriate database table
-    console.log('Saving allergy for patient:', patientId);
+    console.log('Saving allergy for customer:', customerId);
   }
 
   /**
    * Save condition to database
    */
-  private async saveCondition(patientId: string, data: any): Promise<void> {
+  private async saveCondition(customerId: string, data: any): Promise<void> {
     // Implementation would save to appropriate database table
-    console.log('Saving condition for patient:', patientId);
+    console.log('Saving condition for customer:', customerId);
   }
 
   /**

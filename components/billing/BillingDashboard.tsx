@@ -20,7 +20,7 @@ interface BillingDashboardProps {
   subscriptionStatus?: string;
   currentPeriodEnd?: Date;
   usage: {
-    patients: number;
+    customers: number;
     storage: number;
     aiInsights: number;
     ehrConnections: number;
@@ -163,14 +163,14 @@ export function BillingDashboard({
       {/* Usage Warning */}
       {currentPlanDetails && (
         <>
-          {usage.patients >= currentPlanDetails.limits.patients * 0.9 &&
-            currentPlanDetails.limits.patients !== -1 && (
+          {usage.customers >= currentPlanDetails.limits.customers * 0.9 &&
+            currentPlanDetails.limits.customers !== -1 && (
               <Alert>
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Approaching Patient Limit</AlertTitle>
+                <AlertTitle>Approaching Customer Limit</AlertTitle>
                 <AlertDescription>
-                  You're using {usage.patients} of {currentPlanDetails.limits.patients} patients.
-                  Consider upgrading your plan to add more patients.
+                  You're using {usage.customers} of {currentPlanDetails.limits.customers} customers.
+                  Consider upgrading your plan to add more customers.
                 </AlertDescription>
               </Alert>
             )}
