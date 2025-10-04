@@ -1,0 +1,2996 @@
+// HoloVitals Complete Database Schema
+// Includes: Base platform + AI Architecture + All Repository Systems
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+// ============================================================================
+// USER MANAGEMENT & AUTHENTICATION
+// ============================================================================
+
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum AccessRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+  REVOKED
+}
+
+enum AccessRequestType {
+  FULL_RECORD
+  SPECIFIC_RECORDS
+  DATE_RANGE
+}
+
+enum AccessReviewType {
+  USER_ACCESS
+  ROLE_ASSIGNMENT
+  PERMISSION_AUDIT
+  EMERGENCY_ACCESS
+  COMPREHENSIVE
+}
+
+enum AccessUrgency {
+  LOW
+  NORMAL
+  HIGH
+  EMERGENCY
+}
+
+enum AgreementType {
+  BAA
+  DPA
+  CONSENT
+  TERMS_OF_SERVICE
+  PRIVACY_POLICY
+}
+
+enum AlertSeverity {
+  INFO
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AlertStatus {
+  NEW
+  ACKNOWLEDGED
+  INVESTIGATING
+  RESOLVED
+  FALSE_POSITIVE
+  IGNORED
+}
+
+enum AuditEventCategory {
+  AUTHENTICATION
+  AUTHORIZATION
+  DATA_ACCESS
+  DATA_MODIFICATION
+  ADMINISTRATIVE
+  SECURITY
+  SYSTEM
+  COMPLIANCE
+}
+
+enum AuditEventType {
+  // Authentication Events
+  LOGIN_SUCCESS
+  LOGIN_FAILURE
+  LOGOUT
+  PASSWORD_CHANGE
+  PASSWORD_RESET
+  MFA_ENABLED
+  MFA_DISABLED
+  MFA_SUCCESS
+  MFA_FAILURE
+  SESSION_CREATED
+  SESSION_EXPIRED
+  SESSION_TERMINATED
+  
+  // Authorization Events
+  ACCESS_GRANTED
+  ACCESS_DENIED
+  PERMISSION_CHANGED
+  ROLE_ASSIGNED
+  ROLE_REMOVED
+  EMERGENCY_ACCESS
+  
+  // Data Access Events
+  PHI_VIEWED
+  PHI_CREATED
+  PHI_UPDATED
+  PHI_DELETED
+  PHI_EXPORTED
+  PHI_PRINTED
+  PHI_SEARCHED
+  RECORD_ACCESSED
+  
+  // Administrative Events
+  USER_CREATED
+  USER_UPDATED
+  USER_DELETED
+  USER_ACTIVATED
+  USER_DEACTIVATED
+  CONFIG_CHANGED
+  SECURITY_POLICY_CHANGED
+  SYSTEM_UPDATED
+  
+  // Security Events
+  FAILED_ACCESS_ATTEMPT
+  SUSPICIOUS_ACTIVITY
+  SECURITY_VIOLATION
+  BREACH_ATTEMPT
+  VULNERABILITY_DETECTED
+  MALWARE_DETECTED
+  
+  // System Events
+  SYSTEM_STARTUP
+  SYSTEM_SHUTDOWN
+  BACKUP_CREATED
+  BACKUP_RESTORED
+  DATA_MIGRATION
+  
+  // Compliance Events
+  CONSENT_GIVEN
+  CONSENT_REVOKED
+  DATA_REQUEST
+  DATA_DISCLOSURE
+  BREACH_NOTIFICATION
+}
+
+enum AuditOutcome {
+  SUCCESS
+  FAILURE
+  PARTIAL_SUCCESS
+  DENIED
+  ERROR
+}
+
+enum BreachSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum BreachType {
+  UNAUTHORIZED_ACCESS
+  UNAUTHORIZED_DISCLOSURE
+  THEFT
+  LOSS
+  IMPROPER_DISPOSAL
+  HACKING
+  MALWARE
+  PHISHING
+  INSIDER_THREAT
+  SYSTEM_ERROR
+  OTHER
+}
+
+enum BulkExportStatus {
+  INITIATED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  EXPIRED
+  CANCELLED
+}
+
+enum BulkExportType {
+  CUSTOMER
+  GROUP
+  SYSTEM
+}
+
+enum CommunicationType {
+  EMAIL
+  PHONE
+  MAIL
+}
+
+enum ComplianceReportType {
+  HIPAA_SECURITY
+  HIPAA_PRIVACY
+  ACCESS_REVIEW
+  AUDIT_LOG_REVIEW
+  SECURITY_ASSESSMENT
+  RISK_ASSESSMENT
+  INCIDENT_SUMMARY
+  TRAINING_COMPLIANCE
+}
+
+enum ComplianceStatus {
+  COMPLIANT
+  PARTIALLY_COMPLIANT
+  NON_COMPLIANT
+  UNDER_REVIEW
+}
+
+enum ComponentType {
+  CHEMISTRY
+  HEMATOLOGY
+  MICROBIOLOGY
+  IMMUNOLOGY
+  TOXICOLOGY
+  GENETICS
+  PATHOLOGY
+  VITAL_SIGNS
+  OTHER
+}
+
+enum ConnectionStatus {
+  PENDING           // Awaiting user authorization
+  ACTIVE            // Connected and syncing
+  EXPIRED           // Token expired, needs reauth
+  REVOKED           // User revoked access
+  ERROR             // Connection error
+  DISCONNECTED      // User disconnected
+}
+
+enum ConsentStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  REVOKED
+  SUPERSEDED
+}
+
+enum ConsentType {
+  TREATMENT
+  PAYMENT
+  OPERATIONS
+  RESEARCH
+  MARKETING
+  DISCLOSURE
+  ELECTRONIC_COMMUNICATION
+  DATA_SHARING
+}
+
+enum DataRegion {
+  US_EAST
+  US_WEST
+  EU_WEST
+  EU_CENTRAL
+  CA_CENTRAL
+  UK
+}
+
+enum DeliveryMethod {
+  ELECTRONIC
+  PAPER
+  PICKUP
+}
+
+enum EHRProvider {
+  EPIC
+  CERNER
+  ALLSCRIPTS
+  ATHENAHEALTH
+  ECLINICALWORKS
+  NEXTGEN
+  MEDITECH
+  PRACTICE_FUSION
+  GREENWAY
+  OTHER
+}
+
+enum FHIRResourceType {
+  CUSTOMER
+  DOCUMENT_REFERENCE
+  OBSERVATION
+  CONDITION
+  MEDICATION_REQUEST
+  ALLERGY_INTOLERANCE
+  IMMUNIZATION
+  PROCEDURE
+  DIAGNOSTIC_REPORT
+  CARE_PLAN
+  ENCOUNTER
+  PRACTITIONER
+  ORGANIZATION
+  OTHER
+}
+
+enum FileProcessingStatus {
+  PENDING              // Awaiting cost approval
+  APPROVED             // Cost approved, queued for processing
+  PROCESSING           // Currently being processed
+  COMPLETED            // Successfully processed
+  FAILED               // Processing failed
+  CANCELLED            // User cancelled
+  SCHEDULED            // Multi-month processing scheduled
+}
+
+enum InvestigationStatus {
+  PENDING
+  ONGOING
+  COMPLETED
+  CLOSED
+}
+
+enum Jurisdiction {
+  USA
+  CANADA_ONTARIO
+  CANADA_ALBERTA
+  CANADA_BC
+  EU
+  UK
+}
+
+enum KeyStatus {
+  PENDING
+  ACTIVE
+  DEACTIVATED
+  COMPROMISED
+  DESTROYED
+}
+
+enum KeyType {
+  MASTER_KEY
+  DATA_ENCRYPTION_KEY
+  KEY_ENCRYPTION_KEY
+}
+
+enum LOINCCategory {
+  LABORATORY
+  CLINICAL
+  SURVEY
+  CLAIMS
+  DOCUMENT
+  RADIOLOGY
+}
+
+enum NotificationStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  NOT_REQUIRED
+}
+
+enum PermissionScope {
+  OWN       // User's own data only
+  ASSIGNED  // Assigned customers/resources
+  DEPARTMENT // Department-level access
+  ORGANIZATION // Organization-level access
+  SYSTEM    // System-wide access
+}
+
+enum ReferenceRangeType {
+  NORMAL
+  CRITICAL_LOW
+  CRITICAL_HIGH
+  THERAPEUTIC
+  TOXIC
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  DENIED
+  FULFILLED
+  CANCELLED
+}
+
+enum RestrictionType {
+  USE
+  DISCLOSURE
+  BOTH
+}
+
+enum ReviewStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum SecurityAlertType {
+  FAILED_LOGIN_ATTEMPTS
+  SUSPICIOUS_ACCESS_PATTERN
+  UNAUTHORIZED_ACCESS_ATTEMPT
+  DATA_EXFILTRATION
+  PRIVILEGE_ESCALATION
+  MALWARE_DETECTED
+  VULNERABILITY_EXPLOIT
+  POLICY_VIOLATION
+  ANOMALOUS_BEHAVIOR
+  BRUTE_FORCE_ATTACK
+  SQL_INJECTION_ATTEMPT
+  XSS_ATTEMPT
+  CSRF_ATTEMPT
+  DDOS_ATTACK
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+  TRIAL
+}
+
+enum SubscriptionTier {
+  BASIC         // $9.99/month, 10MB free upload, 100K tokens/month
+  PROFESSIONAL  // $29.99/month, 25MB free upload, 500K tokens/month
+  ENTERPRISE    // $99.99/month, 100MB free upload, 2M tokens/month
+}
+
+enum SyncStatus {
+  IDLE              // Not syncing
+  QUEUED            // Queued for sync
+  SYNCING           // Currently syncing
+  COMPLETED         // Sync completed successfully
+  FAILED            // Sync failed
+  CANCELLED         // Sync cancelled by user
+}
+
+enum TokenTransactionType {
+  INITIAL_DEPOSIT      // First-time subscription tokens
+  MONTHLY_REFRESH      // Monthly token top-up
+  PURCHASE             // One-time token purchase
+  DEDUCTION            // Token usage
+  REFUND               // Token refund
+  BONUS                // Promotional tokens
+  ADJUSTMENT           // Manual adjustment
+}
+
+enum TwoFactorMethod {
+  TOTP_2FA
+  SMS_2FA
+}
+
+enum UnitSystem {
+  UCUM  // Unified Code for Units of Measure
+  SI    // International System of Units
+  CONVENTIONAL
+}
+
+
+// ============================================================================
+// MODELS
+// ============================================================================
+
+model AccessLog {
+  id            String    @id @default(uuid())
+  consentId     String    @map("consent_id")
+  specialistId  String    @map("specialist_id")
+  action        String
+  resource      String
+  ipAddress     String?   @map("ip_address")
+  userAgent     String?   @map("user_agent")
+  details       String?   @db.Text
+  timestamp     DateTime  @default(now())
+  success       Boolean   @default(true)
+  
+  consent       ConsentGrant @relation(fields: [consentId], references: [id], onDelete: Cascade)
+  
+  @@map("access_logs")
+  @@index([consentId])
+  @@index([specialistId])
+  @@index([timestamp])
+}
+
+model AccessRequest {
+  id              String   @id @default(cuid())
+  
+  // Requester Information
+  requesterId     String
+  requesterName   String
+  requesterRole   String
+  
+  // Request Details
+  resourceType    String
+  resourceId      String
+  accessType      String   // e.g., "read", "write", "emergency"
+  reason          String
+  urgency         AccessUrgency @default(NORMAL)
+  
+  // Emergency Access
+  isEmergency     Boolean  @default(false)
+  emergencyReason String?
+  
+  // Approval Workflow
+  status          AccessRequestStatus @default(PENDING)
+  approvedBy      String?
+  approvedAt      DateTime?
+  rejectedBy      String?
+  rejectedAt      DateTime?
+  rejectionReason String?
+  
+  // Access Period
+  requestedAt     DateTime @default(now())
+  accessStartTime DateTime?
+  accessEndTime   DateTime?
+  
+  // Audit Trail
+  reviewNotes     String?
+  auditLogId      String?
+  
+  @@index([requesterId])
+  @@index([status])
+  @@index([resourceType, resourceId])
+  @@map("access_requests")
+}
+
+model AccessReview {
+  id          String   @id @default(cuid())
+  
+  // Review Information
+  reviewType  AccessReviewType
+  reviewPeriodStart DateTime
+  reviewPeriodEnd   DateTime
+  
+  // Scope
+  userId      String?
+  departmentId String?
+  
+  // Status
+  status      ReviewStatus @default(PENDING)
+  scheduledAt DateTime
+  startedAt   DateTime?
+  completedAt DateTime?
+  
+  // Results
+  findings    Json?
+  actions     Json?
+  
+  // Reviewers
+  assignedTo  String?
+  reviewedBy  String?
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("access_reviews")
+}
+
+model AiInteraction {
+  id                String    @id @default(uuid())
+  sessionId         String    @map("session_id")
+  query             String    @db.Text
+  response          String?   @db.Text
+  contextDocuments  String[]  @map("context_documents")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  
+  session           AnalysisSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@map("ai_interactions")
+}
+
+model AnalysisCost {
+  id        String   @id @default(cuid())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  taskId    String
+  timestamp DateTime @default(now())
+  
+  inputTokens  Int
+  outputTokens Int
+  totalTokens  Int
+  
+  modelCost      Float
+  infrastructureCost Float
+  totalCost      Float
+  
+
+model AnalysisQueue {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type      String
+  priority  Int      @default(3)
+  
+  prompt    String   @db.Text
+  documents Json
+  
+  totalTokens      Int
+  contextWindow    Int
+  needsSplitting   Boolean @default(false)
+  splitStrategy    String?
+  estimatedCost    Float
+  recommendedModel String
+  
+  status    String   @default("queued")
+  
+  createdAt   DateTime @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+  
+  result    Json?
+  error     String?  @db.Text
+  
+  instanceId String?
+  instance   CloudInstance? @relation(fields: [instanceId], references: [id])
+  
+  actualCost Float?
+  
+  @@index([userId])
+  @@index([status])
+  @@index([priority, createdAt])
+  @@index([createdAt])
+  @@map("analysis_queue")
+}
+
+model AnalysisSession {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  customerId     String?   @map("customer_id")
+  sessionType   String    @map("session_type")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customer       Customer?  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  interactions  AiInteraction[]
+  
+  @@map("analysis_sessions")
+}
+
+model AnalysisTask {
+  id                      String    @id @default(cuid())
+  userId                  String
+  type                    String
+  priority                String
+  status                  String
+  progress                Int       @default(0)
+  data                    String    @db.Text
+  result                  String?   @db.Text
+  error                   String?   @db.Text
+  retryCount              Int       @default(0)
+  maxRetries              Int       @default(2)
+  estimatedCompletionTime DateTime?
+  startedAt               DateTime?
+  completedAt             DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  metadata                String?   @db.Text
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cloudInstances CloudInstance[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([priority])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model AthenaHealthSpecificData {
+  id              String   @id @default(cuid())
+  
+  // Resource reference
+  resourceType    String
+  resourceId      String   @unique
+  
+  // User reference
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // DiagnosticReport fields
+  reportType      String?
+  status          String?
+  category        String?
+  effectiveDateTime DateTime?
+  issued          DateTime?
+  conclusion      String?
+  presentedForm   Json?    // Array of attachments
+  
+  // CarePlan fields
+  intent          String?
+  title           String?
+  description     String?
+  period          Json?    // { start, end }
+  activities      Json?    // Array of activities
+  
+  // Encounter fields
+  class           String?
+  type            String?
+  reasonCode      Json?    // Array of reason codes
+  diagnosis       Json?    // Array of diagnoses
+  hospitalization Json?    // Hospitalization details
+  
+  // Appointment fields
+  appointmentType String?
+  start           DateTime?
+  end             DateTime?
+  minutesDuration Int?
+  comment         String?
+  
+  // DocumentReference fields
+  date            DateTime?
+  content         Json?    // Array of content attachments
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([resourceType])
+  @@index([resourceId])
+}
+
+model AuditLog {
+  id              String    @id @default(uuid())
+  userId          String    @map("user_id")
+  action          String
+  resource        String
+  resourceId      String    @map("resource_id")
+  details         String?   @db.Text
+  ipAddress       String?   @map("ip_address")
+  userAgent       String?   @map("user_agent")
+  sessionId       String?   @map("session_id")
+  severity        String
+  requiresReview  Boolean   @default(false) @map("requires_review")
+  reviewed        Boolean   @default(false)
+  reviewedBy      String?   @map("reviewed_by")
+  reviewedAt      DateTime? @map("reviewed_at")
+  reviewNotes     String?   @map("review_notes") @db.Text
+  consentId       String?   @map("consent_id")
+  timestamp       DateTime  @default(now())
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("audit_logs")
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([timestamp])
+  @@index([severity])
+  @@index([requiresReview])
+}
+
+model AuditLogArchive {
+  id          String   @id @default(cuid())
+  
+  // Archive Information
+  archiveDate DateTime
+  startDate   DateTime
+  endDate     DateTime
+  recordCount Int
+  
+  // Storage
+  storagePath String
+  fileSize    Int
+  compressed  Boolean  @default(true)
+  encrypted   Boolean  @default(true)
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  createdBy   String
+  
+  @@index([archiveDate])
+  @@map("audit_log_archives")
+}
+
+model BreachIncident {
+  id                String   @id @default(cuid())
+  
+  // Incident Information
+  incidentNumber    String   @unique
+  discoveredAt      DateTime
+  reportedAt        DateTime @default(now())
+  
+  // Breach Details
+  breachType        BreachType
+  description       String
+  causeOfBreach     String
+  
+  // Affected Data
+  affectedRecords   Int
+  affectedIndividuals Int
+  dataTypes         Json     // Types of PHI affected
+  
+  // Risk Assessment
+  riskLevel         RiskLevel
+  riskAssessment    String
+  
+  // Affected Parties
+  affectedCustomerIds String[]
+  affectedUserIds    String[]
+  
+  // Notification Status
+  notificationStatus NotificationStatus @default(PENDING)
+  individualsNotifiedAt DateTime?
+  hhsNotifiedAt      DateTime?
+  mediaNotifiedAt    DateTime?
+  
+  // Investigation
+  investigationStatus InvestigationStatus @default(ONGOING)
+  investigationNotes  String?
+  rootCause          String?
+  
+  // Remediation
+  remediationActions Json?
+  remediationStatus  String?
+  remediationCompletedAt DateTime?
+  
+  // Documentation
+  documents          Json?    // Links to related documents
+  
+  // Metadata
+  createdBy          String
+  updatedAt          DateTime @updatedAt
+  
+  @@index([discoveredAt])
+  @@index([notificationStatus])
+  @@index([riskLevel])
+  @@map("breach_incidents")
+}
+
+model BreachNotification {
+  id                              String          @id @default(cuid())
+  
+  // Breach Details
+  breachType                      BreachType
+  severity                        BreachSeverity
+  discoveryDate                   DateTime
+  affectedUsers                   Int
+  affectedRecords                 Int
+  description                     String          @db.Text
+  containmentActions              String[]
+  
+  // Affected Data
+  affectedDataTypes               String[]        // e.g., ["PHI", "PII", "Financial"]
+  affectedUserIds                 String[]        // List of affected user IDs
+  
+  // Notification Tracking - HIPAA (60 days)
+  hipaaNotificationStatus         NotificationStatus @default(PENDING)
+  hipaaNotificationDate           DateTime?
+  hipaaIndividualsNotified        Int             @default(0)
+  
+  // Notification Tracking - GDPR (72 hours)
+  gdprNotificationStatus          NotificationStatus @default(PENDING)
+  gdprNotificationDate            DateTime?
+  gdprIndividualsNotified         Int             @default(0)
+  
+  // Notification Tracking - PHIPA (immediate if harm)
+  phipaNotificationStatus         NotificationStatus @default(PENDING)
+  phipaNotificationDate           DateTime?
+  phipaIndividualsNotified        Int             @default(0)
+  
+  // Regulatory Reporting - USA
+  hhsReported                     Boolean         @default(false)
+  hhsReportDate                   DateTime?
+  hhsReportNumber                 String?
+  
+  // Regulatory Reporting - EU
+  supervisoryAuthorityReported    Boolean         @default(false)
+  supervisoryAuthorityReportDate  DateTime?
+  supervisoryAuthority            String?         // e.g., "ICO", "CNIL"
+  
+  // Regulatory Reporting - Canada
+  privacyCommissionerReported     Boolean         @default(false)
+  privacyCommissionerReportDate   DateTime?
+  privacyCommissioner             String?         // e.g., "IPC Ontario"
+  
+  // Media Notification (if >500 affected)
+  mediaNotificationRequired       Boolean         @default(false)
+  mediaNotificationDate           DateTime?
+  
+  // Resolution
+  resolved                        Boolean         @default(false)
+  resolvedDate                    DateTime?
+  resolutionNotes                 String?         @db.Text
+  
+  // Post-Incident Review
+  postIncidentReviewCompleted     Boolean         @default(false)
+  postIncidentReviewDate          DateTime?
+  lessonsLearned                  String?         @db.Text
+  preventiveMeasures              String[]
+  
+  // Metadata
+  createdAt                       DateTime        @default(now())
+  updatedAt                       DateTime        @updatedAt
+  createdBy                       String
+  
+  @@index([severity])
+  @@index([discoveryDate])
+  @@index([hipaaNotificationStatus])
+  @@index([gdprNotificationStatus])
+  @@index([phipaNotificationStatus])
+  @@index([resolved])
+}
+
+model BulkExportJob {
+  id                    String            @id @default(uuid())
+  connectionId          String            @map("connection_id")
+  exportType            BulkExportType    @map("export_type")
+  status                BulkExportStatus  @default(INITIATED)
+  
+  // Export URLs
+  kickoffUrl            String?           @map("kickoff_url")
+  statusUrl             String?           @map("status_url")
+  outputUrls            String?           @db.Text @map("output_urls") // JSON array
+  
+  // Export parameters
+  resourceTypes         String?           @db.Text @map("resource_types") // JSON array
+  since                 DateTime?         // Only resources modified after this date
+  
+  // Progress tracking
+  startedAt             DateTime          @default(now()) @map("started_at")
+  completedAt           DateTime?         @map("completed_at")
+  expiresAt             DateTime?         @map("expires_at")
+  
+  // Metrics
+  resourceCount         Int               @default(0) @map("resource_count")
+  totalSize             BigInt            @default(0) @map("total_size") // bytes
+  
+  // Error tracking
+  errorMessage          String?           @db.Text @map("error_message")
+  errorDetails          String?           @db.Text @map("error_details") // JSON
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: additional export details
+  
+  connection            EHRConnection     @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  
+  @@index([connectionId])
+  @@index([status])
+  @@index([startedAt])
+  @@map("bulk_export_jobs")
+}
+
+model CPTCode {
+  id              String      @id @default(cuid())
+  code            String      @unique // e.g., "99213"
+  
+  // Display
+  description     String      // Full description
+  shortDescription String?    // Abbreviated description
+  
+  // Classification
+  category        String      // e.g., "Evaluation and Management"
+  subcategory     String?
+  
+  // Billing
+  rvuWork         Float?      // Relative Value Unit - Work
+  rvuPractice     Float?      // RVU - Practice Expense
+  rvuMalpractice  Float?      // RVU - Malpractice
+  
+  // Status
+  status          String      @default("ACTIVE")
+  effectiveDate   DateTime    @default(now())
+  
+  // Metadata
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([code])
+  @@index([description])
+  @@index([category])
+  @@index([status])
+}
+
+model ChatConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title     String?
+  startedAt DateTime @default(now())
+  lastMessageAt DateTime @default(now())
+  
+  messages  ChatMessage[]
+  
+  @@index([userId])
+  @@index([lastMessageAt])
+  @@map("chat_conversations")
+}
+
+model ChatMessage {
+  id             String   @id @default(cuid())
+  conversationId String
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  role           String
+  content        String   @db.Text
+  timestamp      DateTime @default(now())
+  
+  type           String   @default("quick")
+  confidence     Float?
+  
+  needsEscalation Boolean @default(false)
+  escalationReason String? @db.Text
+  escalatedToTaskId String?
+  
+  documentId     String?
+  analysisId     String?
+  
+  metadata       Json?
+  
+  @@index([conversationId])
+  @@index([timestamp])
+  @@map("chat_messages")
+}
+
+model ChatbotCost {
+  id        String   @id @default(cuid())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  messageId String
+  timestamp DateTime @default(now())
+  
+  inputTokens  Int
+  outputTokens Int
+  totalTokens  Int
+  
+  cost      Float
+  
+
+  model CloudInstance {
+    id                  String    @id @default(cuid())
+    userId              String
+    user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    taskId              String?
+    task                AnalysisTask? @relation(fields: [taskId], references: [id], onDelete: SetNull)
+    
+    provider            String
+    instanceType        String
+    region              String
+    cloudInstanceId     String?
+    
+    publicIp            String?
+    privateIp           String?
+    
+    status              String
+    
+    diskSizeGB          Int       @default(100)
+    autoTerminateMinutes Int      @default(60)
+    
+    costPerHour         Float
+    totalCost           Float     @default(0)
+    
+    purpose             String?
+    metadata            Json?
+    
+    tasks               AnalysisQueue[]
+    
+    createdAt           DateTime  @default(now())
+    terminatedAt        DateTime?
+    updatedAt           DateTime  @updatedAt
+    
+    @@index([userId])
+    @@index([taskId])
+    @@index([status])
+    @@index([provider])
+    @@index([createdAt])
+    @@map("cloud_instances")
+  }
+
+model CodeMapping {
+  id              String      @id @default(cuid())
+  
+  // Source (LOINC)
+  loincCode       String
+  loinc           LOINCCode   @relation(fields: [loincCode], references: [loincNumber], onDelete: Cascade)
+  
+  // Target System
+  targetSystem    String      // e.g., "SNOMED-CT", "CPT", "ICD-10"
+  targetCode      String
+  targetName      String?
+  
+  // Relationship
+  relationship    String      // EQUIVALENT, BROADER, NARROWER, RELATED
+  confidence      Float       @default(1.0) // 0-1
+  
+  // Source
+  source          String      @default("Manual")
+  
+  // Metadata
+  createdAt       DateTime    @default(now())
+  
+  @@unique([loincCode, targetSystem, targetCode])
+  @@index([loincCode])
+  @@index([targetSystem])
+  @@index([targetCode])
+  @@index([confidence])
+}
+
+model ComplianceChecklist {
+  id              String   @id @default(cuid())
+  
+  // Checklist Details
+  jurisdiction    Jurisdiction
+  category        String   // ENCRYPTION, LEGAL, BREACH_RESPONSE, etc.
+  requirement     String
+  description     String   @db.Text
+  
+  // Status
+  status          String   @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, COMPLETED
+  completedDate   DateTime?
+  completedBy     String?
+  
+  // Evidence
+  evidenceUrl     String?
+  evidenceNotes   String?  @db.Text
+  
+  // Priority
+  priority        String   // CRITICAL, HIGH, MEDIUM, LOW
+  dueDate         DateTime?
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([jurisdiction])
+  @@index([status])
+  @@index([priority])
+  @@index([dueDate])
+}
+
+model ComplianceReport {
+  id          String   @id @default(cuid())
+  
+  // Report Information
+  reportType  ComplianceReportType
+  reportPeriodStart DateTime
+  reportPeriodEnd   DateTime
+  
+  // Report Data
+  summary     Json
+  findings    Json
+  recommendations Json?
+  
+  // Compliance Status
+  overallStatus ComplianceStatus
+  score         Float?
+  
+  // Generation
+  generatedAt DateTime @default(now())
+  generatedBy String
+  
+  // Review
+  reviewedAt  DateTime?
+  reviewedBy  String?
+  reviewNotes String?
+  
+  // Documentation
+  reportUrl   String?
+  
+  @@index([reportType])
+  @@index([reportPeriodStart, reportPeriodEnd])
+  @@map("compliance_reports")
+}
+
+model ConsentGrant {
+  id                      String    @id @default(uuid())
+  customerId               String    @map("customer_id")
+  specialistId            String    @map("specialist_id")
+  permissions             String    @db.Text
+  reason                  String    @db.Text
+  requestedDuration       Int       @map("requested_duration")
+  urgency                 String
+  status                  String
+  restrictions            String?   @db.Text
+  grantedAt               DateTime? @map("granted_at")
+  expiresAt               DateTime  @map("expires_at")
+  revokedAt               DateTime? @map("revoked_at")
+  revocationReason        String?   @map("revocation_reason") @db.Text
+  denialReason            String?   @map("denial_reason") @db.Text
+  lastAccessed            DateTime? @map("last_accessed")
+  accessCount             Int       @default(0) @map("access_count")
+  expirationWarningSent   Boolean   @default(false) @map("expiration_warning_sent")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  customer                 User      @relation("PatientConsents", fields: [customerId], references: [id], onDelete: Cascade)
+  specialist              User      @relation("SpecialistConsents", fields: [specialistId], references: [id], onDelete: Cascade)
+  accessLogs              AccessLog[]
+  
+  @@map("consent_grants")
+  @@index([customerId])
+  @@index([specialistId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model ContextOptimization {
+  id                  String   @id @default(cuid())
+  userId              String
+  originalTokens      Int
+  optimizedTokens     Int
+  reductionPercentage Float
+  strategy            String
+  compressionRatio    Float
+  relevanceScore      Float
+  informationDensity  Float
+  processingTimeMs    Int
+  qualityScore        Float
+  createdAt           DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([strategy])
+}
+
+model DataPortabilityRequest {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Request Details
+  format          String   // JSON, XML, CSV
+  includeDocuments Boolean @default(true)
+  includeEHRData  Boolean @default(true)
+  
+  // Status
+  status          String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  
+  // Output
+  exportUrl       String?
+  exportSize      Int?     // Size in bytes
+  expirationDate  DateTime? // URL expiration (7 days)
+  
+  // Processing
+  startedAt       DateTime?
+  completedAt     DateTime?
+  errorMessage    String?
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model DataRectificationRequest {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Request Details
+  dataType        String   // e.g., "DIAGNOSIS", "MEDICATION", "PERSONAL_INFO"
+  recordId        String?  // ID of specific record to correct
+  currentValue    String   @db.Text
+  requestedValue  String   @db.Text
+  reason          String   @db.Text
+  
+  // Status
+  status          String   @default("PENDING") // PENDING, UNDER_REVIEW, APPROVED, REJECTED, COMPLETED
+  
+  // Review
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  reviewNotes     String?  @db.Text
+  
+  // Resolution
+  approved        Boolean?
+  completedAt     DateTime?
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([dataType])
+}
+
+model DataRetentionPolicy {
+  id          String   @id @default(cuid())
+  
+  // Policy Information
+  name        String   @unique
+  description String
+  
+  // Scope
+  dataType    String   // e.g., "customer_record", "audit_log", "lab_result"
+  category    String?
+  
+  // Retention Rules
+  retentionPeriodDays Int
+  archiveAfterDays    Int?
+  deleteAfterDays     Int?
+  
+  // Legal Requirements
+  legalBasis  String?
+  jurisdiction String?
+  
+  // Status
+  active      Boolean  @default(true)
+  effectiveFrom DateTime @default(now())
+  effectiveTo   DateTime?
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  
+  @@map("data_retention_policies")
+}
+
+model Document {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  customerId     String?   @map("customer_id")
+  filePath      String    @map("file_path")
+  fileName      String    @map("file_name")
+  fileSize      Int?      @map("file_size")
+  mimeType      String?   @map("mime_type")
+  documentType  String?   @map("document_type")
+  uploadDate    DateTime  @default(now()) @map("upload_date")
+  documentDate  DateTime? @map("document_date")
+  status        String    @default("pending")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customer       Customer?  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  ocrResults    OcrResult[]
+  extractedData ExtractedData[]
+  sourceLinks   DocumentLink[] @relation("SourceDocument")
+  targetLinks   DocumentLink[] @relation("TargetDocument")
+  embeddings    DocumentEmbedding[]
+  
+  @@map("documents")
+}
+
+model DocumentEmbedding {
+  id            String    @id @default(uuid())
+  documentId    String    @map("document_id")
+  chunkIndex    Int       @map("chunk_index")
+  chunkText     String    @map("chunk_text") @db.Text
+  embedding     Float[]
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  document      Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@map("document_embeddings")
+}
+
+model DocumentLink {
+  id                  String    @id @default(uuid())
+  sourceDocumentId    String    @map("source_document_id")
+  targetDocumentId    String    @map("target_document_id")
+  relationshipType    String    @map("relationship_type")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  
+  sourceDocument      Document  @relation("SourceDocument", fields: [sourceDocumentId], references: [id], onDelete: Cascade)
+  targetDocument      Document  @relation("TargetDocument", fields: [targetDocumentId], references: [id], onDelete: Cascade)
+  
+  @@unique([sourceDocumentId, targetDocumentId])
+  @@map("document_links")
+}
+
+model EClinicalWorksSpecificData {
+  id              String   @id @default(cuid())
+  
+  // Resource reference
+  resourceType    String
+  resourceId      String   @unique
+  
+  // User reference
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // DiagnosticReport fields
+  reportType      String?
+  status          String?
+  category        String?
+  effectiveDateTime DateTime?
+  issued          DateTime?
+  conclusion      String?
+  presentedForm   Json?    // Array of attachments
+  
+  // CarePlan fields
+  intent          String?
+  title           String?
+  description     String?
+  period          Json?    // { start, end }
+  activities      Json?    // Array of activities
+  
+  // Encounter fields
+  class           String?
+  type            String?
+  reasonCode      Json?    // Array of reason codes
+  diagnosis       Json?    // Array of diagnoses
+  hospitalization Json?    // Hospitalization details
+  
+  // Communication fields
+  category        String?
+  priority        String?
+  medium          Json?    // Array of communication mediums
+  subject         String?
+  topic           String?
+  sent            DateTime?
+  received        DateTime?
+  payload         Json?    // Array of message payloads
+  
+  // Task fields
+  code            String?
+  authoredOn      DateTime?
+  lastModified    DateTime?
+  executionPeriod Json?    // { start, end }
+  note            Json?    // Array of notes
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([resourceType])
+  @@index([resourceId])
+}
+
+model EHRConnection {
+  id                    String            @id @default(uuid())
+  userId                String            @map("user_id")
+  provider              EHRProvider
+  providerName          String            @map("provider_name") // e.g., "Kaiser Permanente"
+  fhirBaseUrl           String            @map("fhir_base_url")
+  status                ConnectionStatus  @default(PENDING)
+  
+  // OAuth tokens (encrypted)
+  accessToken           String?           @map("access_token") @db.Text
+  refreshToken          String?           @map("refresh_token") @db.Text
+  tokenExpiresAt        DateTime?         @map("token_expires_at")
+  
+  // Customer context
+  customerId             String?           @map("customer_id") // FHIR Customer ID
+  customerName           String?           @map("customer_name")
+  
+  // Sync settings
+  autoSync              Boolean           @default(true) @map("auto_sync")
+  syncFrequency         Int               @default(24) @map("sync_frequency") // hours
+  lastSyncAt            DateTime?         @map("last_sync_at")
+  nextSyncAt            DateTime?         @map("next_sync_at")
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: additional provider-specific data
+  errorMessage          String?           @db.Text @map("error_message")
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  user                  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fhirResources         FHIRResource[]
+  syncHistory           SyncHistory[]
+  bulkExportJobs        BulkExportJob[]
+  
+  @@index([userId])
+  @@index([status])
+  @@index([provider])
+  @@index([nextSyncAt])
+  @@map("ehr_connections")
+}
+
+model EncryptionKey {
+  id          String   @id @default(cuid())
+  
+  // Key Information
+  keyId       String   @unique
+  keyType     KeyType
+  algorithm   String
+  keySize     Int
+  
+  // Key Material (encrypted)
+  encryptedKey String
+  keyVersion   Int      @default(1)
+  
+  // Key Status
+  status      KeyStatus @default(ACTIVE)
+  createdAt   DateTime @default(now())
+  activatedAt DateTime?
+  deactivatedAt DateTime?
+  destroyedAt DateTime?
+  
+  // Rotation
+  rotationSchedule String?
+  lastRotatedAt    DateTime?
+  nextRotationAt   DateTime?
+  
+  // Usage
+  purpose     String   // e.g., "database", "file_storage", "field_level"
+  usageCount  Int      @default(0)
+  
+  // Access Control
+  allowedRoles String[]
+  
+  @@index([keyId])
+  @@index([status])
+  @@map("encryption_keys")
+}
+
+model EncryptionKeyRotation {
+  id              String   @id @default(cuid())
+  
+  // Key Details
+  keyId           String
+  keyType         String   // DATABASE, FILE_STORAGE, BACKUP
+  region          DataRegion
+  
+  // Rotation
+  oldKeyId        String?
+  newKeyId        String
+  rotationDate    DateTime
+  rotationReason  String   // SCHEDULED, COMPROMISE, COMPLIANCE
+  
+  // Status
+  status          String   @default("COMPLETED") // IN_PROGRESS, COMPLETED, FAILED
+  affectedRecords Int      @default(0)
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  performedBy     String
+  
+  @@index([keyId])
+  @@index([rotationDate])
+  @@index([region])
+}
+
+model EpicSpecificData {
+  id                    String            @id @default(uuid())
+  resourceId            String            @unique @map("resource_id")
+  
+  // Epic-specific extensions
+  extensions            String?           @db.Text // JSON: Epic FHIR extensions
+  customFields          String?           @db.Text @map("custom_fields") // JSON: Epic custom fields
+  
+  // Enhanced data
+  clinicalNotes         String?           @db.Text @map("clinical_notes")
+  labResultDetails      String?           @db.Text @map("lab_result_details") // JSON
+  imagingMetadata       String?           @db.Text @map("imaging_metadata") // JSON
+  carePlanDetails       String?           @db.Text @map("care_plan_details") // JSON
+  encounterDetails      String?           @db.Text @map("encounter_details") // JSON
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  resource              FHIRResource      @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  
+  @@index([resourceId])
+  @@map("epic_specific_data")
+}
+
+model ErrorLog {
+  id          String   @id @default(uuid())
+  severity    String   // LOW, MEDIUM, HIGH, CRITICAL
+  message     String   @db.Text
+  code        String?
+  statusCode  Int?
+  stack       String?  @db.Text
+  details     String?  @db.Text // JSON string
+  userId      String?
+  requestId   String?
+  endpoint    String?
+  method      String?
+  userAgent   String?
+  ipAddress   String?
+  timestamp   DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([timestamp])
+  @@index([severity])
+  @@index([code])
+  @@index([endpoint])
+  @@map("error_logs")
+}
+
+model ExtractedData {
+  id            String    @id @default(uuid())
+  documentId    String    @map("document_id")
+  dataType      String    @map("data_type")
+  fieldName     String    @map("field_name")
+  fieldValue    String    @map("field_value") @db.Text
+  unit          String?
+  referenceRange String?  @map("reference_range")
+  isAbnormal    Boolean?  @map("is_abnormal")
+  extractedAt   DateTime  @default(now()) @map("extracted_at")
+  
+  document      Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@map("extracted_data")
+}
+
+model FHIRResource {
+  id                    String            @id @default(uuid())
+  connectionId          String            @map("connection_id")
+  resourceType          FHIRResourceType  @map("resource_type")
+  fhirId                String            @map("fhir_id") // Resource ID from FHIR server
+  fhirVersion           String            @default("R4") @map("fhir_version")
+  
+  // Raw FHIR data
+  rawData               String            @db.Text @map("raw_data") // JSON string of FHIR resource
+  
+  // Extracted metadata for quick access
+  title                 String?
+  description           String?           @db.Text
+  date                  DateTime?
+  category              String?
+  status                String?
+  
+  // Document-specific fields
+  contentType           String?           @map("content_type") // e.g., "application/pdf"
+  contentUrl            String?           @map("content_url") @db.Text
+  contentSize           Int?              @map("content_size") // bytes
+  documentDownloaded    Boolean           @default(false) @map("document_downloaded")
+  localFilePath         String?           @map("local_file_path")
+  
+  // Processing status
+  processed             Boolean           @default(false)
+  processedAt           DateTime?         @map("processed_at")
+  tokensUsed            Int?              @map("tokens_used")
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: additional resource-specific data
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  connection            EHRConnection     @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  epicSpecificData      EpicSpecificData?
+  
+  @@unique([connectionId, fhirId, resourceType])
+  @@index([connectionId])
+  @@index([resourceType])
+  @@index([date])
+  @@index([processed])
+  @@map("fhir_resources")
+}
+
+model FileAccessGrant {
+  id        String   @id @default(cuid())
+  
+  fileId    String
+  userId    String
+  
+  file      SecureFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  
+  grantedBy String
+  grantedAt DateTime @default(now())
+  expiresAt DateTime?
+  
+  @@unique([fileId, userId])
+  @@index([userId])
+  @@map("file_access_grants")
+}
+
+model FileUpload {
+  id                    String                @id @default(uuid())
+  userId                String                @map("user_id")
+  fileName              String                @map("file_name")
+  filePath              String                @map("file_path")
+  fileSize              Int                   @map("file_size") // In bytes
+  mimeType              String                @map("mime_type")
+  status                FileProcessingStatus  @default(PENDING)
+  estimatedTokens       Int?                  @map("estimated_tokens")
+  estimatedCost         Float?                @map("estimated_cost") // In USD
+  actualTokens          Int?                  @map("actual_tokens")
+  actualCost            Float?                @map("actual_cost") // In USD
+  processingStartedAt   DateTime?             @map("processing_started_at")
+  processingCompletedAt DateTime?             @map("processing_completed_at")
+  scheduledMonths       Int?                  @map("scheduled_months") // For multi-month processing
+  currentMonth          Int?                  @map("current_month") // Current processing month
+  errorMessage          String?               @db.Text @map("error_message")
+  usedFreeUpload        Boolean               @default(false) @map("used_free_upload") // Whether this used free upload limit
+  metadata              String?               @db.Text // JSON: processing details, chunks, etc.
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("file_uploads")
+}
+
+model ICD10Code {
+  id              String      @id @default(cuid())
+  code            String      @unique // e.g., "E11.9"
+  
+  // Display
+  description     String      // Full description
+  shortDescription String?    // Abbreviated description
+  
+  // Classification
+  category        String      // e.g., "Endocrine"
+  subcategory     String?
+  
+  // Billing
+  billable        Boolean     @default(true)
+  
+  // Status
+  status          String      @default("ACTIVE")
+  effectiveDate   DateTime    @default(now())
+  
+  // Metadata
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([code])
+  @@index([description])
+  @@index([category])
+  @@index([billable])
+  @@index([status])
+}
+
+model IdentityChallenge {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  questions       String    @db.Text
+  expiresAt       DateTime  @map("expires_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  @@map("identity_challenges")
+  @@index([repositoryId])
+  @@index([expiresAt])
+}
+
+model InstanceCost {
+  id           String   @id @default(cuid())
+  
+  instanceId   String
+  provider     String
+  instanceType String
+
+model LOINCCode {
+  id              String          @id @default(cuid())
+  loincNumber     String          @unique // e.g., "2345-7"
+  
+  // LOINC Components
+  component       String          // e.g., "Glucose"
+  property        String          // e.g., "MCnc" (Mass Concentration)
+  timeAspect      String          // e.g., "Pt" (Point in time)
+  system          String          // e.g., "Ser/Plas" (Serum or Plasma)
+  scale           String          // e.g., "Qn" (Quantitative)
+  method          String?         // e.g., "Enzymatic"
+  
+  // Classification
+  category        LOINCCategory
+  componentType   ComponentType
+  
+  // Display Names
+  commonName      String          // Most common name
+  shortName       String          // Abbreviated name
+  longName        String          // Full descriptive name
+  relatedNames    String[]        // Alternative names
+  
+  // Status
+  status          String          @default("ACTIVE") // ACTIVE, DEPRECATED, TRIAL
+  version         String          @default("2.76")
+  effectiveDate   DateTime        @default(now())
+  
+  // Relationships
+  units           LOINCUnit[]
+  referenceRanges ReferenceRange[]
+  mappings        CodeMapping[]
+  labResults      LabResultStandardization[]
+  
+  // Metadata
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  @@index([loincNumber])
+  @@index([component])
+  @@index([category])
+  @@index([componentType])
+  @@index([status])
+  @@index([commonName])
+}
+
+model LOINCUnit {
+  id                String      @id @default(cuid())
+  loincCodeId       String
+  loincCode         LOINCCode   @relation(fields: [loincCodeId], references: [id], onDelete: Cascade)
+  
+  // Unit Information
+  unit              String      // e.g., "mg/dL"
+  ucumCode          String      // UCUM code e.g., "mg/dL"
+  unitSystem        UnitSystem
+  
+  // Conversion
+  conversionFactor  Float?      // Factor to convert to primary unit
+  isPrimary         Boolean     @default(false)
+  
+  // Metadata
+  createdAt         DateTime    @default(now())
+  
+  @@index([loincCodeId])
+  @@index([unit])
+  @@index([isPrimary])
+}
+
+model LabResultStandardization {
+  id                  String          @id @default(cuid())
+  
+  // Original Data (from EHR provider)
+  originalCode        String          // Provider-specific code
+  originalCodeSystem  String          // e.g., "EPIC", "CERNER"
+  originalName        String
+  originalValue       String          // Store as string to handle all types
+  originalUnit        String?
+  
+  // Standardized Data (LOINC)
+  loincCodeId         String
+  loincCode           LOINCCode       @relation(fields: [loincCodeId], references: [id])
+  standardizedValue   Float?          // Numeric value if quantitative
+  standardizedUnit    String?
+  
+  // Interpretation
+  interpretation      String?         // NORMAL, LOW, HIGH, CRITICAL_LOW, CRITICAL_HIGH
+  flags               String[]        // Additional flags
+  referenceRangeId    String?
+  referenceRange      ReferenceRange? @relation(fields: [referenceRangeId], references: [id])
+  
+  // Context
+  customerId           String
+  customer             User            @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  fhirResourceId      String?
+  fhirResource        FHIRResource?   @relation(fields: [fhirResourceId], references: [id])
+  
+  // Audit
+  standardizedAt      DateTime        @default(now())
+  standardizedBy      String          @default("SYSTEM")
+  
+  // Metadata
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  
+  @@index([originalCode, originalCodeSystem])
+  @@index([loincCodeId])
+  @@index([customerId])
+  @@index([interpretation])
+  @@index([standardizedAt])
+}
+
+model LegalAgreement {
+  id              String        @id @default(cuid())
+  
+  // Agreement Details
+  type            AgreementType
+  version         String        @default("1.0")
+  
+  // Parties
+  partyName       String
+  partyEmail      String
+  partyRole       String?       // e.g., "Covered Entity", "Controller"
+  
+  // User Association (if applicable)
+  userId          String?
+  user            User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Dates
+  signedDate      DateTime
+  effectiveDate   DateTime
+  expirationDate  DateTime?
+  
+  // Status
+  status          String        @default("ACTIVE") // ACTIVE, EXPIRED, TERMINATED, PENDING
+  
+  // Document
+  documentUrl     String
+  documentHash    String        // SHA-256 hash for integrity
+  signatureData   Json          // Digital signature details
+  
+  // Renewal
+  renewalRequired Boolean       @default(false)
+  renewalDate     DateTime?
+  renewalReminder DateTime?
+  
+  // Termination
+  terminatedDate  DateTime?
+  terminationReason String?
+  
+  // Metadata
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  @@index([type])
+  @@index([status])
+  @@index([expirationDate])
+  @@index([userId])
+  @@index([partyEmail])
+}
+
+model ModelPerformance {
+  id        String   @id @default(cuid())
+  
+
+model Notification {
+  id              String    @id @default(uuid())
+  customerId       String    @map("customer_id")
+  type            String
+  message         String    @db.Text
+  requiresAction  Boolean   @default(false) @map("requires_action")
+  read            Boolean   @default(false)
+  readAt          DateTime? @map("read_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  @@map("notifications")
+  @@index([customerId])
+  @@index([read])
+  @@index([createdAt])
+}
+
+model OcrResult {
+  id              String    @id @default(uuid())
+  documentId      String    @map("document_id")
+  rawText         String    @map("raw_text") @db.Text
+  confidenceScore Float?    @map("confidence_score")
+  processedAt     DateTime  @default(now()) @map("processed_at")
+  
+  document        Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@map("ocr_results")
+}
+
+model Customer {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  firstName     String?   @map("first_name")
+  lastName      String?   @map("last_name")
+  dateOfBirth   DateTime? @map("date_of_birth")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents     Document[]
+  analysisSessions AnalysisSession[]
+  
+  @@map("customers")
+}
+
+model CustomerAccessRequest {
+  id              String   @id @default(cuid())
+  
+  customerId       String
+  requestType     AccessRequestType
+  specificRecords String[] // JSON array
+  startDate       DateTime?
+  endDate         DateTime?
+  
+  deliveryMethod  DeliveryMethod
+  deliveryAddress String?
+  
+  status          RequestStatus @default(PENDING)
+  requestedAt     DateTime @default(now())
+  fulfilledAt     DateTime?
+  fulfilledBy     String?
+  notes           String?
+  
+  @@index([customerId])
+  @@index([status])
+  @@map("customer_access_requests")
+}
+
+model CustomerAllergy {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  allergen        String
+  type            String
+  reaction        String
+  severity        String
+  diagnosedDate   DateTime? @map("diagnosed_date")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      CustomerRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("customer_allergies")
+  @@index([repositoryId])
+}
+
+model CustomerAmendmentRequest {
+  id            String   @id @default(cuid())
+  
+  customerId     String
+  recordId      String
+  recordType    String
+  currentValue  String
+  proposedValue String
+  reason        String
+  
+  status        RequestStatus @default(PENDING)
+  requestedAt   DateTime @default(now())
+  reviewedAt    DateTime?
+  reviewedBy    String?
+  reviewNotes   String?
+  
+  @@index([customerId])
+  @@index([status])
+  @@map("customer_amendment_requests")
+}
+
+model CustomerCommunicationRequest {
+  id                 String   @id @default(cuid())
+  
+  customerId          String
+  communicationType  CommunicationType
+  alternativeContact String
+  reason             String
+  
+  status             RequestStatus @default(PENDING)
+  requestedAt        DateTime @default(now())
+  reviewedAt         DateTime?
+  reviewedBy         String?
+  
+  @@index([customerId])
+  @@index([status])
+  @@map("customer_communication_requests")
+}
+
+model CustomerConsent {
+  id          String   @id @default(cuid())
+  
+  // Customer Information
+  customerId   String
+  
+  // Consent Details
+  consentType ConsentType
+  purpose     String
+  description String?
+  
+  // Consent Status
+  status      ConsentStatus @default(ACTIVE)
+  givenAt     DateTime @default(now())
+  givenBy     String   // Customer or authorized representative
+  
+  // Expiration
+  expiresAt   DateTime?
+  revokedAt   DateTime?
+  revokedBy   String?
+  revocationReason String?
+  
+  // Scope
+  scope       Json?    // What data/actions are covered
+  restrictions Json?   // Any restrictions on use
+  
+  // Documentation
+  documentUrl String?
+  signatureUrl String?
+  
+  // Audit
+  auditLogId  String?
+  
+  @@index([customerId])
+  @@index([consentType])
+  @@index([status])
+  @@map("customer_consents")
+}
+
+model CustomerDiagnosis {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  condition       String
+  icd10Code       String?   @map("icd10_code")
+  diagnosedDate   DateTime  @map("diagnosed_date")
+  status          String
+  severity        String?
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      CustomerRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("customer_diagnoses")
+  @@index([repositoryId])
+  @@index([diagnosedDate])
+}
+
+model CustomerFamilyHistory {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  relationship    String
+  condition       String
+  ageAtDiagnosis  Int?      @map("age_at_diagnosis")
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      CustomerRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("customer_family_history")
+  @@index([repositoryId])
+}
+
+model CustomerImmunization {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  vaccine         String
+  date            DateTime
+  doseNumber      Int?      @map("dose_number")
+  administeredBy  String?   @map("administered_by")
+  lotNumber       String?   @map("lot_number")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      CustomerRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("customer_immunizations")
+  @@index([repositoryId])
+  @@index([date])
+}
+
+model CustomerMedication {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  name            String
+  dosage          String
+  frequency       String
+  startDate       DateTime  @map("start_date")
+  endDate         DateTime? @map("end_date")
+  prescribedBy    String?   @map("prescribed_by")
+  purpose         String?   @db.Text
+  status          String
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      CustomerRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("customer_medications")
+  @@index([repositoryId])
+  @@index([status])
+}
+
+model CustomerProcedure {
+  id              String    @id @default(uuid())
+  repositoryId    String    @map("repository_id")
+  name            String
+  date            DateTime
+  performedBy     String?   @map("performed_by")
+  location        String?
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  repository      CustomerRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("customer_procedures")
+  @@index([repositoryId])
+  @@index([date])
+}
+
+model CustomerRepository {
+  id                      String    @id @default(uuid())
+  userId                  String    @unique @map("user_id")
+  primaryIdentityHash     String    @unique @map("primary_identity_hash")
+  secondaryIdentityHash   String    @map("secondary_identity_hash")
+  compositeIdentityHash   String    @unique @map("composite_identity_hash")
+  encryptedPersonalInfo   String    @map("encrypted_personal_info") @db.Text
+  hasMothersMaidenName    Boolean   @default(false) @map("has_mothers_maiden_name")
+  hasPreviousAddress      Boolean   @default(false) @map("has_previous_address")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  lastAccessedAt          DateTime? @map("last_accessed_at")
+  version                 Int       @default(1)
+  
+  diagnoses               CustomerDiagnosis[]
+  medications             CustomerMedication[]
+  allergies               CustomerAllergy[]
+  vitalSigns              CustomerVitalSign[]
+  procedures              CustomerProcedure[]
+  immunizations           CustomerImmunization[]
+  familyHistory           CustomerFamilyHistory[]
+  
+  @@map("customer_repositories")
+  @@index([userId])
+  @@index([compositeIdentityHash])
+}
+
+model PatientRestrictionRequest {
+  id              String   @id @default(cuid())
+  
+  customerId       String
+  restrictionType RestrictionType
+  dataType        String
+  recipient       String?
+  reason          String
+  
+  status          RequestStatus @default(PENDING)
+  requestedAt     DateTime @default(now())
+  reviewedAt      DateTime?
+  reviewedBy      String?
+  reviewNotes     String?
+  
+  @@index([customerId])
+  @@index([status])
+  @@map("customer_restriction_requests")
+}
+
+model CustomerVitalSign {
+  id                      String    @id @default(uuid())
+  repositoryId            String    @map("repository_id")
+  date                    DateTime
+  bloodPressureSystolic   Int?      @map("blood_pressure_systolic")
+  bloodPressureDiastolic  Int?      @map("blood_pressure_diastolic")
+  heartRate               Int?      @map("heart_rate")
+  temperature             Float?
+  weight                  Float?
+  height                  Float?
+  bmi                     Float?
+  oxygenSaturation        Int?      @map("oxygen_saturation")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  
+  repository              CustomerRepository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  
+  @@map("customer_vital_signs")
+  @@index([repositoryId])
+  @@index([date])
+}
+
+model PaymentIntent {
+  id                String    @id @default(uuid())
+  userId            String    @map("user_id")
+  amount            Float     // In USD
+  currency          String    @default("USD")
+  status            String    // pending, succeeded, failed, cancelled
+  paymentMethod     String?   @map("payment_method") // stripe, paypal, etc.
+  paymentMethodId   String?   @map("payment_method_id") // External payment ID
+  tokensPurchased   Int?      @map("tokens_purchased")
+  description       String?   @db.Text
+  metadata          String?   @db.Text // JSON: additional payment details
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("payment_intents")
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  displayName String
+  description String?
+  
+  // Permission Properties
+  resource    String   // e.g., "customer", "lab_result", "user"
+  action      String   // e.g., "read", "write", "delete"
+  scope       PermissionScope @default(OWN)
+  
+  // Conditions
+  conditions  Json?    // Additional conditions for permission
+  
+  // Relationships
+  rolePermissions RolePermission[]
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([resource, action, scope])
+  @@map("permissions")
+}
+
+model PromptOptimization {
+  id        String   @id @default(cuid())
+  
+  originalPrompt String @db.Text
+  originalTokens Int
+  
+  optimizedPrompt String @db.Text
+  optimizedTokens Int
+  
+  strategy       String
+  tokenReduction Int
+  reductionPercent Float
+  
+  executionTime  Float?
+  successRate    Float?
+  
+  createdAt DateTime @default(now())
+  
+  metadata  Json?
+  
+  @@index([createdAt])
+  @@map("prompt_optimizations")
+}
+
+model PromptSplit {
+  id        String   @id @default(cuid())
+  
+  taskId    String
+  
+  splitId   String
+  content   String   @db.Text
+  tokens    Int
+  order     Int
+  
+  dependencies Json
+  
+  status    String   @default("pending")
+  
+  result    Json?
+  error     String?  @db.Text
+  
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+  
+  @@index([taskId])
+  @@index([order])
+  @@map("prompt_splits")
+}
+
+model ProviderConfiguration {
+  id                    String            @id @default(uuid())
+  provider              EHRProvider
+  providerName          String            @map("provider_name")
+  
+  // FHIR endpoints
+  fhirBaseUrl           String            @map("fhir_base_url")
+  authorizationUrl      String            @map("authorization_url")
+  tokenUrl              String            @map("token_url")
+  
+  // OAuth configuration
+  clientId              String?           @map("client_id")
+  clientSecret          String?           @map("client_secret")
+  redirectUri           String?           @map("redirect_uri")
+  scopes                String            // Space-separated scopes
+  
+  // Capabilities
+  supportsDocumentReference Boolean       @default(true) @map("supports_document_reference")
+  supportsObservation   Boolean           @default(true) @map("supports_observation")
+  supportsCondition     Boolean           @default(true) @map("supports_condition")
+  supportsMedication    Boolean           @default(true) @map("supports_medication")
+  supportsAllergy       Boolean           @default(true) @map("supports_allergy")
+  supportsImmunization  Boolean           @default(true) @map("supports_immunization")
+  supportsProcedure     Boolean           @default(true) @map("supports_procedure")
+  
+  // Rate limiting
+  rateLimit             Int?              @map("rate_limit") // requests per minute
+  
+  // Status
+  enabled               Boolean           @default(true)
+  isSandbox             Boolean           @default(false) @map("is_sandbox")
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: additional provider-specific config
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  
+  @@unique([provider, providerName])
+  @@index([provider])
+  @@index([enabled])
+  @@map("provider_configurations")
+}
+
+model RBACAccessLog {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  action       String
+  resourceType String   @map("resource_type")
+  resourceId   String?  @map("resource_id")
+  allowed      Boolean
+  reason       String?
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  timestamp    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([timestamp])
+  @@index([allowed])
+  @@index([resourceType])
+  @@map("rbac_access_logs")
+}
+
+model ReferenceRange {
+  id              String              @id @default(cuid())
+  loincCodeId     String
+  loincCode       LOINCCode           @relation(fields: [loincCodeId], references: [id], onDelete: Cascade)
+  
+  // Range Type
+  type            ReferenceRangeType  @default(NORMAL)
+  
+  // Range Values
+  lowValue        Float?
+  highValue       Float?
+  unit            String
+  
+  // Demographics
+  ageMin          Int?                // Minimum age in years
+  ageMax          Int?                // Maximum age in years
+  gender          String?             // MALE, FEMALE, OTHER, ALL
+  
+  // Conditions
+  condition       String?             // e.g., "Pregnant", "Fasting"
+  population      String?             // e.g., "Adult", "Pediatric"
+  
+  // Source
+  source          String              @default("Mayo Clinic")
+  effectiveDate   DateTime            @default(now())
+  
+  // Relationships
+  labResults      LabResultStandardization[]
+  
+  // Metadata
+  createdAt       DateTime            @default(now())
+  
+  @@index([loincCodeId])
+  @@index([type])
+  @@index([gender])
+  @@index([ageMin, ageMax])
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  displayName String
+  description String?
+  
+  // Role Properties
+  isSystem    Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  priority    Int      @default(0)
+  
+  // Permissions
+  permissions RolePermission[]
+  
+  // Relationships
+  userRoles   UserRole[]
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String?
+  
+  @@map("roles")
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  
+  // Additional Constraints
+  constraints  Json?
+  
+  createdAt    DateTime   @default(now())
+  
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model RxNormCode {
+  id              String      @id @default(cuid())
+  rxcui           String      @unique // RxNorm Concept Unique Identifier
+  
+  // Display
+  name            String      // Drug name
+  synonym         String?     // Alternative name
+  
+  // Classification
+  termType        String      // e.g., "SCD" (Semantic Clinical Drug)
+  strength        String?     // e.g., "500 mg"
+  doseForm        String?     // e.g., "Tablet"
+  
+  // Relationships
+  ingredients     String[]    // Active ingredients
+  brandNames      String[]    // Brand names
+  
+  // Status
+  status          String      @default("ACTIVE")
+  
+  // Metadata
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([rxcui])
+  @@index([name])
+  @@index([termType])
+  @@index([status])
+}
+
+model SNOMEDCode {
+  id              String      @id @default(cuid())
+  snomedId        String      @unique // e.g., "73211009"
+  
+  // Display
+  preferredTerm   String      // Preferred display name
+  fullySpecified  String      // Fully specified name
+  synonyms        String[]    // Alternative names
+  
+  // Classification
+  semanticTag     String      // e.g., "disorder", "procedure"
+  hierarchy       String[]    // Parent concepts
+  
+  // Status
+  status          String      @default("ACTIVE")
+  effectiveDate   DateTime    @default(now())
+  
+  // Metadata
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([snomedId])
+  @@index([preferredTerm])
+  @@index([semanticTag])
+  @@index([status])
+}
+
+model SecureFile {
+  id          String   @id @default(cuid())
+  
+  // File Information
+  fileName    String
+  fileType    String
+  fileSize    Int
+  fileHash    String
+  
+  // Classification
+  category    String
+  description String?
+  tags        String[] // Array of tags
+  
+  // Encryption
+  encrypted   Boolean  @default(true)
+  encryptionMetadata Json?
+  
+  // Storage
+  storagePath String
+  
+  // Ownership
+  uploadedBy  String
+  customerId   String?
+  
+  // Access Tracking
+  accessCount Int      @default(0)
+  lastAccessedAt DateTime?
+  
+  // Status
+  deleted     Boolean  @default(false)
+  deletedAt   DateTime?
+  deletedBy   String?
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relationships
+  accessGrants FileAccessGrant[]
+  
+  @@index([customerId])
+  @@index([uploadedBy])
+  @@index([category])
+  @@index([deleted])
+  @@map("secure_files")
+}
+
+model SecurityAlert {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  action        String
+  details       String    @db.Text
+  severity      String    @default("high")
+  acknowledged  Boolean   @default(false)
+  acknowledgedBy String?  @map("acknowledged_by")
+  acknowledgedAt DateTime? @map("acknowledged_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  @@map("security_alerts")
+  @@index([userId])
+  @@index([acknowledged])
+  @@index([createdAt])
+}
+
+model SecurityConfiguration {
+  id          String   @id @default(cuid())
+  
+  // Configuration Key
+  key         String   @unique
+  category    String
+  
+  // Configuration Value
+  value       Json
+  description String?
+  
+  // Validation
+  valueType   String   // e.g., "string", "number", "boolean", "json"
+  validation  Json?    // Validation rules
+  
+  // Status
+  active      Boolean  @default(true)
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?
+  
+  @@map("security_configurations")
+}
+
+  model     String
+  provider  String
+
+model Subprocessor {
+  id              String   @id @default(cuid())
+  
+  // Subprocessor Details
+  name            String
+  description     String
+  website         String?
+  
+  // Services
+  services        String[] // e.g., ["Cloud Hosting", "Email Delivery"]
+  dataProcessed   String[] // e.g., ["PHI", "PII", "Payment Data"]
+  
+  // Location
+  locations       String[] // Countries where data is processed
+  
+  // Agreements
+  baaStatus       String   @default("PENDING") // PENDING, SIGNED, EXPIRED
+  baaSigned       DateTime?
+  baaExpiration   DateTime?
+  dpaStatus       String   @default("PENDING")
+  dpaSigned       DateTime?
+  dpaExpiration   DateTime?
+  
+  // Compliance
+  soc2Certified   Boolean  @default(false)
+  iso27001Certified Boolean @default(false)
+  hipaaCompliant  Boolean  @default(false)
+  gdprCompliant   Boolean  @default(false)
+  
+  // Status
+  status          String   @default("ACTIVE") // ACTIVE, INACTIVE, TERMINATED
+  
+  // Notifications
+  lastNotificationDate DateTime?
+  notificationsSent    Int      @default(0)
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([status])
+  @@index([baaStatus])
+  @@index([dpaStatus])
+}
+
+model Subscription {
+  id                    String              @id @default(uuid())
+  userId                String              @unique @map("user_id")
+  tier                  SubscriptionTier
+  status                SubscriptionStatus  @default(ACTIVE)
+  monthlyPrice          Float               @map("monthly_price") // In USD
+  billingCycleStart     DateTime            @map("billing_cycle_start")
+  billingCycleEnd       DateTime            @map("billing_cycle_end")
+  nextBillingDate       DateTime?           @map("next_billing_date")
+  cancelledAt           DateTime?           @map("cancelled_at")
+  trialEndsAt           DateTime?           @map("trial_ends_at")
+  metadata              String?             @db.Text // JSON: payment method, billing address, etc.
+  createdAt             DateTime            @default(now()) @map("created_at")
+  updatedAt             DateTime            @updatedAt @map("updated_at")
+
+  user                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenBalance          TokenBalance?
+  subscriptionHistory   SubscriptionHistory[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([nextBillingDate])
+  @@map("subscriptions")
+}
+
+model SubscriptionHistory {
+  id                String              @id @default(uuid())
+  subscriptionId    String              @map("subscription_id")
+  fromTier          SubscriptionTier?   @map("from_tier")
+  toTier            SubscriptionTier    @map("to_tier")
+  fromStatus        SubscriptionStatus? @map("from_status")
+  toStatus          SubscriptionStatus  @map("to_status")
+  reason            String?             @db.Text
+  changedAt         DateTime            @default(now()) @map("changed_at")
+
+  subscription      Subscription        @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+  @@index([changedAt])
+  @@map("subscription_history")
+}
+
+model SyncHistory {
+  id                    String            @id @default(uuid())
+  connectionId          String            @map("connection_id")
+  status                SyncStatus        @default(QUEUED)
+  syncType              String            @default("incremental") @map("sync_type") // incremental, full
+  
+  // Sync metrics
+  startedAt             DateTime?         @map("started_at")
+  completedAt           DateTime?         @map("completed_at")
+  duration              Int?              // seconds
+  
+  // Resources synced
+  resourcesQueried      Int               @default(0) @map("resources_queried")
+  resourcesCreated      Int               @default(0) @map("resources_created")
+  resourcesUpdated      Int               @default(0) @map("resources_updated")
+  resourcesSkipped      Int               @default(0) @map("resources_skipped")
+  resourcesFailed       Int               @default(0) @map("resources_failed")
+  
+  // Documents downloaded
+  documentsDownloaded   Int               @default(0) @map("documents_downloaded")
+  totalBytesDownloaded  BigInt            @default(0) @map("total_bytes_downloaded")
+  
+  // Cost tracking
+  tokensEstimated       Int?              @map("tokens_estimated")
+  tokensUsed            Int?              @map("tokens_used")
+  costEstimated         Float?            @map("cost_estimated")
+  costActual            Float?            @map("cost_actual")
+  
+  // Error tracking
+  errorMessage          String?           @db.Text @map("error_message")
+  errorDetails          String?           @db.Text @map("error_details") // JSON
+  
+  // Metadata
+  metadata              String?           @db.Text // JSON: sync details, resource types synced, etc.
+  createdAt             DateTime          @default(now()) @map("created_at")
+  
+  connection            EHRConnection     @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  
+  @@index([connectionId])
+  @@index([status])
+  @@index([startedAt])
+  @@index([createdAt])
+  @@map("sync_history")
+}
+
+model SystemHealth {
+  id        String   @id @default(cuid())
+  
+  component String
+  
+  status    String
+  
+  responseTime Float?
+  errorRate    Float?
+  throughput   Float?
+  
+  cpuUsage    Float?
+  memoryUsage Float?
+  diskUsage   Float?
+  
+  timestamp DateTime @default(now())
+  
+  message   String?  @db.Text
+  metadata  Json?
+  
+  @@index([component])
+  @@index([timestamp])
+  @@index([status])
+  @@map("system_health")
+}
+
+model SystemNotification {
+  id        String   @id @default(uuid())
+  type      String   // CRITICAL_ERROR, INFO, WARNING, etc.
+  title     String
+  message   String   @db.Text
+  severity  String   // LOW, MEDIUM, HIGH, CRITICAL
+  metadata  String?  @db.Text // JSON string
+  read      Boolean  @default(false)
+  userId    String?  @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([read])
+  @@map("system_notifications")
+}
+
+model TokenBalance {
+  id                    String      @id @default(uuid())
+  userId                String      @unique @map("user_id")
+  subscriptionId        String      @unique @map("subscription_id")
+  currentBalance        Int         @default(0) @map("current_balance") // Available tokens
+  totalEarned           Int         @default(0) @map("total_earned")    // Lifetime earned
+  totalUsed             Int         @default(0) @map("total_used")      // Lifetime used
+  totalPurchased        Int         @default(0) @map("total_purchased") // Lifetime purchased
+  freeUploadUsed        Int         @default(0) @map("free_upload_used") // Bytes used from free upload limit
+  lastRefreshDate       DateTime?   @map("last_refresh_date")
+  createdAt             DateTime    @default(now()) @map("created_at")
+  updatedAt             DateTime    @updatedAt @map("updated_at")
+
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription          Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  transactions          TokenTransaction[]
+
+  @@index([userId])
+  @@index([subscriptionId])
+  @@map("token_balances")
+}
+
+model TokenTransaction {
+  id                String                @id @default(uuid())
+  tokenBalanceId    String                @map("token_balance_id")
+  type              TokenTransactionType
+  amount            Int                   // Positive for credits, negative for debits
+  balanceBefore     Int                   @map("balance_before")
+  balanceAfter      Int                   @map("balance_after")
+  description       String?               @db.Text
+  referenceId       String?               @map("reference_id") // Link to related entity (upload, chat, etc.)
+  referenceType     String?               @map("reference_type") // Type of reference (FileUpload, ChatMessage, etc.)
+  metadata          String?               @db.Text // JSON: additional details
+  createdAt         DateTime              @default(now()) @map("created_at")
+
+  tokenBalance      TokenBalance          @relation(fields: [tokenBalanceId], references: [id], onDelete: Cascade)
+
+  @@index([tokenBalanceId])
+  @@index([type])
+  @@index([referenceId])
+  @@index([createdAt])
+  @@map("token_transactions")
+}
+
+model TrainingRecord {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Training Details
+  trainingType    String   // HIPAA, GDPR, PHIPA, SECURITY, INCIDENT_RESPONSE
+  trainingTitle   String
+  trainingUrl     String?
+  
+  // Completion
+  status          String   @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, COMPLETED
+  startedAt       DateTime?
+  completedAt     DateTime?
+  score           Int?     // If assessment included
+  
+  // Certification
+  certificateUrl  String?
+  certificateExpiration DateTime?
+  
+  // Renewal
+  renewalRequired Boolean  @default(false)
+  renewalDate     DateTime?
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([trainingType])
+  @@index([status])
+  @@index([certificateExpiration])
+}
+
+model User {
+  id                    String    @id @default(uuid())
+  email                 String    @unique
+  passwordHash          String    @map("password_hash")
+  role                  String    @default("CUSTOMER") // OWNER, ADMIN, DOCTOR, CUSTOMER, SUPPORT, ANALYST
+  mfaEnabled            Boolean   @default(false) @map("mfa_enabled")
+  mfaSecret             String?   @map("mfa_secret")
+  mfaBackupCodes        String?   @map("mfa_backup_codes")
+  failedLoginAttempts   Int       @default(0) @map("failed_login_attempts")
+  lastFailedLogin       DateTime? @map("last_failed_login")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  
+  customers              Customer[]
+  documents             Document[]
+  analysisSessions      AnalysisSession[]
+  sessions              UserSession[]
+  consentRequestsAsPatient ConsentGrant[] @relation("CustomerConsents")
+  consentRequestsAsSpecialist ConsentGrant[] @relation("SpecialistConsents")
+  auditLogs             AuditLog[]
+  rbacAccessLogs        RBACAccessLog[]
+  errorLogs             ErrorLog[]
+  systemNotifications   SystemNotification[]
+  
+  // AI Architecture Relations
+  chatConversations     ChatConversation[]
+  analysisQueue         AnalysisQueue[]
+  chatbotCosts          ChatbotCost[]
+  analysisCosts         AnalysisCost[]
+  contextOptimizations  ContextOptimization[]
+  analysisTasks         AnalysisTask[]
+    cloudInstances        CloudInstance[]
+    
+    // Subscription & Pricing Relations
+    subscription          Subscription?
+    tokenBalance          TokenBalance?
+    fileUploads           FileUpload[]
+    paymentIntents        PaymentIntent[]
+    
+    // EHR Integration Relations
+    ehrConnections        EHRConnection[]
+  
+  @@map("users")
+}
+
+model User2FA {
+  id        String   @id @default(cuid())
+  userId    String
+  method    TwoFactorMethod
+  
+  // TOTP
+  secret    String?
+  
+  // SMS
+  phoneNumber String?
+  smsCode     String?
+  smsCodeExpiresAt DateTime?
+  
+  // Backup Codes
+  backupCodes String? // JSON array
+  
+  // Status
+  enabled   Boolean  @default(false)
+  
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, method])
+  @@map("user_2fa")
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String
+  roleId    String
+  
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  
+  // Assignment Information
+  assignedAt DateTime @default(now())
+  assignedBy String?
+  expiresAt  DateTime?
+  
+  // Scope Limitations
+  scopeType  String?  // e.g., "organization", "department", "customer_group"
+  scopeId    String?
+  
+  // Status
+  active     Boolean  @default(true)
+  
+  @@unique([userId, roleId, scopeType, scopeId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+model UserSession {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  expiresAt     DateTime  @map("expires_at")
+  ipAddress     String?   @map("ip_address")
+  userAgent     String?   @map("user_agent")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_sessions")
+  @@index([userId])
+  @@index([expiresAt])
+}
