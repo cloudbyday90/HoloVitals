@@ -118,9 +118,13 @@ else
     cd HoloVitals
 fi
 
-# Checkout v1.4.1
-echo "Checking out v1.4.1..."
-git checkout v1.4.1
+# Stay on main branch (v1.4.1 tag doesn't have the application code)
+echo "Using main branch..."
+git checkout main
+
+# Navigate to the application directory
+echo "Navigating to medical-analysis-platform..."
+cd medical-analysis-platform
 
 echo ""
 echo "=================================================="
@@ -135,7 +139,7 @@ echo "=================================================="
 echo "Phase 4: Environment Configuration"
 echo "=================================================="
 
-# Create .env.local
+# Create .env.local in the medical-analysis-platform directory
 echo "Creating .env.local configuration..."
 cat > .env.local << EOF
 # Database Configuration
@@ -222,17 +226,20 @@ echo "   CREATE USER holovitals WITH PASSWORD '${DB_PASSWORD}';"
 echo "   GRANT ALL PRIVILEGES ON DATABASE holovitals TO holovitals;"
 echo "   \\q"
 echo ""
-echo "2. Run database migrations:"
+echo "2. Navigate to the application directory:"
+echo "   cd HoloVitals/medical-analysis-platform"
+echo ""
+echo "3. Run database migrations:"
 echo "   npx prisma migrate deploy"
 echo ""
-echo "3. Update API keys in .env.local:"
+echo "4. Update API keys in .env.local:"
 echo "   - OPENAI_API_KEY"
 echo "   - ANTHROPIC_API_KEY"
 echo ""
-echo "4. Start the application:"
+echo "5. Start the application:"
 echo "   npm run start"
 echo ""
-echo "5. Access your application at:"
+echo "6. Access your application at:"
 echo "   https://${DOMAIN_NAME}"
 echo ""
 echo "⚠️  IMPORTANT: Save your database password securely!"
