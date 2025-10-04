@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# HoloVitals v1.4.3 One-Line Installer
-# Installation: wget https://raw.githubusercontent.com/cloudbyday90/HoloVitals/main/scripts/install-v1.4.3.sh && chmod +x install-v1.4.3.sh && ./install-v1.4.3.sh
+# HoloVitals v1.4.4 One-Line Installer
+# Installation: wget https://raw.githubusercontent.com/cloudbyday90/HoloVitals/main/scripts/install-v1.4.4.sh && chmod +x install-v1.4.4.sh && ./install-v1.4.4.sh
 
 set -e
 
@@ -13,11 +13,11 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Version
-VERSION="1.4.3"
+VERSION="1.4.4"
 
 echo "=================================================="
 echo "HoloVitals v${VERSION} Production Installer"
-echo "Bug Fix Release - Next.js Configuration Fix"
+echo "Bug Fix Release - Smart Installation with Skip Checks"
 echo "=================================================="
 echo ""
 echo "⚠️  Current user: $(whoami)"
