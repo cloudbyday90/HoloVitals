@@ -142,7 +142,7 @@ export function ChatInterface({ documentId, onSendMessage }: ChatInterfaceProps)
                 <Bot className="w-5 h-5 text-primary" />
               </div>
               <div className="bg-gray-100 rounded-lg p-4">
-                <Loader2 className="w-5 h-5 animate-spin text-gray-600" />
+                <Loader2 className="w-5 h-5 animate-spin text-gray-800" />
               </div>
             </div>
           )}
@@ -153,7 +153,7 @@ export function ChatInterface({ documentId, onSendMessage }: ChatInterfaceProps)
         {/* Suggested Questions */}
         {messages.length === 1 && (
           <div className="px-6 pb-4">
-            <p className="text-sm text-gray-600 mb-2">Suggested questions:</p>
+            <p className="text-sm text-gray-800 mb-2">Suggested questions:</p>
             <div className="flex flex-wrap gap-2">
               {suggestedQuestions.map((question, index) => (
                 <button
@@ -193,7 +193,7 @@ export function ChatInterface({ documentId, onSendMessage }: ChatInterfaceProps)
               )}
             </Button>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-700 mt-2">
             Press Enter to send, Shift+Enter for new line
           </p>
         </div>

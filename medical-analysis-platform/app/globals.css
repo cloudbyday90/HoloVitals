@@ -2,12 +2,42 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: #111827;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111827;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #f3f4f6;
+  --accent-foreground: #111827;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #111827;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -19,8 +49,224 @@
   }
 }
 
+/* Dark mode styles */
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --card: #1a1a1a;
+  --card-foreground: #ededed;
+  --popover: #1a1a1a;
+  --popover-foreground: #ededed;
+  --primary: #ededed;
+  --primary-foreground: #0a0a0a;
+  --secondary: #262626;
+  --secondary-foreground: #ededed;
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+  --accent: #262626;
+  --accent-foreground: #ededed;
+  --border: #404040;
+  --input: #404040;
+  --ring: #ededed;
+}
+
+.dark body {
+  background-color: #0a0a0a;
+  color: #ededed;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* FORCE TEXT VISIBILITY - Using !important to override everything */
+
+/* Headings must be dark */
+h1, h2, h3, h4, h5, h6 {
+  color: #111827 !important;
+}
+
+/* Paragraphs must be visible */
+p {
+  color: #374151 !important;
+}
+
+/* Spans must be visible */
+span {
+  color: #374151 !important;
+}
+
+/* Card titles must be dark */
+[class*="CardTitle"] {
+  color: #111827 !important;
+}
+
+/* Card descriptions should be visible but muted */
+[class*="CardDescription"] {
+  color: #4b5563 !important;
+}
+
+/* Muted text should still be readable */
+.text-muted-foreground {
+  color: #4b5563 !important;
+}
+
+/* Stat numbers (large text) must be dark and bold */
+.text-2xl, .text-3xl, .text-4xl {
+  color: #111827 !important;
+}
+
+/* Any bold div (stat numbers) must be dark */
+div.font-bold {
+  color: #111827 !important;
+}
+
+/* Small text should be visible */
+.text-xs, .text-sm {
+  color: #374151 !important;
+}
+
+/* But preserve layout - these should not have forced colors */
+.grid, .flex, 
+[class*="grid"], [class*="flex"],
+.space-y-6, .space-y-4, .space-y-2,
+[class*="space-"] {
+  color: inherit !important;
+}
+
+/* Fix sidebar icons - make them darker */
+nav svg, 
+[class*="sidebar"] svg,
+a svg {
+  color: #374151 !important;
+  opacity: 1 !important;
+}
+
+/* Fix notification icon */
+[class*="notification"] svg,
+button svg {
+  color: #374151 !important;
+  opacity: 1 !important;
+}
+
+/* Fix icons in general */
+svg {
+  opacity: 1 !important;
+}
+
+/* Preserve green color for success indicators */
+.text-green-600 {
+  color: #16a34a !important;
+}
+
+/* Preserve red color for notifications */
+.text-red-600, .text-red-500 {
+  color: #dc2626 !important;
+}
+
+/* Preserve blue color for info */
+.text-blue-600 {
+  color: #2563eb !important;
+}
+
+/* Preserve yellow color for warnings */
+.text-yellow-600 {
+  color: #ca8a04 !important;
+}
+
+/* Text on colored backgrounds needs to be even darker */
+[class*="bg-gradient"] h3,
+[class*="bg-gradient"] [class*="CardTitle"],
+[class*="bg-green"] h3,
+[class*="bg-green"] [class*="CardTitle"] {
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+/* Make sure text-gray-900 is actually very dark */
+.text-gray-900 {
+  color: #111827 !important;
+}
+
+/* Fix Input and Select components to match page styling */
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+textarea,
+input.flex,
+input[class*="rounded"],
+input[class*="border"] {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+  color: #111827 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280 !important;
+}
+
+/* Force all inputs to have white background */
+input {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+input:focus {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+/* Select trigger styling */
+button[role="combobox"],
+[data-radix-select-trigger] {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+  color: #111827 !important;
+}
+
+/* Select content (dropdown) styling */
+[data-radix-select-content],
+[data-radix-select-viewport] {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+  color: #111827 !important;
+}
+
+/* Select items */
+[data-radix-select-item] {
+  color: #111827 !important;
+}
+
+[data-radix-select-item]:hover,
+[data-radix-select-item][data-highlighted] {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+/* Fix Button components - ensure no black backgrounds */
+button[class*="outline"] {
+  background-color: #ffffff !important;
+  border-color: #d1d5db !important;
+  color: #111827 !important;
+}
+
+button[class*="outline"]:hover {
+  background-color: #f9fafb !important;
+  color: #111827 !important;
+}
+
+/* Ghost buttons should have transparent backgrounds */
+button[class*="ghost"] {
+  background-color: transparent !important;
+  color: #111827 !important;
+}
+
+button[class*="ghost"]:hover {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
 }

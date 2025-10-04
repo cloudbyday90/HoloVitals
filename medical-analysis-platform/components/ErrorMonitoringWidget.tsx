@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * Error Monitoring Widget
  * Compact widget for dashboard showing error summary
@@ -89,8 +91,8 @@ export function ErrorMonitoringWidget() {
             {/* Total Errors */}
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold">{stats.total}</p>
-                <p className="text-sm text-gray-600">Total errors (24h)</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100 font-bold">{stats.total}</p>
+                <p className="text-sm text-gray-800">Total errors (24h)</p>
               </div>
               <div className="flex items-center gap-1">
                 {stats.trend.change > 0 ? (

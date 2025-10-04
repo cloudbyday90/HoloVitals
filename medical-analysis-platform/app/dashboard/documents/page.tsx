@@ -4,6 +4,19 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+   
+   // Utility function to format dates consistently (avoids hydration mismatch)
+   const formatDate = (date: Date): string => {
+     const year = date.getFullYear();
+     const month = String(date.getMonth() + 1).padStart(2, '0');
+     const day = String(date.getDate()).padStart(2, '0');
+     return `${month}/${day}/${year}`;
+   };
+   
+   // Utility function to format numbers consistently
+   const formatNumber = (num: number): string => {
+     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+   };
 import {
   FileText,
   Upload,
@@ -133,7 +146,7 @@ export default function DocumentsPage() {
       case 'failed':
         return <AlertCircle className="w-4 h-4 text-red-600" />;
       default:
-        return <Clock className="w-4 h-4 text-gray-400" />;
+        return <Clock className="w-4 h-4 text-gray-600" />;
     }
   };
 
@@ -152,17 +165,17 @@ export default function DocumentsPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold mb-2">Documents</h1>
-        <p className="text-gray-600">Upload and manage your medical documents</p>
+        <p className="text-gray-800">Upload and manage your medical documents</p>
       </div>
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Total Documents
             </CardTitle>
-            <FileText className="w-4 h-4 text-gray-500" />
+            <FileText className="w-4 h-4 text-gray-700" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
@@ -171,7 +184,7 @@ export default function DocumentsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Processing
             </CardTitle>
             <Loader2 className="w-4 h-4 text-blue-500" />
@@ -183,7 +196,7 @@ export default function DocumentsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Completed
             </CardTitle>
             <CheckCircle2 className="w-4 h-4 text-green-500" />
@@ -195,14 +208,14 @@ export default function DocumentsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Tokens Saved
             </CardTitle>
             <FileType className="w-4 h-4 text-purple-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
-              {stats.totalTokensSaved.toLocaleString()}
+              {formatNumber(stats.totalTokensSaved)}
             </div>
           </CardContent>
         </Card>
@@ -235,15 +248,15 @@ export default function DocumentsPage() {
                 <>
                   <Loader2 className="w-12 h-12 text-blue-500 mb-4 animate-spin" />
                   <p className="text-lg font-medium mb-2">Uploading...</p>
-                  <p className="text-sm text-gray-500">Please wait</p>
+                  <p className="text-sm text-gray-700">Please wait</p>
                 </>
               ) : (
                 <>
-                  <Upload className="w-12 h-12 text-gray-400 mb-4" />
+                  <Upload className="w-12 h-12 text-gray-600 mb-4" />
                   <p className="text-lg font-medium mb-2">
                     Click to upload or drag and drop
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-700">
                     PDF, JPG, PNG up to 10MB
                   </p>
                 </>
@@ -260,7 +273,7 @@ export default function DocumentsPage() {
             {/* Search */}
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600" />
                 <Input
                   placeholder="Search documents..."
                   value={searchQuery}
@@ -305,9 +318,9 @@ export default function DocumentsPage() {
         {filteredDocuments.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">No documents found</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-800">
                 {searchQuery || filterType !== 'all' || filterStatus !== 'all'
                   ? 'Try adjusting your filters'
                   : 'Upload your first document to get started'}
@@ -330,14 +343,14 @@ export default function DocumentsPage() {
                         {doc.name}
                       </h3>
                       
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-3">
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-800 mb-3">
                         <span className="flex items-center gap-1">
                           <FileType className="w-4 h-4" />
                           {doc.type}
                         </span>
                         <span className="flex items-center gap-1">
                           <Calendar className="w-4 h-4" />
-                          {doc.uploadDate.toLocaleDateString()}
+                          {formatDate(doc.uploadDate)}
                         </span>
                         <span>{doc.size.toFixed(2)} MB</span>
                       </div>
@@ -356,7 +369,7 @@ export default function DocumentsPage() {
                         </span>
                         {doc.tokensSaved && (
                           <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
-                            {doc.tokensSaved.toLocaleString()} tokens saved
+                            {formatNumber(doc.tokensSaved)} tokens saved
                           </span>
                         )}
                       </div>

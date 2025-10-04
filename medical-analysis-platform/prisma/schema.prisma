@@ -56,27 +56,7 @@ model User {
     
     // EHR Integration Relations
     ehrConnections        EHRConnection[]
-    
-    // Beta Testing
-    betaCodeId            String?
-    betaCode              BetaCode? @relation(fields: [betaCodeId], references: [id])
-    isBetaTester          Boolean   @default(false)
-    betaJoinedAt          DateTime?
-    
-    // Token Tracking
-    tokensUsed            Int       @default(0)
-    tokensLimit           Int       @default(0)
-    tokensResetAt         DateTime?
-    
-    // Storage Tracking (in MB)
-    storageUsed           Int       @default(0)
-    storageLimit          Int       @default(0)
-    
-    // Beta System Relations
-    tokenUsage            TokenUsage[]
   
-  @@index([isBetaTester])
-  @@index([betaCodeId])
   @@map("users")
 }
 
@@ -916,20 +896,29 @@ model AnalysisTask {
 // ============================================================================
 
 model ErrorLog {
-  id          String   @id @default(uuid())
-  severity    String   // LOW, MEDIUM, HIGH, CRITICAL
-  message     String   @db.Text
-  code        String?
-  statusCode  Int?
-  stack       String?  @db.Text
-  details     String?  @db.Text // JSON string
-  userId      String?
-  requestId   String?
-  endpoint    String?
-  method      String?
-  userAgent   String?
-  ipAddress   String?
-  timestamp   DateTime @default(now())
+  id              String    @id @default(uuid())
+  severity        String    // LOW, MEDIUM, HIGH, CRITICAL
+  message         String    @db.Text
+  code            String?
+  masterCode      String?   // Master error code for grouping
+  statusCode      Int?
+  stack           String?   @db.Text
+  details         String?   @db.Text // JSON string
+  userId          String?
+  requestId       String?
+  endpoint        String?
+  method          String?
+  userAgent       String?
+  ipAddress       String?
+  timestamp       DateTime  @default(now())
+  
+  // Deduplication fields
+  errorHash       String?   // MD5 hash for deduplication
+  occurrenceCount Int       @default(1)
+  firstSeen       DateTime?
+  lastSeen        DateTime?
+  sampleStacks    String?   @db.Text // JSON array of sample stack traces
+  isDuplicate     Boolean   @default(false)
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
@@ -938,7 +927,27 @@ model ErrorLog {
   @@index([severity])
   @@index([code])
   @@index([endpoint])
+  @@index([errorHash])
+  @@index([masterCode])
+  @@index([errorHash, lastSeen])
+  @@index([severity, timestamp])
+  @@index([occurrenceCount])
   @@map("error_logs")
+}
+
+model ErrorMaster {
+  id              String   @id @default(uuid())
+  masterCode      String   @unique
+  category        String
+  description     String   @db.Text
+  severity        String
+  resolutionGuide String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([masterCode])
+  @@index([category])
+  @@map("error_masters")
 }
 
 // ============================================================================
@@ -1473,95 +1482,341 @@ enum BulkExportStatus {
   CANCELLED
 }
 
-// Beta Testing System Schema
-// Add these models to your main schema.prisma file
+// ============================================================================
+// EHR DATA SYNCHRONIZATION ENGINE
+// ============================================================================
 
-model BetaCode {
-  id            String   @id @default(cuid())
-  code          String   @unique
-  maxUses       Int      @default(1)
-  usedCount     Int      @default(0)
-  expiresAt     DateTime?
-  createdAt     DateTime @default(now())
-  createdBy     String
-  
-  // Limits for this code (in MB for storage)
-  tokenLimit    Int      @default(3000000)  // 3M tokens
-  storageLimit  Int      @default(500)      // 500MB
-  
-  // Status
-  isActive      Boolean  @default(true)
-  
-  // Relationships
-  users         User[]
-  
-  @@index([code])
-  @@index([isActive])
-  @@index([createdAt])
-}
+model SyncJob {
+  id                String          @id @default(cuid())
+  type              String          // FULL_SYNC, INCREMENTAL_SYNC, PATIENT_SYNC, RESOURCE_SYNC, WEBHOOK_SYNC
+  direction         String          // INBOUND, OUTBOUND, BIDIRECTIONAL
+  priority          Int             @default(3) // 1=CRITICAL, 2=HIGH, 3=NORMAL, 4=LOW, 5=BACKGROUND
+  status            String          @default("PENDING") // PENDING, QUEUED, PROCESSING, COMPLETED, FAILED, CANCELLED, RETRYING
 
+  // Connection info
+  ehrProvider       String
+  ehrConnectionId   String
+  userId            String
 
-model TokenUsage {
-  id            String   @id @default(cuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  tokensUsed    Int
-  operation     String   // 'chat', 'analysis', 'insights', 'document_analysis', etc.
-  metadata      Json?    // Additional context
-  timestamp     DateTime @default(now())
-  
-  @@index([userId, timestamp])
-  @@index([operation])
-}
+  // Resource info
+  patientId         String?
+  resourceType      String?
+  resourceIds       String[]        @default([])
 
-model BetaFeedback {
-  id            String   @id @default(cuid())
-  userId        String
-  
-  // Feedback details
-  type          String   // 'bug', 'feature_request', 'general', 'improvement'
-  title         String
-  description   String   @db.Text
-  severity      String?  // 'low', 'medium', 'high', 'critical'
-  
-  // Status
-  status        String   @default("open") // 'open', 'in_progress', 'resolved', 'closed'
-  priority      String?  // 'low', 'medium', 'high'
-  
-  // Metadata
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  resolvedAt    DateTime?
-  resolvedBy    String?
-  
-  // Additional context
-  metadata      Json?    // Browser info, page URL, etc.
-  
-  @@index([userId, createdAt])
+  // Configuration
+  filters           Json?
+  options           Json?
+  metadata          Json?
+
+  // Execution tracking
+  startTime         DateTime?
+  endTime           DateTime?
+  duration          Int?            // milliseconds
+  retryCount        Int             @default(0)
+
+  // Results
+  recordsProcessed  Int             @default(0)
+  recordsSucceeded  Int             @default(0)
+  recordsFailed     Int             @default(0)
+  recordsSkipped    Int             @default(0)
+  summary           Json?
+
+  // Timestamps
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // Relations
+  errors            SyncError[]
+  conflicts         SyncConflict[]
+
+  @@index([ehrConnectionId])
   @@index([status])
-  @@index([type])
+  @@index([createdAt])
+  @@index([userId])
+  @@map("sync_jobs")
 }
 
-model BetaAnalytics {
-  id            String   @id @default(cuid())
-  userId        String
+model SyncError {
+  id                String          @id @default(cuid())
+  syncJobId         String
+  syncJob           SyncJob         @relation(fields: [syncJobId], references: [id], onDelete: Cascade)
+
+  severity          String          // CRITICAL, ERROR, WARNING
+  code              String
+  message           String          @db.Text
+  resourceType      String?
+  resourceId        String?
+  stackTrace        String?         @db.Text
+  context           Json?
+
+  timestamp         DateTime        @default(now())
+
+  @@index([syncJobId])
+  @@index([severity])
+  @@map("sync_errors")
+}
+
+model SyncConflict {
+  id                String          @id @default(cuid())
+  syncJobId         String?
+  syncJob           SyncJob?        @relation(fields: [syncJobId], references: [id], onDelete: SetNull)
+
+  type              String          // UPDATE_UPDATE, UPDATE_DELETE, DELETE_UPDATE, CREATE_CREATE, FIELD_MISMATCH
+  severity          String          // CRITICAL, HIGH, MEDIUM, LOW
+  status            String          @default("DETECTED") // DETECTED, PENDING_REVIEW, RESOLVED, IGNORED
+
+  resourceType      String
+  resourceId        String
+  field             String
+
+  localValue        Json?
+  remoteValue       Json?
+  localTimestamp    DateTime
+  remoteTimestamp   DateTime
+  localVersion      String?
+  remoteVersion     String?
+
+  resolution        Json?           // Contains strategy, resolvedValue, resolvedBy, resolvedAt, reason
+
+  detectedAt        DateTime        @default(now())
+  detectedBy        String
+  metadata          Json?
+
+  @@index([syncJobId])
+  @@index([status])
+  @@index([resourceType, resourceId])
+  @@map("sync_conflicts")
+}
+
+model WebhookConfig {
+  id                String          @id @default(cuid())
+  ehrProvider       String
+  ehrConnectionId   String
+  endpoint          String
+  secret            String
+  enabled           Boolean         @default(true)
+
+  events            String[]        @default([])
+  retryAttempts     Int             @default(3)
+  retryDelay        Int             @default(2000) // milliseconds
+  timeout           Int             @default(30000) // milliseconds
+
+  signatureHeader   String?
+  signatureAlgorithm String?        // sha256, sha512
+  customHeaders     Json?
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([ehrProvider, ehrConnectionId])
+  @@map("webhook_configs")
+}
+
+model WebhookLog {
+  id                String          @id @default(cuid())
+  ehrProvider       String
+  ehrConnectionId   String
+
+  payload           Json
+  status            String          @default("RECEIVED") // RECEIVED, VALIDATED, PROCESSING, COMPLETED, FAILED, RETRYING, IGNORED
+
+  syncJobId         String?
+  errors            String[]        @default([])
+  warnings          String[]        @default([])
+
+  receivedAt        DateTime        @default(now())
+  processedAt       DateTime?
+
+  @@index([ehrProvider, ehrConnectionId])
+  @@index([status])
+  @@index([receivedAt])
+  @@map("webhook_logs")
+}
+
+model TransformationRule {
+  id                String          @id @default(cuid())
+  name              String
+  type              String          // FIELD_MAPPING, VALUE_MAPPING, DATA_TYPE_CONVERSION, etc.
+
+  ehrProvider       String
+  resourceType      String
+  direction         String          // INBOUND, OUTBOUND
+
+  sourceFormat      String          // FHIR_R4, FHIR_STU3, HL7_V2, CUSTOM_JSON, etc.
+  targetFormat      String
+
+  sourceField       String
+  targetField       String
+
+  mapping           Json?
+  function          String?         @db.Text
+  condition         String?         @db.Text
+
+  priority          Int             @default(100)
+  enabled           Boolean         @default(true)
+  metadata          Json?
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([ehrProvider, resourceType, direction])
+  @@map("transformation_rules")
+}
+
+model FieldMapping {
+  id                String          @id @default(cuid())
+  ehrProvider       String
+  resourceType      String
+
+  sourceField       String
+  targetField       String
+  required          Boolean         @default(false)
+  defaultValue      Json?
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([ehrProvider, resourceType])
+  @@map("field_mappings")
+}
+
+model SyncStatistics {
+  id                String          @id @default(cuid())
+  ehrConnectionId   String
+  date              DateTime        @db.Date
+
+  totalJobs         Int             @default(0)
+  completedJobs     Int             @default(0)
+  failedJobs        Int             @default(0)
+
+  recordsProcessed  Int             @default(0)
+  recordsSucceeded  Int             @default(0)
+  recordsFailed     Int             @default(0)
+
+  averageDuration   Int             @default(0) // milliseconds
+  totalDuration     Int             @default(0) // milliseconds
+
+  bytesTransferred  BigInt          @default(0)
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([ehrConnectionId, date])
+  @@index([date])
+  @@map("sync_statistics")
+}
+
+// ============================================================================
+// HIPAA COMPLIANCE MONITORING SYSTEM
+// CRITICAL: Separate from general error logging
+// Every incident tracked individually, NO deduplication, 6+ year retention
+// ============================================================================
+
+model HipaaIncident {
+  id                      String    @id @default(uuid())
+  incidentNumber          String    @unique
+  timestamp               DateTime
+  severity                String    // CRITICAL, HIGH, MEDIUM, LOW
+  category                String
+  description             String    @db.Text
   
-  // Event tracking
-  eventType     String   // 'page_view', 'feature_used', 'error', 'conversion', etc.
-  eventName     String
-  eventData     Json?
-  
-  // Session info
-  sessionId     String?
-  timestamp     DateTime @default(now())
+  // PHI Information
+  phiExposed              Boolean   @default(false)
+  phiType                 String?   @db.Text // JSON array
+  numberOfRecordsAffected Int?
+  patientIds              String?   @db.Text // JSON array
   
   // Context
-  page          String?
-  userAgent     String?
-  ipAddress     String?
+  userId                  String?
+  userRole                String?
+  ipAddress               String?
+  endpoint                String?   @db.Text
+  action                  String?   @db.Text
+  stackTrace              String?   @db.Text
   
-  @@index([userId, timestamp])
-  @@index([eventType])
-  @@index([sessionId])
+  // Investigation
+  status                  String    @default("NEW")
+  assignedTo              String?
+  investigationNotes      String?   @db.Text
+  resolutionNotes         String?   @db.Text
+  
+  // Compliance
+  reportedToOCR           Boolean   @default(false)
+  reportedDate            DateTime?
+  breachNotificationSent  Boolean   @default(false)
+  breachNotificationDate  DateTime?
+  
+  // Audit
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  closedAt                DateTime?
+  
+  // Relations
+  auditLog                HipaaIncidentAuditLog[]
+  notifications           HipaaNotification[]
+
+  @@index([incidentNumber])
+  @@index([timestamp])
+  @@index([severity])
+  @@index([status])
+  @@index([category])
+  @@index([assignedTo])
+  @@index([phiExposed])
+  @@index([userId])
+  @@map("hipaa_incidents")
+}
+
+model HipaaIncidentAuditLog {
+  id            String    @id @default(uuid())
+  incidentId    String
+  timestamp     DateTime  @default(now())
+  action        String
+  performedBy   String?
+  previousState String?   @db.Text // JSON
+  newState      String    @db.Text // JSON
+  notes         String?   @db.Text
+  
+  incident      HipaaIncident @relation(fields: [incidentId], references: [id], onDelete: Restrict)
+
+  @@index([incidentId])
+  @@index([timestamp])
+  @@index([performedBy])
+  @@map("hipaa_incident_audit_log")
+}
+
+model HipaaComplianceTeam {
+  id                      String    @id @default(uuid())
+  userId                  String    @unique
+  role                    String    // COMPLIANCE_OFFICER, PRIVACY_OFFICER, SECURITY_OFFICER, INVESTIGATOR
+  email                   String
+  phone                   String?
+  notificationPreferences String?   @db.Text // JSON
+  active                  Boolean   @default(true)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([role])
+  @@index([active])
+  @@map("hipaa_compliance_team")
+}
+
+model HipaaNotification {
+  id                   String    @id @default(uuid())
+  incidentId           String
+  notificationType     String    // EMAIL, SMS, PHONE, CRITICAL_ALERT, ESCALATION
+  recipientId          String?
+  recipientEmail       String
+  sentAt               DateTime  @default(now())
+  delivered            Boolean   @default(false)
+  deliveryConfirmedAt  DateTime?
+  errorMessage         String?   @db.Text
+  
+  incident             HipaaIncident @relation(fields: [incidentId], references: [id], onDelete: Restrict)
+
+  @@index([incidentId])
+  @@index([sentAt])
+  @@index([recipientId])
+  @@index([delivered])
+  @@map("hipaa_notifications")
 }

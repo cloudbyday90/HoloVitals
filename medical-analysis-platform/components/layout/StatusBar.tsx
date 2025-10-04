@@ -16,12 +16,20 @@ export default function StatusBar() {
     totalCost: 0,
     activeTasks: 0,
     activeInstances: 0,
-    lastUpdate: new Date().toLocaleTimeString(),
+    lastUpdate: '',
   });
 
   const [isOnline, setIsOnline] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Set mounted flag and initial time
+    setMounted(true);
+    setStatus((prev) => ({
+      ...prev,
+      lastUpdate: new Date().toLocaleTimeString(),
+    }));
+
     // Simulate real-time updates
     const interval = setInterval(() => {
       setStatus((prev) => ({
@@ -47,13 +55,13 @@ export default function StatusBar() {
               'w-2 h-2 rounded-full',
               isOnline ? 'bg-green-500' : 'bg-red-500'
             )} />
-            <span className="text-gray-600 hidden sm:inline">
+            <span className="text-gray-800 hidden sm:inline">
               {isOnline ? 'Online' : 'Offline'}
             </span>
           </div>
 
           {/* Active Tasks */}
-          <div className="flex items-center gap-2 text-gray-600">
+          <div className="flex items-center gap-2 text-gray-800">
             <Activity className="w-4 h-4" />
             <span className="hidden sm:inline">
               {status.activeTasks} active {status.activeTasks === 1 ? 'task' : 'tasks'}
@@ -62,7 +70,7 @@ export default function StatusBar() {
           </div>
 
           {/* Active Instances */}
-          <div className="flex items-center gap-2 text-gray-600">
+          <div className="flex items-center gap-2 text-gray-800">
             <Server className="w-4 h-4" />
             <span className="hidden sm:inline">
               {status.activeInstances} {status.activeInstances === 1 ? 'instance' : 'instances'}
@@ -74,19 +82,21 @@ export default function StatusBar() {
         {/* Right Section - Cost & Time */}
         <div className="flex items-center gap-4">
           {/* Total Cost */}
-          <div className="flex items-center gap-2 text-gray-600">
+          <div className="flex items-center gap-2 text-gray-800">
             <DollarSign className="w-4 h-4" />
             <span className="font-medium">
               ${status.totalCost.toFixed(2)}
             </span>
-            <span className="text-xs text-gray-500 hidden md:inline">today</span>
+            <span className="text-xs text-gray-700 hidden md:inline">today</span>
           </div>
 
           {/* Last Update */}
-          <div className="flex items-center gap-2 text-gray-500 text-xs hidden lg:flex">
-            <Clock className="w-3 h-3" />
-            <span>Updated {status.lastUpdate}</span>
-          </div>
+          {mounted && (
+            <div className="flex items-center gap-2 text-gray-700 text-xs hidden lg:flex">
+              <Clock className="w-3 h-3" />
+              <span>Updated {status.lastUpdate}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
