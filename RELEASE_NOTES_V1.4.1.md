@@ -61,7 +61,7 @@ PatientDetailView         → CustomerDetailView
 ### One-Line Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/cloudbyday90/HoloVitals/main/scripts/install-v1.4.1.sh | bash
+wget https://raw.githubusercontent.com/cloudbyday90/HoloVitals/main/scripts/install-v1.4.1.sh && chmod +x install-v1.4.1.sh && ./install-v1.4.1.sh
 ```
 
 This script will:
