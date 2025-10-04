@@ -1,0 +1,389 @@
+// Employee Management & RBAC Schema
+// This schema extends the existing Prisma schema with employee management capabilities
+
+// ============================================================================
+// EMPLOYEE MODELS
+// ============================================================================
+
+model Employee {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Basic Information
+  employeeId        String   @unique // Company employee ID (e.g., EMP-001)
+  firstName         String
+  lastName          String
+  email             String   @unique
+  phone             String?
+  dateOfBirth       DateTime?
+  
+  // Employment Details
+  department        Department @relation(fields: [departmentId], references: [id])
+  departmentId      String
+  jobTitle          String
+  hireDate          DateTime
+  terminationDate   DateTime?
+  employmentStatus  EmploymentStatus @default(ACTIVE)
+  
+  // Role and Permissions
+  roles             EmployeeRole[]
+  customPermissions EmployeePermission[]
+  
+  // Onboarding
+  onboardingStatus  OnboardingStatus @default(INVITED)
+  onboarding        EmployeeOnboarding?
+  
+  // Contact Information
+  address           String?
+  city              String?
+  state             String?
+  zipCode           String?
+  country           String?   @default("USA")
+  emergencyContact  Json?     // {name, phone, relationship, email}
+  
+  // Compliance & Training
+  hipaaTrainingDate           DateTime?
+  hipaaTrainingExpiresAt      DateTime?
+  backgroundCheckDate         DateTime?
+  backgroundCheckStatus       String?
+  confidentialityAgreementDate DateTime?
+  
+  // Professional Information
+  licenseNumber     String?
+  licenseState      String?
+  licenseExpiresAt  DateTime?
+  certifications    Json?     // Array of certifications
+  
+  // Metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  createdBy         String
+  lastModifiedBy    String?
+  notes             String?   @db.Text
+  
+  // Relations
+  auditLogs         AuditLog[]
+  managedEmployees  Employee[] @relation("ManagerRelation")
+  manager           Employee?  @relation("ManagerRelation", fields: [managerId], references: [id])
+  managerId         String?
+  
+  // HIPAA Incident Relations (for HIPAA officers)
+  assignedIncidents HIPAAIncident[] @relation("AssignedOfficer")
+  
+  @@index([email])
+  @@index([employeeId])
+  @@index([departmentId])
+  @@index([employmentStatus])
+  @@index([onboardingStatus])
+  @@map("employees")
+}
+
+// ============================================================================
+// DEPARTMENT MODEL
+// ============================================================================
+
+model Department {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  code        String     @unique // e.g., "CLIN", "IT", "HR"
+  description String?    @db.Text
+  managerId   String?
+  
+  // Department Type
+  type        DepartmentType @default(GENERAL)
+  
+  // Budget & Cost Center
+  costCenter  String?
+  budget      Decimal?   @db.Decimal(12, 2)
+  
+  // Relations
+  employees   Employee[]
+  
+  // Metadata
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  active      Boolean    @default(true)
+  
+  @@index([type])
+  @@map("departments")
+}
+
+// ============================================================================
+// ROLE & PERMISSION MODELS
+// ============================================================================
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  code        String   @unique // e.g., "ADMIN", "PHYSICIAN", "COMPLIANCE_OFFICER"
+  description String?  @db.Text
+  
+  // Hierarchy
+  level       Int      // 1 = highest (SUPER_ADMIN), higher numbers = lower privilege
+  parentRoleId String?
+  parentRole  Role?    @relation("RoleHierarchy", fields: [parentRoleId], references: [id])
+  childRoles  Role[]   @relation("RoleHierarchy")
+  
+  // Permissions
+  permissions String[] // Array of permission codes
+  
+  // Role Type
+  type        RoleType @default(STANDARD)
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  active      Boolean  @default(true)
+  
+  // Relations
+  employees   EmployeeRole[]
+  
+  @@index([code])
+  @@index([level])
+  @@map("roles")
+}
+
+model EmployeeRole {
+  id         String   @id @default(cuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  roleId     String
+  role       Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  
+  // Assignment Details
+  assignedAt DateTime @default(now())
+  assignedBy String
+  expiresAt  DateTime?
+  isPrimary  Boolean  @default(false) // Primary role for the employee
+  
+  // Metadata
+  notes      String?  @db.Text
+  
+  @@unique([employeeId, roleId])
+  @@index([employeeId])
+  @@index([roleId])
+  @@map("employee_roles")
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  code        String   @unique // e.g., "clinical.read.all"
+  category    PermissionCategory
+  description String?  @db.Text
+  
+  // Permission Details
+  resource    String   // What resource this permission applies to
+  action      String   // What action is allowed (read, write, delete, etc.)
+  scope       String?  // Scope of permission (all, assigned, own, etc.)
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  active      Boolean  @default(true)
+  
+  // Relations
+  employees   EmployeePermission[]
+  
+  @@index([code])
+  @@index([category])
+  @@map("permissions")
+}
+
+model EmployeePermission {
+  id           String     @id @default(cuid())
+  employeeId   String
+  employee     Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  
+  // Grant Details
+  grantedAt    DateTime   @default(now())
+  grantedBy    String
+  expiresAt    DateTime?
+  reason       String?    @db.Text
+  
+  @@unique([employeeId, permissionId])
+  @@index([employeeId])
+  @@index([permissionId])
+  @@map("employee_permissions")
+}
+
+// ============================================================================
+// ONBOARDING MODELS
+// ============================================================================
+
+model EmployeeOnboarding {
+  id                String   @id @default(cuid())
+  employeeId        String   @unique
+  employee          Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  
+  // Invitation
+  invitationToken   String   @unique
+  invitationSentAt  DateTime?
+  invitationExpires DateTime?
+  invitationAcceptedAt DateTime?
+  
+  // Checklist
+  checklist         Json     // Array of checklist items with completion status
+  checklistProgress Int      @default(0) // Percentage complete (0-100)
+  
+  // Stages
+  currentStage      OnboardingStage @default(INVITATION)
+  stageHistory      Json     // Array of stage transitions with timestamps
+  
+  // Documents
+  documentsRequired Json     // Array of required documents
+  documentsUploaded Json     // Array of uploaded documents with metadata
+  
+  // Training
+  trainingModules   Json     // Array of training modules with completion status
+  trainingProgress  Int      @default(0) // Percentage complete (0-100)
+  
+  // Compliance
+  hipaaTrainingCompleted Boolean @default(false)
+  backgroundCheckCompleted Boolean @default(false)
+  confidentialityAgreementSigned Boolean @default(false)
+  
+  // Completion
+  completedAt       DateTime?
+  completedBy       String?
+  
+  // Metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  notes             String?  @db.Text
+  
+  @@index([invitationToken])
+  @@index([currentStage])
+  @@map("employee_onboarding")
+}
+
+// ============================================================================
+// AUDIT LOG MODEL
+// ============================================================================
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  employeeId  String?
+  employee    Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+  
+  // Action Details
+  action      AuditAction // CREATE, READ, UPDATE, DELETE, LOGIN, LOGOUT, etc.
+  resource    String      // What was accessed/modified (e.g., "Patient", "Employee")
+  resourceId  String?     // ID of the resource
+  
+  // Change Details
+  changes     Json?       // Before/after values for updates
+  details     String?     @db.Text
+  
+  // Request Details
+  ipAddress   String?
+  userAgent   String?
+  method      String?     // HTTP method (GET, POST, PUT, DELETE)
+  endpoint    String?     // API endpoint
+  
+  // Result
+  success     Boolean     @default(true)
+  errorMessage String?    @db.Text
+  
+  // Metadata
+  createdAt   DateTime    @default(now())
+  
+  @@index([employeeId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum EmploymentStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  TERMINATED
+  ON_LEAVE
+  PROBATION
+}
+
+enum OnboardingStatus {
+  INVITED
+  ACCOUNT_SETUP
+  ROLE_ASSIGNMENT
+  TRAINING
+  COMPLIANCE
+  PROVISIONING
+  ACTIVE
+  INCOMPLETE
+  CANCELLED
+}
+
+enum OnboardingStage {
+  INVITATION
+  ACCOUNT_SETUP
+  ROLE_ASSIGNMENT
+  TRAINING
+  COMPLIANCE
+  PROVISIONING
+  ACTIVE
+}
+
+enum DepartmentType {
+  CLINICAL
+  ADMINISTRATIVE
+  IT
+  FINANCE
+  HR
+  SUPPORT
+  COMPLIANCE
+  GENERAL
+}
+
+enum RoleType {
+  SYSTEM        // System-defined roles (cannot be deleted)
+  STANDARD      // Standard organizational roles
+  CUSTOM        // Custom roles created by admins
+  TEMPORARY     // Temporary roles with expiration
+}
+
+enum PermissionCategory {
+  SYSTEM
+  USER_MANAGEMENT
+  EMPLOYEE_MANAGEMENT
+  CLINICAL_DATA
+  HIPAA_COMPLIANCE
+  FINANCIAL
+  SUPPORT
+  DEVELOPMENT
+  REPORTING
+}
+
+enum AuditAction {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  EXPORT
+  IMPORT
+  APPROVE
+  REJECT
+  ASSIGN
+  UNASSIGN
+  GRANT
+  REVOKE
+  ENABLE
+  DISABLE
+}
+
+// ============================================================================
+// INDEXES FOR PERFORMANCE
+// ============================================================================
+
+// Additional indexes are defined inline with each model above
+// These ensure optimal query performance for common operations

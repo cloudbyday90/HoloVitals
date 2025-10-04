@@ -1,0 +1,223 @@
+// ============================================================================
+// EHR DATA SYNCHRONIZATION ENGINE
+// ============================================================================
+
+model SyncJob {
+  id                String          @id @default(cuid())
+  type              String          // FULL_SYNC, INCREMENTAL_SYNC, PATIENT_SYNC, RESOURCE_SYNC, WEBHOOK_SYNC
+  direction         String          // INBOUND, OUTBOUND, BIDIRECTIONAL
+  priority          Int             @default(3) // 1=CRITICAL, 2=HIGH, 3=NORMAL, 4=LOW, 5=BACKGROUND
+  status            String          @default("PENDING") // PENDING, QUEUED, PROCESSING, COMPLETED, FAILED, CANCELLED, RETRYING
+
+  // Connection info
+  ehrProvider       String
+  ehrConnectionId   String
+  userId            String
+
+  // Resource info
+  patientId         String?
+  resourceType      String?
+  resourceIds       String[]        @default([])
+
+  // Configuration
+  filters           Json?
+  options           Json?
+  metadata          Json?
+
+  // Execution tracking
+  startTime         DateTime?
+  endTime           DateTime?
+  duration          Int?            // milliseconds
+  retryCount        Int             @default(0)
+
+  // Results
+  recordsProcessed  Int             @default(0)
+  recordsSucceeded  Int             @default(0)
+  recordsFailed     Int             @default(0)
+  recordsSkipped    Int             @default(0)
+  summary           Json?
+
+  // Timestamps
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // Relations
+  errors            SyncError[]
+  conflicts         SyncConflict[]
+
+  @@index([ehrConnectionId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([userId])
+  @@map("sync_jobs")
+}
+
+model SyncError {
+  id                String          @id @default(cuid())
+  syncJobId         String
+  syncJob           SyncJob         @relation(fields: [syncJobId], references: [id], onDelete: Cascade)
+
+  severity          String          // CRITICAL, ERROR, WARNING
+  code              String
+  message           String          @db.Text
+  resourceType      String?
+  resourceId        String?
+  stackTrace        String?         @db.Text
+  context           Json?
+
+  timestamp         DateTime        @default(now())
+
+  @@index([syncJobId])
+  @@index([severity])
+  @@map("sync_errors")
+}
+
+model SyncConflict {
+  id                String          @id @default(cuid())
+  syncJobId         String?
+  syncJob           SyncJob?        @relation(fields: [syncJobId], references: [id], onDelete: SetNull)
+
+  type              String          // UPDATE_UPDATE, UPDATE_DELETE, DELETE_UPDATE, CREATE_CREATE, FIELD_MISMATCH
+  severity          String          // CRITICAL, HIGH, MEDIUM, LOW
+  status            String          @default("DETECTED") // DETECTED, PENDING_REVIEW, RESOLVED, IGNORED
+
+  resourceType      String
+  resourceId        String
+  field             String
+
+  localValue        Json?
+  remoteValue       Json?
+  localTimestamp    DateTime
+  remoteTimestamp   DateTime
+  localVersion      String?
+  remoteVersion     String?
+
+  resolution        Json?           // Contains strategy, resolvedValue, resolvedBy, resolvedAt, reason
+
+  detectedAt        DateTime        @default(now())
+  detectedBy        String
+  metadata          Json?
+
+  @@index([syncJobId])
+  @@index([status])
+  @@index([resourceType, resourceId])
+  @@map("sync_conflicts")
+}
+
+model WebhookConfig {
+  id                String          @id @default(cuid())
+  ehrProvider       String
+  ehrConnectionId   String
+  endpoint          String
+  secret            String
+  enabled           Boolean         @default(true)
+
+  events            String[]        @default([])
+  retryAttempts     Int             @default(3)
+  retryDelay        Int             @default(2000) // milliseconds
+  timeout           Int             @default(30000) // milliseconds
+
+  signatureHeader   String?
+  signatureAlgorithm String?        // sha256, sha512
+  customHeaders     Json?
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([ehrProvider, ehrConnectionId])
+  @@map("webhook_configs")
+}
+
+model WebhookLog {
+  id                String          @id @default(cuid())
+  ehrProvider       String
+  ehrConnectionId   String
+
+  payload           Json
+  status            String          @default("RECEIVED") // RECEIVED, VALIDATED, PROCESSING, COMPLETED, FAILED, RETRYING, IGNORED
+
+  syncJobId         String?
+  errors            String[]        @default([])
+  warnings          String[]        @default([])
+
+  receivedAt        DateTime        @default(now())
+  processedAt       DateTime?
+
+  @@index([ehrProvider, ehrConnectionId])
+  @@index([status])
+  @@index([receivedAt])
+  @@map("webhook_logs")
+}
+
+model TransformationRule {
+  id                String          @id @default(cuid())
+  name              String
+  type              String          // FIELD_MAPPING, VALUE_MAPPING, DATA_TYPE_CONVERSION, etc.
+
+  ehrProvider       String
+  resourceType      String
+  direction         String          // INBOUND, OUTBOUND
+
+  sourceFormat      String          // FHIR_R4, FHIR_STU3, HL7_V2, CUSTOM_JSON, etc.
+  targetFormat      String
+
+  sourceField       String
+  targetField       String
+
+  mapping           Json?
+  function          String?         @db.Text
+  condition         String?         @db.Text
+
+  priority          Int             @default(100)
+  enabled           Boolean         @default(true)
+  metadata          Json?
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([ehrProvider, resourceType, direction])
+  @@map("transformation_rules")
+}
+
+model FieldMapping {
+  id                String          @id @default(cuid())
+  ehrProvider       String
+  resourceType      String
+
+  sourceField       String
+  targetField       String
+  required          Boolean         @default(false)
+  defaultValue      Json?
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([ehrProvider, resourceType])
+  @@map("field_mappings")
+}
+
+model SyncStatistics {
+  id                String          @id @default(cuid())
+  ehrConnectionId   String
+  date              DateTime        @db.Date
+
+  totalJobs         Int             @default(0)
+  completedJobs     Int             @default(0)
+  failedJobs        Int             @default(0)
+
+  recordsProcessed  Int             @default(0)
+  recordsSucceeded  Int             @default(0)
+  recordsFailed     Int             @default(0)
+
+  averageDuration   Int             @default(0) // milliseconds
+  totalDuration     Int             @default(0) // milliseconds
+
+  bytesTransferred  BigInt          @default(0)
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([ehrConnectionId, date])
+  @@index([date])
+  @@map("sync_statistics")
+}
