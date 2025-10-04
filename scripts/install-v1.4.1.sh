@@ -46,8 +46,10 @@ if [ "$EUID" -eq 0 ]; then
     print_warning "Running as root. Consider using a non-root user for security."
 fi
 
-# Check prerequisites
-print_status "Checking prerequisites..."
+echo "=================================================="
+echo "Phase 1: Checking Prerequisites"
+echo "=================================================="
+echo ""
 
 # Check Node.js
 if ! command -v node &> /dev/null; then
@@ -85,6 +87,10 @@ fi
 print_success "git detected"
 
 echo ""
+echo "=================================================="
+echo "Phase 2: Repository Setup"
+echo "=================================================="
+echo ""
 
 # Installation directory
 INSTALL_DIR="${INSTALL_DIR:-holovitals-v${VERSION}}"
@@ -104,16 +110,22 @@ git clone --branch main --depth 1 https://github.com/cloudbyday90/HoloVitals.git
 cd "$INSTALL_DIR"
 
 print_success "Repository cloned"
-echo ""
 
-# Install dependencies
+echo ""
+echo "=================================================="
+echo "Phase 3: Installing Dependencies"
+echo "=================================================="
+echo ""
 print_status "Installing dependencies (this may take a few minutes)..."
 npm install --legacy-peer-deps
 
 print_success "Dependencies installed"
-echo ""
 
-# Setup environment file
+echo ""
+echo "=================================================="
+echo "Phase 4: Environment Configuration"
+echo "=================================================="
+echo ""
 if [ ! -f .env ]; then
     print_status "Creating .env file..."
     
@@ -129,15 +141,20 @@ else
 fi
 
 echo ""
-
-# Generate Prisma Client
+echo "=================================================="
+echo "Phase 5: Generating Prisma Client"
+echo "=================================================="
+echo ""
 print_status "Generating Prisma client..."
 npx prisma generate
 
 print_success "Prisma client generated"
-echo ""
 
-# Database setup
+echo ""
+echo "=================================================="
+echo "Phase 6: Next Steps & Instructions"
+echo "=================================================="
+echo ""
 print_status "Database setup instructions..."
 echo ""
 echo "To complete the installation, run the following commands:"
