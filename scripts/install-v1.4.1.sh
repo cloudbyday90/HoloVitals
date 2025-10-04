@@ -111,8 +111,8 @@ main() {
     echo ""
     print_success "All system requirements met!"
     echo ""
-    echo -e "${YELLOW}Press Enter to continue to Phase 2...${NC}"
-    read -r
+    echo -e "${YELLOW}⏳ Proceeding to Phase 2 in 3 seconds...${NC}"
+    sleep 3
     
     # Phase 2: Clone repository
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -130,8 +130,8 @@ main() {
     cd "$INSTALL_DIR"
     print_success "Repository cloned successfully"
     echo ""
-    echo -e "${YELLOW}Press Enter to continue to Phase 3...${NC}"
-    read -r
+    echo -e "${YELLOW}⏳ Proceeding to Phase 3 in 2 seconds...${NC}"
+    sleep 2
     
     # Phase 3: Install dependencies
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -143,8 +143,8 @@ main() {
     npm install --silent 2>&1 | grep -E "(added|removed|changed|audited)" || true
     print_success "Dependencies installed successfully"
     echo ""
-    echo -e "${YELLOW}Press Enter to continue to Phase 4...${NC}"
-    read -r
+    echo -e "${YELLOW}⏳ Proceeding to Phase 4 in 2 seconds...${NC}"
+    sleep 2
     
     # Phase 4: Set up environment
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -166,8 +166,8 @@ main() {
         print_info ".env file already exists"
     fi
     echo ""
-    echo -e "${YELLOW}Press Enter to continue to Phase 5...${NC}"
-    read -r
+    echo -e "${YELLOW}⏳ Proceeding to Phase 5 in 2 seconds...${NC}"
+    sleep 2
     
     # Phase 5: Generate Prisma client
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -179,8 +179,8 @@ main() {
     npx prisma generate 2>&1 | grep -E "(Generated|Prisma Client)" || true
     print_success "Prisma client generated successfully"
     echo ""
-    echo -e "${YELLOW}Press Enter to continue to Phase 6...${NC}"
-    read -r
+    echo -e "${YELLOW}⏳ Proceeding to Phase 6 in 2 seconds...${NC}"
+    sleep 2
     
     # Phase 6: Database setup instructions
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -237,6 +237,9 @@ main() {
     echo "  - Issues: https://github.com/cloudbyday90/HoloVitals/issues"
     echo ""
     print_success "Happy coding! 🚀"
+    echo ""
+    echo -e "${BLUE}Installation script will exit in 5 seconds...${NC}"
+    sleep 5
 }
 
 # Run main function
