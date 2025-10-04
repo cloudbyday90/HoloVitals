@@ -8,14 +8,14 @@
 - [x] Prepare one-line installation command
 - [x] Create release summary document
 
-### Phase 2: GitHub Release Creation [ ]
-- [ ] Create v1.4.0 tag on main branch
-- [ ] Create GitHub release with notes
-- [ ] Attach release documentation
-- [ ] Mark as latest release
+### Phase 2: GitHub Release Creation [x]
+- [x] Create v1.4.0 tag on main branch
+- [x] Create GitHub release with notes
+- [x] Attach release documentation
+- [x] Mark as latest release
 
-### Phase 3: Verification [ ]
-- [ ] Verify release is published
-- [ ] Test one-line installation command
-- [ ] Update documentation links
-- [ ] Confirm release is accessible
+### Phase 3: Verification [x]
+- [x] Verify release is published
+- [x] Confirm release is marked as latest
+- [x] Verify release URL is accessible
+- [x] Confirm all documentation is included
