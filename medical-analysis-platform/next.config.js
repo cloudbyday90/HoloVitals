@@ -33,9 +33,7 @@ const nextConfig = {
     return config;
   },
   // Ensure API routes are server-side only
-  experimental: {
-    serverComponentsExternalPackages: ['bull', 'bullmq', 'ioredis', 'tiktoken'],
-  },
+  serverExternalPackages: ['bull', 'bullmq', 'ioredis', 'tiktoken'],
 };
 
 module.exports = nextConfig;
