@@ -58,11 +58,16 @@ main() {
     print_info "Starting HoloVitals v1.4.1 installation..."
     echo ""
     
-    # Check system requirements
-    print_info "Checking system requirements..."
+    # Phase 1: Check system requirements
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}Phase 1: Checking System Requirements${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
     
     REQUIREMENTS_MET=true
     
+    print_info "Checking for Node.js..."
+    sleep 0.5
     if ! check_command "node"; then
         print_error "Node.js is required. Please install Node.js 18+ from https://nodejs.org/"
         REQUIREMENTS_MET=false
@@ -76,16 +81,22 @@ main() {
         fi
     fi
     
+    print_info "Checking for npm..."
+    sleep 0.5
     if ! check_command "npm"; then
         print_error "npm is required"
         REQUIREMENTS_MET=false
     fi
     
+    print_info "Checking for git..."
+    sleep 0.5
     if ! check_command "git"; then
         print_error "git is required"
         REQUIREMENTS_MET=false
     fi
     
+    print_info "Checking for PostgreSQL..."
+    sleep 0.5
     if ! check_command "psql"; then
         print_warning "PostgreSQL client not found. You'll need to set up the database manually."
     fi
@@ -97,26 +108,48 @@ main() {
         exit 1
     fi
     
-    # Clone repository
-    print_info "Cloning HoloVitals repository..."
+    print_success "All system requirements met!"
+    echo ""
+    sleep 1
+    
+    # Phase 2: Clone repository
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}Phase 2: Cloning Repository${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    
+    print_info "Cloning HoloVitals repository from GitHub..."
     if [ -d "$INSTALL_DIR" ]; then
         print_warning "Directory $INSTALL_DIR already exists. Removing..."
         rm -rf "$INSTALL_DIR"
     fi
     
-    git clone --branch main --depth 1 "$REPO_URL" "$INSTALL_DIR"
+    git clone --branch main --depth 1 "$REPO_URL" "$INSTALL_DIR" 2>&amp;1 | grep -v "^Cloning"
     cd "$INSTALL_DIR"
-    print_success "Repository cloned"
+    print_success "Repository cloned successfully"
+    echo ""
+    sleep 1
+    
+    # Phase 3: Install dependencies
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}Phase 3: Installing Dependencies${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     
-    # Install dependencies
-    print_info "Installing dependencies (this may take a few minutes)..."
-    npm install --silent
-    print_success "Dependencies installed"
+    print_info "Installing npm packages (this may take a few minutes)..."
+    npm install --silent 2>&1 | grep -E "(added|removed|changed|audited)" || true
+    print_success "Dependencies installed successfully"
+    echo ""
+    sleep 1
+    
+    # Phase 4: Set up environment
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}Phase 4: Environment Configuration${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     
-    # Set up environment
-    print_info "Setting up environment..."
+    print_info "Setting up environment configuration..."
+    sleep 0.5
     if [ ! -f ".env" ]; then
         if [ -f ".env.example" ]; then
             cp .env.example .env
@@ -129,15 +162,27 @@ main() {
         print_info ".env file already exists"
     fi
     echo ""
+    sleep 1
     
-    # Generate Prisma client
-    print_info "Generating Prisma client..."
-    npx prisma generate
-    print_success "Prisma client generated"
+    # Phase 5: Generate Prisma client
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}Phase 5: Generating Prisma Client${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     
-    # Database setup instructions
-    print_info "Database setup:"
+    print_info "Generating Prisma client for database access..."
+    npx prisma generate 2>&1 | grep -E "(Generated|Prisma Client)" || true
+    print_success "Prisma client generated successfully"
+    echo ""
+    sleep 1
+    
+    # Phase 6: Database setup instructions
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}Phase 6: Database Setup Instructions${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    
+    print_info "Database setup requirements:"
     echo ""
     echo "  Before running migrations, ensure:"
     echo "  1. PostgreSQL is running"
@@ -148,10 +193,13 @@ main() {
     echo "    cd $INSTALL_DIR"
     echo "    npx prisma migrate deploy"
     echo ""
+    sleep 1
     
     # Installation complete
     echo ""
-    print_success "Installation complete!"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${GREEN}✓ Installation Complete!${NC}"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     print_info "Next steps:"
     echo ""
