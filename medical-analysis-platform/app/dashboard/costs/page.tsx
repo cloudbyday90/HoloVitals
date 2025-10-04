@@ -114,7 +114,7 @@ export default function CostsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold mb-2">Cost Dashboard</h1>
-          <p className="text-gray-600">Track and optimize your platform costs</p>
+          <p className="text-gray-800">Track and optimize your platform costs</p>
         </div>
         <div className="flex gap-2">
           <Select value={timeRange} onValueChange={setTimeRange}>
@@ -138,10 +138,10 @@ export default function CostsPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Today
             </CardTitle>
-            <DollarSign className="w-4 h-4 text-gray-500" />
+            <DollarSign className="w-4 h-4 text-gray-700" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${stats.today.toFixed(2)}</div>
@@ -157,21 +157,21 @@ export default function CostsPage() {
                   <span className="text-green-600">{percentChange.toFixed(1)}%</span>
                 </>
               )}
-              <span className="text-gray-500">vs yesterday</span>
+              <span className="text-gray-700">vs yesterday</span>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               This Week
             </CardTitle>
-            <Calendar className="w-4 h-4 text-gray-500" />
+            <Calendar className="w-4 h-4 text-gray-700" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${stats.week.toFixed(2)}</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-700 mt-1">
               Avg ${(stats.week / 7).toFixed(2)}/day
             </p>
           </CardContent>
@@ -179,14 +179,14 @@ export default function CostsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               This Month (Est.)
             </CardTitle>
-            <TrendingUp className="w-4 h-4 text-gray-500" />
+            <TrendingUp className="w-4 h-4 text-gray-700" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${stats.month.toFixed(2)}</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-700 mt-1">
               Projected
             </p>
           </CardContent>
@@ -245,7 +245,7 @@ export default function CostsPage() {
                       title={`Instances: $${data.instances.toFixed(2)}`}
                     />
                   </div>
-                  <div className="text-xs text-gray-600 text-center">
+                  <div className="text-xs text-gray-800 text-center">
                     {new Date(data.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </div>
                   <div className="text-xs font-medium">
@@ -259,19 +259,19 @@ export default function CostsPage() {
             <div className="flex flex-wrap gap-4 justify-center pt-4 border-t">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-blue-500 rounded" />
-                <span className="text-sm text-gray-600">Chatbot</span>
+                <span className="text-sm text-gray-800">Chatbot</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-purple-500 rounded" />
-                <span className="text-sm text-gray-600">Optimizer</span>
+                <span className="text-sm text-gray-800">Optimizer</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-green-500 rounded" />
-                <span className="text-sm text-gray-600">Queue</span>
+                <span className="text-sm text-gray-800">Queue</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-orange-500 rounded" />
-                <span className="text-sm text-gray-600">Instances</span>
+                <span className="text-sm text-gray-800">Instances</span>
               </div>
             </div>
           </div>
@@ -298,7 +298,7 @@ export default function CostsPage() {
                       </div>
                       <div>
                         <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-700">
                           {item.percentage.toFixed(1)}% of total
                         </p>
                       </div>

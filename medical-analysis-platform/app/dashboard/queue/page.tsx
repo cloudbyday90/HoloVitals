@@ -168,9 +168,9 @@ export default function QueuePage() {
       case 'FAILED':
         return <XCircle className="w-5 h-5 text-red-600" />;
       case 'CANCELLED':
-        return <XCircle className="w-5 h-5 text-gray-600" />;
+        return <XCircle className="w-5 h-5 text-gray-800" />;
       default:
-        return <Clock className="w-5 h-5 text-gray-400" />;
+        return <Clock className="w-5 h-5 text-gray-600" />;
     }
   };
 
@@ -222,17 +222,17 @@ export default function QueuePage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold mb-2">Analysis Queue</h1>
-        <p className="text-gray-600">Monitor and manage your analysis tasks</p>
+        <p className="text-gray-800">Monitor and manage your analysis tasks</p>
       </div>
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Total Tasks
             </CardTitle>
-            <ListTodo className="w-4 h-4 text-gray-500" />
+            <ListTodo className="w-4 h-4 text-gray-700" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
@@ -241,7 +241,7 @@ export default function QueuePage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Pending
             </CardTitle>
             <Clock className="w-4 h-4 text-yellow-500" />
@@ -253,7 +253,7 @@ export default function QueuePage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Processing
             </CardTitle>
             <Activity className="w-4 h-4 text-blue-500" />
@@ -265,7 +265,7 @@ export default function QueuePage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Completed
             </CardTitle>
             <CheckCircle2 className="w-4 h-4 text-green-500" />
@@ -277,7 +277,7 @@ export default function QueuePage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium text-gray-800">
               Failed
             </CardTitle>
             <AlertCircle className="w-4 h-4 text-red-500" />
@@ -325,9 +325,9 @@ export default function QueuePage() {
         {filteredTasks.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <ListTodo className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <ListTodo className="w-16 h-16 text-gray-600 mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">No tasks found</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-800">
                 {filter !== 'all' ? 'Try changing the filter' : 'No tasks in the queue'}
               </p>
             </CardContent>
@@ -348,8 +348,8 @@ export default function QueuePage() {
                             {task.priority}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600 mb-2">{task.description}</p>
-                        <div className="flex flex-wrap gap-3 text-xs text-gray-500">
+                        <p className="text-sm text-gray-800 mb-2">{task.description}</p>
+                        <div className="flex flex-wrap gap-3 text-xs text-gray-700">
                           <span>Created: {task.createdAt.toLocaleString()}</span>
                           {task.startedAt && (
                             <span>Started: {task.startedAt.toLocaleString()}</span>
@@ -374,12 +374,12 @@ export default function QueuePage() {
                   {['PENDING', 'PROCESSING'].includes(task.status) && (
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Progress</span>
+                        <span className="text-gray-800">Progress</span>
                         <span className="font-medium">{task.progress}%</span>
                       </div>
                       <Progress value={task.progress} className="h-2" />
                       {task.estimatedDuration && (
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-700">
                           Estimated time: {Math.ceil(task.estimatedDuration / 60)} minutes
                         </p>
                       )}
@@ -404,7 +404,7 @@ export default function QueuePage() {
 
                   {/* Duration Info */}
                   {task.actualDuration && (
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-4 text-sm text-gray-800">
                       <span className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
                         Duration: {Math.ceil(task.actualDuration / 60)} minutes

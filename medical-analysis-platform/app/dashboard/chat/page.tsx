@@ -195,15 +195,15 @@ export default function ChatPage() {
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-600">Messages:</span>
+              <span className="text-gray-800">Messages:</span>
               <span className="font-medium">{messages.length}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Tokens:</span>
+              <span className="text-gray-800">Tokens:</span>
               <span className="font-medium">{totalTokens.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Cost:</span>
+              <span className="text-gray-800">Cost:</span>
               <span className="font-medium">${totalCost.toFixed(4)}</span>
             </div>
           </CardContent>
@@ -229,10 +229,10 @@ export default function ChatPage() {
                       <h4 className="font-medium text-sm truncate mb-1">
                         {conv.title}
                       </h4>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-700">
                         {conv.messageCount} messages
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-gray-600">
                         {conv.lastMessage.toLocaleDateString()}
                       </p>
                     </div>
@@ -266,7 +266,7 @@ export default function ChatPage() {
               </div>
               <div>
                 <CardTitle>AI Medical Assistant</CardTitle>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-700">
                   Powered by {selectedModel === 'gpt-4' ? 'GPT-4' : selectedModel === 'claude-3.5-sonnet' ? 'Claude 3.5' : 'Llama 3.2'}
                 </p>
               </div>
@@ -323,7 +323,7 @@ export default function ChatPage() {
 
               {message.role === 'user' && (
                 <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-5 h-5 text-gray-600" />
+                  <User className="w-5 h-5 text-gray-800" />
                 </div>
               )}
             </div>
@@ -365,7 +365,7 @@ export default function ChatPage() {
               )}
             </Button>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-700 mt-2">
             Press Enter to send • Using {selectedModel === 'gpt-4' ? 'GPT-4' : selectedModel === 'claude-3.5-sonnet' ? 'Claude 3.5 Sonnet' : 'Llama 3.2 90B'}
           </p>
         </div>

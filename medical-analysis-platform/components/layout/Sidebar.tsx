@@ -6,30 +6,30 @@ import {
   Home, 
   FileText, 
   MessageSquare, 
-  ListTodo, 
-  Server, 
-  DollarSign, 
   Settings,
   ChevronLeft,
-  ChevronRight,
-  Zap,
-  Lock
+  Sparkles,
+  Activity,
+  Heart,
+  User,
+  RefreshCw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { OwnerOnly, AdminOnly } from '@/components/ui/RoleGuard';
 
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
 }
 
+// Consumer-focused navigation - NO admin items visible by default
 const navigation = [
-  { name: 'Overview', href: '/dashboard', icon: Home, public: true },
-  { name: 'Documents', href: '/dashboard/documents', icon: FileText, public: true },
-  { name: 'AI Chat', href: '/dashboard/chat', icon: MessageSquare, public: true },
-  { name: 'Queue', href: '/dashboard/queue', icon: ListTodo, adminOnly: true },
-  { name: 'Instances', href: '/dashboard/instances', icon: Server, adminOnly: true },
-  { name: 'Costs', href: '/dashboard/costs', icon: DollarSign, ownerOnly: true },
+  { name: 'Overview', href: '/dashboard', icon: Home },
+  { name: 'Documents', href: '/dashboard/documents', icon: FileText },
+  { name: 'AI Chat', href: '/dashboard/chat', icon: MessageSquare },
+  { name: 'AI Insights', href: '/ai-insights', icon: Sparkles },
+  { name: 'My Health Data', href: '/clinical', icon: Activity },
+  { name: 'Health Score', href: '/health-score', icon: Heart },
+  { name: 'EHR Sync', href: '/sync', icon: RefreshCw },
 ];
 
 export function Sidebar({ isOpen, onToggle }: SidebarProps) {
@@ -59,7 +59,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white" />
+              <Heart className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900">HoloVitals</span>
           </div>
@@ -77,68 +77,21 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
             const isActive = pathname === item.href;
             const Icon = item.icon;
 
-            // Render public items
-            if (item.public) {
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-blue-50 text-blue-600'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                  )}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{item.name}</span>
-                </Link>
-              );
-            }
-
-            // Render owner-only items
-            if (item.ownerOnly) {
-              return (
-                <OwnerOnly key={item.name}>
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                      isActive
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                    )}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span className="flex-1">{item.name}</span>
-                    <Lock className="w-3 h-3 text-gray-400" />
-                  </Link>
-                </OwnerOnly>
-              );
-            }
-
-            // Render admin-only items
-            if (item.adminOnly) {
-              return (
-                <AdminOnly key={item.name}>
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                      isActive
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                    )}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span className="flex-1">{item.name}</span>
-                    <Lock className="w-3 h-3 text-gray-400" />
-                  </Link>
-                </AdminOnly>
-              );
-            }
-
-            return null;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={cn(
+                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                )}
+              >
+                <Icon className="w-5 h-5" />
+                <span>{item.name}</span>
+              </Link>
+            );
           })}
         </nav>
 
@@ -156,3 +109,5 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
     </>
   );
 }
+
+export default Sidebar;

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Brain, TrendingUp, Shield, Zap, Database } from 'lucide-react';
+import { Heart, Users, Activity, Shield, Zap, Database, ArrowRight } from 'lucide-react';
 
 export default function HomePage() {
   return (
@@ -10,20 +10,20 @@ export default function HomePage() {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center max-w-4xl mx-auto mb-16">
           <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Medical Document Analysis Platform
+            HoloVitals
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
-            Advanced AI-powered analysis of your medical documents with intelligent context management and cross-referencing capabilities
+          <p className="text-xl text-gray-800 mb-8">
+            Your Personal Health AI Assistant - Comprehensive EHR integration, AI-powered health insights, and intelligent patient care management
           </p>
           <div className="flex gap-4 justify-center">
             <Link href="/dashboard">
-              <Button size="lg" className="text-lg px-8">
+              <Button size="lg" className="text-lg px-8 bg-blue-600 hover:bg-blue-700">
                 Get Started
-                <Zap className="ml-2 w-5 h-5" />
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
             <Link href="/about">
-              <Button size="lg" variant="outline" className="text-lg px-8">
+              <Button size="lg" variant="outline" className="text-lg px-8 border-blue-600 text-blue-600 hover:bg-blue-50">
                 Learn More
               </Button>
             </Link>
@@ -32,127 +32,115 @@ export default function HomePage() {
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-shadow bg-white border-gray-200">
             <CardHeader>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <FileText className="w-6 h-6 text-blue-600" />
+                <Users className="w-6 h-6 text-blue-600" />
               </div>
-              <CardTitle>OCR Document Processing</CardTitle>
-              <CardDescription>
-                Extract and analyze text from PDFs, bloodwork panels, imaging reports, and more
+              <CardTitle className="text-gray-900">Patient Management</CardTitle>
+              <CardDescription className="text-gray-600">
+                Comprehensive patient records with EHR integration across 7 major providers
               </CardDescription>
             </CardHeader>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-shadow bg-white border-gray-200">
             <CardHeader>
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <Brain className="w-6 h-6 text-purple-600" />
+                <Activity className="w-6 h-6 text-purple-600" />
               </div>
-              <CardTitle>AI-Powered Analysis</CardTitle>
-              <CardDescription>
-                Get intelligent insights and answers about your medical documents using advanced AI
+              <CardTitle className="text-gray-900">AI Health Insights</CardTitle>
+              <CardDescription className="text-gray-600">
+                Advanced AI analysis for risk assessment, trend detection, and personalized recommendations
               </CardDescription>
             </CardHeader>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-shadow bg-white border-gray-200">
             <CardHeader>
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <TrendingUp className="w-6 h-6 text-green-600" />
+                <Heart className="w-6 h-6 text-green-600" />
               </div>
-              <CardTitle>Trend Analysis</CardTitle>
-              <CardDescription>
-                Track changes in your health metrics over time with comprehensive trend analysis
+              <CardTitle className="text-gray-900">Clinical Data Viewer</CardTitle>
+              <CardDescription className="text-gray-600">
+                View lab results, medications, allergies, conditions, and health timeline in one place
               </CardDescription>
             </CardHeader>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-shadow bg-white border-gray-200">
             <CardHeader>
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
                 <Database className="w-6 h-6 text-orange-600" />
               </div>
-              <CardTitle>Context Management</CardTitle>
-              <CardDescription>
-                Maintain comprehensive context across all your documents for accurate analysis
+              <CardTitle className="text-gray-900">EHR Integration</CardTitle>
+              <CardDescription className="text-gray-600">
+                Seamless integration with Epic, Cerner, MEDITECH, Allscripts, NextGen, athenahealth, and eClinicalWorks
               </CardDescription>
             </CardHeader>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-shadow bg-white border-gray-200">
             <CardHeader>
               <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-red-600" />
               </div>
-              <CardTitle>Secure & Private</CardTitle>
-              <CardDescription>
-                Your medical data is encrypted and stored securely with HIPAA-compliant practices
+              <CardTitle className="text-gray-900">HIPAA Compliant</CardTitle>
+              <CardDescription className="text-gray-600">
+                Enterprise-grade security with comprehensive audit logging and access control
               </CardDescription>
             </CardHeader>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-shadow bg-white border-gray-200">
             <CardHeader>
-              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6 text-indigo-600" />
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
+                <Zap className="w-6 h-6 text-yellow-600" />
               </div>
-              <CardTitle>Cross-Referencing</CardTitle>
-              <CardDescription>
-                Automatically link related documents and compare results across different tests
+              <CardTitle className="text-gray-900">Real-time Sync</CardTitle>
+              <CardDescription className="text-gray-600">
+                Bidirectional data synchronization with conflict resolution and webhook support
               </CardDescription>
             </CardHeader>
           </Card>
         </div>
 
-        {/* How It Works Section */}
+        {/* How It Works */}
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">How It Works</h2>
           <div className="space-y-8">
             <div className="flex gap-6 items-start">
-              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-xl font-bold">
+              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
                 1
               </div>
               <div>
-                <h3 className="text-xl font-semibold mb-2">Upload Your Documents</h3>
-                <p className="text-gray-600">
-                  Upload medical documents including bloodwork results, imaging reports, after-care summaries, and prescriptions in PDF or image format.
+                <h3 className="text-xl font-semibold mb-2 text-gray-900">Connect Your EHR</h3>
+                <p className="text-gray-700">
+                  Securely connect to your healthcare provider's EHR system. We support the top 7 EHR platforms covering 75%+ of U.S. hospitals.
                 </p>
               </div>
             </div>
 
             <div className="flex gap-6 items-start">
-              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-xl font-bold">
+              <div className="w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
                 2
               </div>
               <div>
-                <h3 className="text-xl font-semibold mb-2">Automatic Processing</h3>
-                <p className="text-gray-600">
-                  Our advanced OCR technology extracts text and structured data from your documents, identifying key information like test results, dates, and values.
+                <h3 className="text-xl font-semibold mb-2 text-gray-900">Sync Your Health Data</h3>
+                <p className="text-gray-700">
+                  Your medical records, lab results, medications, and health history are automatically synchronized and kept up-to-date.
                 </p>
               </div>
             </div>
 
             <div className="flex gap-6 items-start">
-              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-xl font-bold">
+              <div className="w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
                 3
               </div>
               <div>
-                <h3 className="text-xl font-semibold mb-2">AI Analysis</h3>
-                <p className="text-gray-600">
-                  Ask questions about your documents and get intelligent answers. Our AI cross-references related documents and maintains context for accurate analysis.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-6 items-start">
-              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-xl font-bold">
-                4
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Track Trends</h3>
-                <p className="text-gray-600">
-                  View trends over time, compare results, and get insights about changes in your health metrics with comprehensive visualizations.
+                <h3 className="text-xl font-semibold mb-2 text-gray-900">Get AI-Powered Insights</h3>
+                <p className="text-gray-700">
+                  Our advanced AI analyzes your health data to provide personalized insights, risk assessments, and actionable recommendations.
                 </p>
               </div>
             </div>
@@ -160,30 +148,21 @@ export default function HomePage() {
         </div>
 
         {/* CTA Section */}
-        <div className="mt-16 text-center bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-white">
-          <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-xl mb-8 opacity-90">
-            Take control of your medical data with intelligent analysis
+        <div className="mt-16 text-center bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Ready to take control of your health?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8">
+            Join thousands of users who trust HoloVitals for their health management
           </p>
           <Link href="/dashboard">
             <Button size="lg" variant="secondary" className="text-lg px-8">
-              Start Analyzing Now
+              Start Your Journey
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </Link>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="border-t mt-16 py-8">
-        <div className="container mx-auto px-4 text-center text-gray-600">
-          <p className="mb-2">
-            <strong>Medical Disclaimer:</strong> This platform is for informational purposes only and should not replace professional medical advice, diagnosis, or treatment.
-          </p>
-          <p className="text-sm">
-            © 2025 Medical Analysis Platform. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }

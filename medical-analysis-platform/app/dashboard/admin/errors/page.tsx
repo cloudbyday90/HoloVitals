@@ -128,7 +128,7 @@ export default function ErrorMonitoringPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Error Monitoring</h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-800 mt-1">
               Monitor system errors and health metrics
             </p>
           </div>
@@ -166,10 +166,10 @@ export default function ErrorMonitoringPage() {
             {/* Total Errors */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
+                <CardTitle className="text-sm font-medium text-gray-800">
                   Total Errors
                 </CardTitle>
-                <AlertTriangle className="w-4 h-4 text-gray-400" />
+                <AlertTriangle className="w-4 h-4 text-gray-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.total.toLocaleString()}</div>
@@ -193,7 +193,7 @@ export default function ErrorMonitoringPage() {
             {/* Critical Errors */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
+                <CardTitle className="text-sm font-medium text-gray-800">
                   Critical Errors
                 </CardTitle>
                 <AlertCircle className="w-4 h-4 text-red-500" />
@@ -202,7 +202,7 @@ export default function ErrorMonitoringPage() {
                 <div className="text-2xl font-bold text-red-600">
                   {stats.bySeverity.CRITICAL.toLocaleString()}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-700 mt-2">
                   Requires immediate attention
                 </p>
               </CardContent>
@@ -211,7 +211,7 @@ export default function ErrorMonitoringPage() {
             {/* High Severity */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
+                <CardTitle className="text-sm font-medium text-gray-800">
                   High Severity
                 </CardTitle>
                 <AlertTriangle className="w-4 h-4 text-orange-500" />
@@ -220,7 +220,7 @@ export default function ErrorMonitoringPage() {
                 <div className="text-2xl font-bold text-orange-600">
                   {stats.bySeverity.HIGH.toLocaleString()}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-700 mt-2">
                   Security and authorization issues
                 </p>
               </CardContent>
@@ -229,7 +229,7 @@ export default function ErrorMonitoringPage() {
             {/* Medium/Low Errors */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
+                <CardTitle className="text-sm font-medium text-gray-800">
                   Medium/Low
                 </CardTitle>
                 <Info className="w-4 h-4 text-yellow-500" />
@@ -238,7 +238,7 @@ export default function ErrorMonitoringPage() {
                 <div className="text-2xl font-bold text-yellow-600">
                   {(stats.bySeverity.MEDIUM + stats.bySeverity.LOW).toLocaleString()}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-700 mt-2">
                   Expected errors and validation issues
                 </p>
               </CardContent>
@@ -271,7 +271,7 @@ export default function ErrorMonitoringPage() {
                               }}
                             />
                           </div>
-                          <span className="text-sm text-gray-600 w-12 text-right">
+                          <span className="text-sm text-gray-800 w-12 text-right">
                             {count}
                           </span>
                         </div>
@@ -305,7 +305,7 @@ export default function ErrorMonitoringPage() {
                               }}
                             />
                           </div>
-                          <span className="text-sm text-gray-600 w-12 text-right">
+                          <span className="text-sm text-gray-800 w-12 text-right">
                             {count}
                           </span>
                         </div>
@@ -325,7 +325,7 @@ export default function ErrorMonitoringPage() {
               <div className="flex items-center gap-3">
                 {/* Search */}
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600" />
                   <input
                     type="text"
                     placeholder="Search errors..."
@@ -386,10 +386,10 @@ export default function ErrorMonitoringPage() {
                           {error.code || 'N/A'}
                         </code>
                       </td>
-                      <td className="py-3 px-4 text-sm text-gray-600 max-w-xs truncate">
+                      <td className="py-3 px-4 text-sm text-gray-800 max-w-xs truncate">
                         {error.endpoint || 'N/A'}
                       </td>
-                      <td className="py-3 px-4 text-sm text-gray-600">
+                      <td className="py-3 px-4 text-sm text-gray-800">
                         {new Date(error.timestamp).toLocaleString()}
                       </td>
                     </tr>
@@ -400,8 +400,8 @@ export default function ErrorMonitoringPage() {
               {filteredErrors.length === 0 && (
                 <div className="text-center py-12">
                   <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                  <p className="text-gray-600">No errors found</p>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-gray-800">No errors found</p>
+                  <p className="text-sm text-gray-700 mt-1">
                     System is running smoothly
                   </p>
                 </div>

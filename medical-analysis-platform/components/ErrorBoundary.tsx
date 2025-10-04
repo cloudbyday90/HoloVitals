@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * Error Boundary Component
  * Catches React errors and displays fallback UI
@@ -124,12 +126,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             </div>
 
             {/* Error Title */}
-            <h1 className="text-3xl font-bold text-center text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 font-bold text-center text-gray-900 mb-2">
               Oops! Something went wrong
             </h1>
 
             {/* Error Description */}
-            <p className="text-center text-gray-600 mb-8">
+            <p className="text-center text-gray-800 mb-8">
               We're sorry for the inconvenience. An unexpected error has occurred.
             </p>
 
@@ -192,7 +194,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
             {/* Help Text */}
             <div className="mt-8 text-center">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-700">
                 If this problem persists, please{' '}
                 <a
                   href="/support"
