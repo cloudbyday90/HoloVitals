@@ -9,6 +9,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { SubscriptionService } from '@/lib/services/SubscriptionService';
 import { SubscriptionTier } from '@/lib/config/pricing';
 
+
+// Force dynamic rendering for this route
+export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
