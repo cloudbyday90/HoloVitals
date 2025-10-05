@@ -252,7 +252,7 @@ NODE_ENV=${INSTALL_TYPE}
   
   # Encryption Key for Sensitive Data (GitHub PAT, Service Configs)
   ENCRYPTION_KEY="$(openssl rand -base64 32)"
-  EOF
+EOF
 
 echo -e "${GREEN}✓${NC} Environment configuration created"
 echo ""
