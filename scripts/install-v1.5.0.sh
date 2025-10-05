@@ -243,15 +243,15 @@ NODE_ENV=${INSTALL_TYPE}
 # NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key_here
 # STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret_here
 
-  # OpenAI Configuration (Managed via Admin Console)
-  # OpenAI is DISABLED by default. Enable and configure at:
-  # https://${DOMAIN_NAME}/admin/settings
-  
-  # Email/SMTP Configuration (Managed via Admin Console)
-  # SMTP is DISABLED by default. Configure via Admin Console when needed.
-  
-  # Encryption Key for Sensitive Data (GitHub PAT, Service Configs)
-  ENCRYPTION_KEY="$(openssl rand -base64 32)"
+# OpenAI Configuration (Managed via Admin Console)
+# OpenAI is DISABLED by default. Enable and configure at:
+# https://${DOMAIN_NAME}/admin/settings
+
+# Email/SMTP Configuration (Managed via Admin Console)
+# SMTP is DISABLED by default. Configure via Admin Console when needed.
+
+# Encryption Key for Sensitive Data (GitHub PAT, Service Configs)
+ENCRYPTION_KEY="$(openssl rand -base64 32)"
 EOF
 
 echo -e "${GREEN}✓${NC} Environment configuration created"
