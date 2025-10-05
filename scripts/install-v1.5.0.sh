@@ -340,10 +340,14 @@ if [ -d ".next" ]; then
         echo -e "${GREEN}✓${NC} Using existing build"
     else
         echo "Building HoloVitals application..."
+        echo "Cleaning build cache..."
+        rm -rf .next
         npm run build
     fi
 else
     echo "Building HoloVitals application..."
+    echo "Cleaning build cache..."
+    rm -rf .next
     npm run build
 fi
 
