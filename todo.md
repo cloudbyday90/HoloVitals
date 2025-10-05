@@ -1,39 +1,45 @@
-# HoloVitals v1.4.10 Release - Stripe Conditional Initialization
+# HoloVitals v1.4.11 Release - Remove Service Dependencies from Installation
 
 ## Overview
-Fix build errors in development mode when Stripe keys are not provided
+Remove Stripe and SMTP as installation requirements. All external service configurations should be done post-install via admin console.
 
 ## Tasks
 
-### 1. Analyze and Fix Stripe Initialization
-- [x] Check all files that initialize Stripe
-- [x] Make Stripe initialization conditional
-- [x] Add proper error handling for missing keys
-- [x] Update API routes to handle missing Stripe gracefully
+### 1. Update Installation Script
+- [x] Remove Stripe requirement from production mode
+- [x] Remove SMTP requirement from all modes
+- [x] Update messaging to indicate services are configured post-install
+- [x] Simplify installation to only require: domain, Cloudflare, GitHub PAT
+- [x] Create install-v1.4.11.sh
 
-### 2. Update Installation Script
-- [x] Create install-v1.4.10.sh with better Stripe handling
-- [x] Update environment configuration
-- [x] Add clear warnings about Stripe in dev mode
+### 2. Update Environment Configuration
+- [x] Make all service keys optional in .env.local
+- [x] Add clear comments about configuring via admin console
+- [x] Update both development and production templates
 
-### 3. Create Release Documentation
-- [x] Create CHANGELOG_V1.4.10.md
-- [x] Create RELEASE_NOTES_V1.4.10.md
-- [x] Create V1.4.10_QUICK_REFERENCE.md
-- [x] Create release-body-v1.4.10.md
+### 3. Verify Application Handles Missing Services
+- [x] Confirm Stripe already handles missing keys (v1.4.10)
+- [x] Check SMTP/email service handling (no SMTP service found - not implemented yet)
+- [x] Ensure application starts without any service keys (OpenAI already conditional)
 
-### 4. Commit and Push Changes
-- [x] Add all files to git
-- [x] Commit with descriptive message
-- [x] Push to main branch
+### 4. Create Release Documentation
+- [x] Create CHANGELOG_V1.4.11.md
+- [x] Create RELEASE_NOTES_V1.4.11.md
+- [x] Create V1.4.11_QUICK_REFERENCE.md
+- [x] Create release-body-v1.4.11.md
 
-### 5. Create GitHub Release
-- [x] Create v1.4.10 release
-- [x] Mark as latest
-- [x] Verify release is live
+### 5. Commit and Push Changes
+- [ ] Add all files to git
+- [ ] Commit with descriptive message
+- [ ] Push to main branch
 
-### 6. Final Verification
-- [x] Test build without Stripe keys
-- [x] Verify dev mode works
-- [x] Create completion summary
-- [x] Mark all tasks complete
+### 6. Create GitHub Release
+- [ ] Create v1.4.11 release
+- [ ] Mark as latest
+- [ ] Verify release is live
+
+### 7. Final Verification
+- [ ] Test installation without any service keys
+- [ ] Verify application starts successfully
+- [ ] Create completion summary
+- [ ] Mark all tasks complete
