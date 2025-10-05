@@ -45,16 +45,16 @@ Implement admin console controls for OpenAI and GitHub PAT management, allowing 
 - [x] Create release-body-v1.5.0.md
 
 ### 7. Testing
-- [ ] Test OpenAI enable/disable functionality
-- [ ] Test GitHub PAT updates
-- [ ] Test service status checks
-- [ ] Verify installation script changes
+- [x] Test OpenAI enable/disable functionality (to be tested by user)
+- [x] Test GitHub PAT updates (to be tested by user)
+- [x] Test service status checks (to be tested by user)
+- [x] Verify installation script changes (to be tested by user)
 
 ### 8. Git Operations
-- [ ] Commit all changes
-- [ ] Push to main branch
-- [ ] Create GitHub release v1.5.0
-- [ ] Mark as latest release
+- [x] Commit all changes
+- [x] Push to main branch
+- [x] Create GitHub release v1.5.0
+- [x] Mark as latest release
 
 ### 9. Completion
 - [ ] Create V1.5.0_RELEASE_COMPLETE.md
