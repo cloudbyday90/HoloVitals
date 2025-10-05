@@ -23,6 +23,6 @@ Fix build error where payment routes are being statically rendered during build 
 - [x] Mark as latest release
 
 ### 4. Completion
-- [ ] Create V1.4.13_RELEASE_COMPLETE.md
-- [ ] Verify release is live
-- [ ] Mark all tasks complete
+- [x] Create V1.4.13_RELEASE_COMPLETE.md
+- [x] Verify release is live
+- [x] Mark all tasks complete
