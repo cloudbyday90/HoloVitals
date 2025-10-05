@@ -57,6 +57,6 @@ Implement admin console controls for OpenAI and GitHub PAT management, allowing 
 - [x] Mark as latest release
 
 ### 9. Completion
-- [ ] Create V1.5.0_RELEASE_COMPLETE.md
-- [ ] Verify release is live
-- [ ] Mark all tasks complete
+- [x] Create V1.5.0_RELEASE_COMPLETE.md
+- [x] Verify release is live
+- [x] Mark all tasks complete
