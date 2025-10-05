@@ -15,12 +15,23 @@ initializeProvidersFromEnv();
 // Initialize dev chat service
 const devChatService = new AIDevChatService();
 
+// Mark route as dynamic to prevent static rendering
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/dev-chat
  * Send a message to the AI development assistant
  */
 export async function POST(request: NextRequest) {
   try {
+    // Check if any AI provider is configured
+    if (!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
+      return NextResponse.json(
+        { error: 'AI chat is not configured. Please set OPENAI_API_KEY or ANTHROPIC_API_KEY in your environment variables or configure via admin console.' },
+        { status: 503 }
+      );
+    }
+
     const body: DevChatRequest = await request.json();
 
     // Validate request

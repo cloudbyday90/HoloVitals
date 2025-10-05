@@ -8,10 +8,17 @@
 import OpenAI from 'openai';
 import { TOKEN_COSTS } from '@/lib/types/chatbot';
 
-// Initialize OpenAI client
-export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Check if OpenAI is configured
+export const isOpenAIConfigured = (): boolean => {
+  return !!process.env.OPENAI_API_KEY;
+};
+
+// Initialize OpenAI client only if configured
+export const openai = isOpenAIConfigured()
+  ? new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
+  : null;
 
 /**
  * Calculate cost for token usage
@@ -53,6 +60,11 @@ export async function createChatCompletion(
     stream?: boolean;
   } = {}
 ) {
+  // Check if OpenAI is configured
+  if (!openai) {
+    throw new Error('OpenAI is not configured. Please set OPENAI_API_KEY in your environment variables.');
+  }
+
   const {
     model = 'gpt-3.5-turbo',
     maxTokens = 500,
@@ -106,6 +118,11 @@ export async function* createStreamingChatCompletion(
     presencePenalty?: number;
   } = {}
 ) {
+  // Check if OpenAI is configured
+  if (!openai) {
+    throw new Error('OpenAI is not configured. Please set OPENAI_API_KEY in your environment variables.');
+  }
+
   const {
     model = 'gpt-3.5-turbo',
     maxTokens = 500,

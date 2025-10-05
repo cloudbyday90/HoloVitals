@@ -8,9 +8,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { LightweightChatbotService } from '@/lib/services/LightweightChatbotService';
 import { ChatRequest } from '@/lib/types/chatbot';
+import { isOpenAIConfigured } from '@/lib/utils/openai';
 
 // Initialize chatbot service
 const chatbotService = new LightweightChatbotService();
+
+// Mark route as dynamic to prevent static rendering
+export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/chat
@@ -18,6 +22,14 @@ const chatbotService = new LightweightChatbotService();
  */
 export async function POST(request: NextRequest) {
   try {
+    // Check if OpenAI is configured
+    if (!isOpenAIConfigured()) {
+      return NextResponse.json(
+        { error: 'AI chat is not configured. Please set OPENAI_API_KEY in your environment variables or configure via admin console.' },
+        { status: 503 }
+      );
+    }
+
     const body: ChatRequest = await request.json();
 
     // Validate request
