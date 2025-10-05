@@ -14,10 +14,12 @@ NC='\033[0m' # No Color
 
 # Version
 VERSION="1.5.0"
+SCRIPT_BUILD="20251005-fix2"
 
 echo "=================================================="
 echo "HoloVitals v${VERSION} Production Installer"
 echo "Feature Release - Admin Console Service Management"
+echo "Script Build: ${SCRIPT_BUILD}"
 echo "=================================================="
 echo ""
 echo "⚠️  Current user: $(whoami)"
