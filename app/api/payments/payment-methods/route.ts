@@ -3,6 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { StripePaymentService } from '@/lib/services/StripePaymentService';
 
+// Force dynamic rendering to prevent build-time static generation
+export const dynamic = 'force-dynamic';
+
 const paymentService = new StripePaymentService();
 
 export async function GET(req: NextRequest) {

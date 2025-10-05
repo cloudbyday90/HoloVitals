@@ -8,6 +8,9 @@ import { getServerSession } from 'next-auth';
 import StripePaymentService from '@/lib/services/StripePaymentService';
 import { CreateCheckoutSessionRequest } from '@/lib/types/payment';
 
+// Force dynamic rendering to prevent build-time static generation
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     // Check authentication

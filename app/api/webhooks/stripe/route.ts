@@ -5,6 +5,9 @@ import { stripe } from '@/lib/config/stripe';
 import { prisma } from '@/lib/prisma';
 import { AuditLoggingService } from '@/lib/services/AuditLoggingService';
 
+// Force dynamic rendering to prevent build-time static generation
+export const dynamic = 'force-dynamic';
+
 const auditService = new AuditLoggingService();
 
 // Webhook event handlers
