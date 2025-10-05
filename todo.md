@@ -17,10 +17,10 @@ Fix build error where payment routes are being statically rendered during build 
 - [x] Create release-body-v1.4.13.md
 
 ### 3. Git Operations
-- [ ] Commit all changes
-- [ ] Push to main branch
-- [ ] Create GitHub release v1.4.13
-- [ ] Mark as latest release
+- [x] Commit all changes
+- [x] Push to main branch
+- [x] Create GitHub release v1.4.13
+- [x] Mark as latest release
 
 ### 4. Completion
 - [ ] Create V1.4.13_RELEASE_COMPLETE.md
